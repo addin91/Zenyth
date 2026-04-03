@@ -2,68 +2,60 @@
 // models/Admin.php
 class Admin
 {
-    private $pdo;
+    private $jsondb;
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
+        $this->jsondb = new JsonDB("admin");
     }
 
     public function findAll()
     {
-        $stmt = $this->pdo->query("SELECT * FROM admin ORDER BY nom, prenom ASC");
-        return $stmt->fetchAll();
+        $admin = $this->jsondb->selectAll();
+        return $admin;
     }
 
     public function findById($id)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM admin WHERE id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch();
+        $admin = $this->jsondb->find($id);
+        return $admin;
     }
 
     public function findByEmail($email)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM admin WHERE email LIKE ? ORDER BY nom, prenom ASC");
-        $stmt->execute(['%' . $email . '%']);
-        return $stmt->fetchAll();
+        // TODO : adapter manuellement (necessite un LIKE %email%)
+        // SELECT * FROM admin WHERE email LIKE ? ORDER BY nom, prenom ASC
     }
 
-    public function create($nom, $prenom, $email, $mot_de_passe){
-        $sql = "INSERT INTO admin (nom, prenom, email, mot_de_passe)
-                VALUES (:nom, :prenom, :email, :mot_de_passe)";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ":nom" => $nom, 
-            ":prenom" => $prenom, 
-            ":email" => $email, 
-            ":mot_de_passe" => $mot_de_passe, 
-            ]);
-        return $this->pdo->lastInsertId();
-    }
-
-    public function update($id, $nom, $prenom, $email, $mot_de_passe){
-        $sql = "UPDATE admin SET
-                    nom       = :nom,
-                    prenom    = :prenom,
-                    email = :email,
-                    mot_de_passe     = :mot_de_passe
-                WHERE id = :id";
+    public function create($nom, $prenom, $email, $mot_de_passe)
+    {
         $data = [
-            ":id" => $id, 
-            ":nom" => $nom, 
-            ":prenom" => $prenom, 
-            ":email" => $email, 
-            ":mot_de_passe" => $mot_de_passe, 
+            'nom'          => $nom,
+            'prenom'       => $prenom,
+            'email'        => $email,
+            'mot_de_passe' => $mot_de_passe,
         ];
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute($data);
+        $admin = $this->jsondb->add($data);
+        return $admin;
+    }
+
+    public function update($id, $nom, $prenom, $email, $mot_de_passe)
+    {
+        $data = [
+            'id'           => $id,
+            'nom'          => $nom,
+            'prenom'       => $prenom,
+            'email'        => $email,
+            'mot_de_passe' => $mot_de_passe,
+        ];
+        $admin = $this->jsondb->update($id, $data);
+        return $admin;
     }
 
     public function delete($id)
     {
-        $stmt = $this->pdo->prepare("DELETE FROM admin WHERE id = ?");
-        return $stmt->execute([$id]);
+        $admin = $this->jsondb->delete($id);
+        return $admin;
     }
 
     public function getDisplayName($animateur)

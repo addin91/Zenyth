@@ -2,65 +2,54 @@
 // models/Animateur.php
 class Animateur
 {
-    private $pdo;
+    private $jsondb;
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
+        $this->jsondb = new JsonDB("animateur");
     }
 
     public function findAll()
     {
-        $stmt = $this->pdo->query("SELECT * FROM animateurs ORDER BY nom, prenom ASC");
-        return $stmt->fetchAll();
+        $animateur = $this->jsondb->selectAll();
+        return $animateur;
     }
 
     public function findById($id)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM animateurs WHERE id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch();
+        $animateur = $this->jsondb->find($id);
+        return $animateur;
     }
 
     public function findActifs()
     {
-        $stmt = $this->pdo->query("SELECT * FROM animateurs WHERE actif = TRUE ORDER BY nom, prenom ASC");
-        return $stmt->fetchAll();
+        $animateur = $this->jsondb->where('actif', true);
+        return $animateur;
     }
 
     public function findBySpecialite($specialite)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM animateurs WHERE specialite LIKE ? ORDER BY nom, prenom ASC");
-        $stmt->execute(['%' . $specialite . '%']);
-        return $stmt->fetchAll();
+        // TODO : adapter manuellement (necessite un LIKE %specialite%)
+        // SELECT * FROM animateurs WHERE specialite LIKE ? ORDER BY nom, prenom ASC
     }
 
     public function create($data)
     {
-        $sql = "INSERT INTO animateurs (nom, prenom, specialite, actif)
-                VALUES (:nom, :prenom, :specialite, :actif)";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($data);
-        return $this->pdo->lastInsertId();
+        $animateur = $this->jsondb->add($data);
+        return $animateur;
     }
 
     public function update($id, $data)
     {
-        $sql = "UPDATE animateurs SET
-                    nom       = :nom,
-                    prenom    = :prenom,
-                    specialite = :specialite,
-                    actif     = :actif
-                WHERE id = :id";
         $data['id'] = $id;
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute($data);
+        $animateur = $this->jsondb->update($id, $data);
+        return $animateur;
     }
 
     public function delete($id)
     {
-        $stmt = $this->pdo->prepare("DELETE FROM animateurs WHERE id = ?");
-        return $stmt->execute([$id]);
+        $animateur = $this->jsondb->delete($id);
+        return $animateur;
     }
 
     public function getDisplayName($animateur)

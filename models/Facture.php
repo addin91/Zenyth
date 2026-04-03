@@ -2,90 +2,71 @@
 // models/Facture.php
 class Facture
 {
-    private $pdo;
+    private $jsondb;
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
+        $this->jsondb = new JsonDB("facture");
     }
 
     public function findAll()
     {
-        $stmt = $this->pdo->query("SELECT f.*, r.date_debut, r.date_fin,
-                                          c.nom, c.prenom, c.email
-                                   FROM factures f
-                                   JOIN reservations r ON r.id = f.id_reservation
-                                   LEFT JOIN clients c ON c.id = r.id_client
-                                   ORDER BY f.date_emission DESC");
-        return $stmt->fetchAll();
+        // TODO : adapter manuellement (necessite un JOIN reservations + clients)
+        // SELECT f.*, r.date_debut, r.date_fin, c.nom, c.prenom, c.email
+        // FROM factures f
+        // JOIN reservations r ON r.id = f.id_reservation
+        // LEFT JOIN clients c ON c.id = r.id_client
+        // ORDER BY f.date_emission DESC
     }
 
     public function findById($id)
     {
-        $stmt = $this->pdo->prepare("SELECT f.*, r.date_debut, r.date_fin,
-                                            c.nom, c.prenom, c.email
-                                     FROM factures f
-                                     JOIN reservations r ON r.id = f.id_reservation
-                                     LEFT JOIN clients c ON c.id = r.id_client
-                                     WHERE f.id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch();
+        return $this->jsondb->find($id);
     }
 
     public function findByReservation($id_reservation)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM factures WHERE id_reservation = ?");
-        $stmt->execute([$id_reservation]);
-        return $stmt->fetch();
+        $facture = $this->jsondb->where('id_reservation', $id_reservation);
+        return $facture[0] ?? null;
     }
 
     public function findByStatut($statut)
     {
-        $stmt = $this->pdo->prepare("SELECT f.*, c.nom, c.prenom
-                                     FROM factures f
-                                     JOIN reservations r ON r.id = f.id_reservation
-                                     LEFT JOIN clients c ON c.id = r.id_client
-                                     WHERE f.statut = ?
-                                     ORDER BY f.date_emission DESC");
-        $stmt->execute([$statut]);
-        return $stmt->fetchAll();
+        // TODO : adapter manuellement (necessite un JOIN reservations + clients)
+        // SELECT f.*, c.nom, c.prenom
+        // FROM factures f
+        // JOIN reservations r ON r.id = f.id_reservation
+        // LEFT JOIN clients c ON c.id = r.id_client
+        // WHERE f.statut = ?
+        // ORDER BY f.date_emission DESC
     }
 
     public function create($data)
     {
-        $sql = "INSERT INTO factures (id_reservation, montant_total, avoirs, reductions, montant_final, statut, date_emission)
-                VALUES (:id_reservation, :montant_total, :avoirs, :reductions, :montant_final, :statut, :date_emission)";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($data);
-        return $this->pdo->lastInsertId();
+        $facture = $this->jsondb->add($data);
+        return $facture;
     }
 
     public function update($id, $data)
     {
-        $sql = "UPDATE factures SET
-                    montant_total  = :montant_total,
-                    avoirs         = :avoirs,
-                    reductions     = :reductions,
-                    montant_final  = :montant_final,
-                    statut         = :statut,
-                    date_emission  = :date_emission
-                WHERE id = :id";
         $data['id'] = $id;
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute($data);
+        $facture = $this->jsondb->update($id, $data);
+        return $facture;
     }
 
     public function updateStatut($id, $statut)
     {
-        $date_emission = ($statut === 'emise') ? date('Y-m-d H:i:s') : null;
-        $stmt = $this->pdo->prepare("UPDATE factures SET statut = ?, date_emission = ? WHERE id = ?");
-        return $stmt->execute([$statut, $date_emission, $id]);
+        $facture = $this->jsondb->find($id);
+        $facture['statut']        = $statut;
+        $facture['date_emission'] = ($statut === 'emise') ? date('Y-m-d H:i:s') : null;
+        $facture = $this->jsondb->update($id, $facture);
+        return $facture;
     }
 
     public function delete($id)
     {
-        $stmt = $this->pdo->prepare("DELETE FROM factures WHERE id = ?");
-        return $stmt->execute([$id]);
+        $facture = $this->jsondb->delete($id);
+        return $facture;
     }
 
     public function calculerMontantFinal($montant_total, $avoirs, $reductions)

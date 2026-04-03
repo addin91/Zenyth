@@ -2,86 +2,76 @@
 // models/ReservationPrestation.php
 class ReservationPrestation
 {
-    private $pdo;
+    private $jsondb;
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
+        $this->jsondb = new JsonDB("reservationPrestation");
     }
 
     public function findAll()
     {
-        $stmt = $this->pdo->query("SELECT rp.*, p.nom, p.prix_unitaire
-                                   FROM reservation_prestations rp
-                                   JOIN prestations p ON p.id = rp.id_prestation
-                                   ORDER BY rp.id_reservation ASC");
-        return $stmt->fetchAll();
+        // TODO : adapter manuellement (necessite un JOIN prestations)
+        // SELECT rp.*, p.nom, p.prix_unitaire
+        // FROM reservation_prestations rp
+        // JOIN prestations p ON p.id = rp.id_prestation
+        // ORDER BY rp.id_reservation ASC
     }
 
     public function findById($id)
     {
-        $stmt = $this->pdo->prepare("SELECT rp.*, p.nom, p.prix_unitaire
-                                     FROM reservation_prestations rp
-                                     JOIN prestations p ON p.id = rp.id_prestation
-                                     WHERE rp.id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch();
+        // TODO : adapter manuellement (necessite un JOIN prestations)
+        // SELECT rp.*, p.nom, p.prix_unitaire
+        // FROM reservation_prestations rp
+        // JOIN prestations p ON p.id = rp.id_prestation
+        // WHERE rp.id = ?
     }
 
     public function findByReservation($id_reservation)
     {
-        $stmt = $this->pdo->prepare("SELECT rp.*, p.nom, p.description, p.prix_unitaire
-                                     FROM reservation_prestations rp
-                                     JOIN prestations p ON p.id = rp.id_prestation
-                                     WHERE rp.id_reservation = ?");
-        $stmt->execute([$id_reservation]);
-        return $stmt->fetchAll();
+        // TODO : adapter manuellement (necessite un JOIN prestations)
+        // SELECT rp.*, p.nom, p.description, p.prix_unitaire
+        // FROM reservation_prestations rp
+        // JOIN prestations p ON p.id = rp.id_prestation
+        // WHERE rp.id_reservation = ?
     }
 
     public function findByPrestation($id_prestation)
     {
-        $stmt = $this->pdo->prepare("SELECT rp.*, r.date_debut, r.date_fin
-                                     FROM reservation_prestations rp
-                                     JOIN reservations r ON r.id = rp.id_reservation
-                                     WHERE rp.id_prestation = ?
-                                     ORDER BY r.date_debut ASC");
-        $stmt->execute([$id_prestation]);
-        return $stmt->fetchAll();
+        // TODO : adapter manuellement (necessite un JOIN reservations)
+        // SELECT rp.*, r.date_debut, r.date_fin
+        // FROM reservation_prestations rp
+        // JOIN reservations r ON r.id = rp.id_reservation
+        // WHERE rp.id_prestation = ?
+        // ORDER BY r.date_debut ASC
     }
 
     public function create($data)
     {
-        $sql = "INSERT INTO reservation_prestations (id_reservation, id_prestation, quantite, reduction, total)
-                VALUES (:id_reservation, :id_prestation, :quantite, :reduction, :total)";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($data);
-        return $this->pdo->lastInsertId();
+        $reservationPrestation = $this->jsondb->add($data);
+        return $reservationPrestation;
     }
 
     public function update($id, $data)
     {
-        $sql = "UPDATE reservation_prestations SET
-                    id_reservation = :id_reservation,
-                    id_prestation  = :id_prestation,
-                    quantite       = :quantite,
-                    reduction      = :reduction,
-                    total          = :total
-                WHERE id = :id";
         $data['id'] = $id;
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute($data);
+        $reservationPrestation = $this->jsondb->update($id, $data);
+        return $reservationPrestation;
     }
 
     public function delete($id)
     {
-        $stmt = $this->pdo->prepare("DELETE FROM reservation_prestations WHERE id = ?");
-        return $stmt->execute([$id]);
+        $reservationPrestation = $this->jsondb->delete($id);
+        return $reservationPrestation;
     }
 
     public function deleteByReservation($id_reservation)
     {
-        $stmt = $this->pdo->prepare("DELETE FROM reservation_prestations WHERE id_reservation = ?");
-        return $stmt->execute([$id_reservation]);
+        $reservationPrestation = $this->jsondb->where('id_reservation', $id_reservation);
+        foreach ($reservationPrestation as $rp) {
+            $this->jsondb->delete($rp['id']);
+        }
+        return true;
     }
 
     public function calculerTotal($prix_unitaire, $quantite, $reduction)
