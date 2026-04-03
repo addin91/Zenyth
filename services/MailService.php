@@ -14,8 +14,8 @@ class MailService{
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'tonemail@gmail.com';
-            $mail->Password = 'mot_de_passe_app'; // pas ton vrai mdp !
+            $mail->Username = '';
+            $mail->Password = '';
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
 
@@ -34,6 +34,23 @@ class MailService{
             $mail->isHTML(true);
             $mail->Subject = 'Votre mot de passe';
             $mail->Body = 'Voici votre mot de passe : <b>'. $password .'</b>';
+
+            $mail->send();
+        } catch (Exception $e) {
+            echo "Erreur : {$mail->ErrorInfo}";
+        }
+    }
+
+    public function envoieMail($destinataire, $objet, $message, $isHTML){
+        try{    
+            // Expéditeur et destinataire
+            $mail->setFrom('tonemail@gmail.com', 'Mon App');
+            $mail->addAddress($destinataire);
+
+            // Contenu
+            $mail->isHTML($isHTML);
+            $mail->Subject = $objet;
+            $mail->Body = $message;
 
             $mail->send();
         } catch (Exception $e) {
