@@ -18,7 +18,30 @@ class controllersAdmin{
 
     public function accepteReservationChambre($idReservationChambre){
         $reservationChambreModel = new reservationChambre($this->pdo);
+        // créer client 
+        $reservation = $this->reservationModel.findById($reservationChambreModel["id_reservation"]);
+        $client = $this->clientModel.findById($reservation["id_client"]);
+        $motDePasse = $client.definiMotDePasseClient($client["id"]);
+        $client.activeClient($client["id"]);
+        $mailservice = new MailService();
+        $mailservice.envoiePassword($client["email"], $motDePasse);
+        // accepte reservation
         $reservationChambreModel.validerReservation($idReservationChambre);
+    }
+
+
+    // refuse acceptation
+    public function refuseReservationChambre($idReservationChambre){
+        $reservationChambreModel = new reservationChambre($this->pdo);
+        $reservation = $this->reservationModel.findById($reservationChambreModel["id_reservation"]);
+        $client = $this->clientModel.findById($reservation["id_client"]);
+
+        $reservationChambreModel.delete($idReservationChambre);
+        $reservation.delete($reservationChambreModel["id_reservation"]);
+        if($client["statut_compte"] == "invité") $client.delete($reservation["id_client"]);
+
+        $mailservice = new MailService();
+        $mailservice.envoieMail($client["email"], "Reservation annulé", "Votre réservation a été annulé", true);
     }
 
     public function prevoirActivite(){

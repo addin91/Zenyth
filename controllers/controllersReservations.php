@@ -91,7 +91,7 @@ class controllersReservations{
         // redirection
     }
 
-    public function reservationActivité(){
+    public function reservationActivite(){
         if (controlPostForm() && isLoggedIn()) {
             if (isset($_POST['date'], $_POST['creneau'], $_POST['nombrePersonne'], $_POST['message'], $_POST['id_activite'])) {
                     
