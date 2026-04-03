@@ -2,6 +2,9 @@
 // config/config.php
 // Complexe touristique sportif — Système de réservation
 
+
+// Migration db a json
+/*
 // ─────────────────────────────────────────────
 // BASE DE DONNÉES
 // ─────────────────────────────────────────────
@@ -24,6 +27,7 @@ try {
 } catch (PDOException $e) {
     die('Erreur de connexion : ' . $e->getMessage());
 }
+*/
 
 // ─────────────────────────────────────────────
 // SESSION
