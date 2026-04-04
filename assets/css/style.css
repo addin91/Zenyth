@@ -63,7 +63,7 @@ a {
 
 /* ===== HERO ===== */
 .hero {
-    min-height: 85vh;
+    min-height: calc(100vh - 140px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -217,6 +217,7 @@ main section {
     padding-bottom: 3rem;
 }
 
+
 /* ===== POPUP OVERLAY ===== */
 .popup-overlay {
     display: none;
@@ -298,6 +299,129 @@ main section {
 
 .form-check-label {
     color: var(--text-main);
+}
+
+/* ===== CARROUSEL ===== */
+.carrousel-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+}
+
+.carrousel-track {
+    display: flex;
+    overflow: hidden;
+    gap: 20px;
+    flex: 1;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    padding: 6px 0;
+}
+
+.carrousel-track .carrousel-item {
+    min-width: calc((100% - 40px) / 3);
+    max-width: calc((100% - 40px) / 3);
+    flex-shrink: 0;
+    scroll-snap-align: start;
+}
+
+.carrousel-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-heading);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s;
+    padding: 0;
+}
+
+.carrousel-btn:hover:not(.carrousel-disabled) {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+.carrousel-btn.carrousel-disabled {
+    opacity: 0.2;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ===== DASHBOARD POPUP ===== */
+.popup-panel-large {
+    max-width: 850px;
+}
+
+.dash-tabs {
+    list-style: none;
+    display: flex;
+    gap: 0;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+}
+
+.dash-tab {
+    padding: 10px 18px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.3s, border-color 0.3s;
+}
+
+.dash-tab:hover {
+    color: var(--text-heading);
+}
+
+.dash-tab.active {
+    color: var(--accent-light);
+    border-bottom-color: var(--accent);
+}
+
+.dash-panel {
+    display: none;
+}
+
+.dash-panel.active {
+    display: block;
+}
+
+.dash-panel h5 {
+    color: var(--text-heading);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.table {
+    color: var(--text-main);
+    border-color: var(--border);
+}
+
+.table thead th {
+    color: var(--text-heading);
+    border-bottom-color: var(--border);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.table tbody td {
+    border-color: var(--border);
+}
+
+.table tfoot th {
+    color: var(--accent-warm);
+    border-top: 2px solid var(--accent);
+    font-size: 1.05rem;
 }
 
 /* ===== FOOTER ===== */
