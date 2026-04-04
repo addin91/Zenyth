@@ -4,7 +4,7 @@ class JsonDB{
     private $file;
 
     public function __construct($file){
-        $this->file = "./json/". $file .".json";
+        $this->file = __DIR__ . "/json/" . $file . ".json";
         if (!file_exists($this->file)) {
             file_put_contents($this->file, json_encode([]));
         }
