@@ -101,9 +101,21 @@ switch ($action) {
     // --- FACTURES ---
     case 'recuperefactures':
         header('Content-Type: application/json');
-        require_once __DIR__ . '/controllers/controllersFacture.php';
-        $controller = new controllersFacture();
-        $controller->recupereFactures();
+        if (isset($_SESSION['user_id'])) {
+            require_once __DIR__ . '/models/Reservation.php';
+            require_once __DIR__ . '/models/Facture.php';
+            $reservationModel = new Reservation();
+            $factureModel = new Facture();
+            $reservations = $reservationModel->findByClient($_SESSION['user_id']);
+            $factures = [];
+            foreach ($reservations ?: [] as $r) {
+                $facture = $factureModel->findByReservation($r['id']);
+                if ($facture) $factures[] = $facture;
+            }
+            echo json_encode(['success' => true, 'data' => $factures]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Non connecte.']);
+        }
         break;
 
     case 'recuperefactureencours':
