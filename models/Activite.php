@@ -49,8 +49,7 @@ class Activite
             'prix'         => $prix,
             'actif'        => $actif,
         ];
-        $activite = $this->jsondb->add($data);
-        return $activite;
+        return $this->jsondb->add($data);
     }
 
     public function update($id, $nom, $type, $duree, $capacite_min, $capacite_max, $prix, $actif)

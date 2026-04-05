@@ -78,8 +78,7 @@ class ActivitePrevue
             "message" => $message,
             "capacite_restante" => $capacite_restante,
         ];
-        $activitePrevue = $this->jsondb->add($data);
-        return $activitePrevue;
+        return $this->jsondb->add($data);
     }
 
     public function update($id, $data)

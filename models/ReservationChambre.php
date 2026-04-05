@@ -60,14 +60,13 @@ class ReservationChambre
         return false;
     }
 
-    public function create($id_reservation, $id_chambre)
+    public function create($id_client, $id_chambre)
     {
         $data = [
-            'id_reservation' => $id_reservation,
+            'id_client' => $id_client,
             'id_chambre' => $id_chambre,
         ];
-        $reservationChambre = $this->jsondb->add($data);
-        return $reservationChambre;
+        return $this->jsondb->add($data);
     }
 
     public function update($id, $data)
@@ -102,5 +101,5 @@ class ReservationChambre
 }
 
 // id 
-// id_reservation 
+// id_client 
 // id_chambre 

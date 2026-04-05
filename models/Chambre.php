@@ -62,8 +62,7 @@ class Chambre
             'prix_nuit' => $prix_nuit,
             'statut' => $statut,
         ];
-        $chambre = $this->jsondb->add($data);
-        return $chambre;
+        return $this->jsondb->add($data);
     }
 
     public function update($id, $data)

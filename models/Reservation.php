@@ -52,7 +52,7 @@ class Reservation
         // ORDER BY r.date_debut ASC
     }
 
-    public function create($id_client, $id_reservation_chambre, $id_demandes_activite, $id_reservations_prestation, $date_debut , $date_fin , $nombre_personnes , $commentaire , $date_demande)
+    public function create($id_client, $id_reservation_chambre, $id_demandes_activite, $id_reservations_prestation, $date_debut , $date_fin , $nombre_personnes , $commentaire)
     {
         $data = [
             'id_client' => $id_client,
@@ -66,8 +66,7 @@ class Reservation
             'commentaire' => $commentaire,
             'date_demande' => date('Y-m-d H:i:s')
         ];
-        $reservation = $this->jsondb->add($data);
-        return $reservation;
+        return $this->jsondb->add($data);
     }
 
     public function update($id, $data)

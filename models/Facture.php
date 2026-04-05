@@ -59,8 +59,7 @@ class Facture
             'statut' => "Provisoire",
             'date_emission' => null,
         ];
-        $facture = $this->jsondb->add($data);
-        return $facture;
+        return $this->jsondb->add($data);
     }
 
     public function update($id, $data)

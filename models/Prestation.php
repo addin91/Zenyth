@@ -39,8 +39,7 @@ class Prestation
             'prix_unitaire' => $prix_unitaire,
             'actif' => $actif,
         ];
-        $prestation = $this->jsondb->add($data);
-        return $prestation;
+        return $this->jsondb->add($data);
     }
 
     public function update($id, $data)

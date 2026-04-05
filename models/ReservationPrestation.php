@@ -58,8 +58,7 @@ class ReservationPrestation
             'reduction' => $reduction,
             'prix' => $prix,
         ];
-        $reservationPrestation = $this->jsondb->add($data);
-        return $reservationPrestation;
+        return $this->jsondb->add($data);
     }
 
     public function update($id, $data)

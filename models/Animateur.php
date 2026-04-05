@@ -46,8 +46,7 @@ class Animateur
             'specialite' => $specialite,
             'actif' => $actif,
         ];
-        $animateur = $this->jsondb->add($data);
-        return $animateur;
+        return $this->jsondb->add($data);
     }
 
     public function update($id, $data)

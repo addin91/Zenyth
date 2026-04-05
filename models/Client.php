@@ -107,7 +107,8 @@ class Client
 
     public function authentification($email, $password)
     {
-        $client = reset($this->jsondb->whereData($this->jsondb->where('email', $email), "statut_compte", "actif"));
+        $clients = $this->jsondb->whereData($this->jsondb->where('email', $email), "statut_compte", "actif");
+        $client = reset($clients);
         error_log(print_r($client, true));
         error_log(password_verify($password, $client['password']));
 

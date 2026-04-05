@@ -39,8 +39,7 @@ class Admin
             'email'        => $email,
             'mot_de_passe' => $mot_de_passe,
         ];
-        $admin = $this->jsondb->add($data);
-        return $admin;
+        return $this->jsondb->add($data);
     }
 
     public function update($id, $data)

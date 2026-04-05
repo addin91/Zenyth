@@ -74,8 +74,7 @@ class DemandeActivite
             'nombre_personnes_concernees' => $nombre_personnes_concernees,
             'message' => $message,
         ];
-        $demandeActivite = $this->jsondb->add($data);
-        return $demandeActivite;
+        return $this->jsondb->add($data);
     }
 
     public function update($id, $data)
