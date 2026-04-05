@@ -6,22 +6,22 @@ require_once __DIR__ . '/../models/Admin.php';
 require_once __DIR__ . '/../services/MailService.php';
 
 class controllersAuthentification{
-    private $pdo;
     private $clientModel;
     private $adminModel;
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
-        $this->clientModel = new Client($pdo);
-        $this->adminModel = new Admin($pdo);
+        $this->clientModel = new Client();
+        $this->adminModel = new Admin();
     }
 
     // inscrption
     // connexion
     public function connexion(){
+        error_log("conn");
         if (controlPostForm()) {
-            
+                    error_log("conn1");
+
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
 
@@ -30,40 +30,63 @@ class controllersAuthentification{
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['nom'];
                 $_SESSION['admin'] = false;
-                //redirection auto
+                $response = [
+                    'status' => 'success',
+                    'nom' => $user['nom'],
+                ];
             } else {
                 $_SESSION['error'] = "Identifiant ou mot de passe incorrect.";
-                // redirection error
+                $response = [
+                    'status' => 'error',
+                    'msg' => 'Identifiant ou mot de passe incorrect.',
+                ];
             }
-        } 
-            // redirection auto
+        } else {
+            $response = [
+                'status' => 'error',
+                'msg' => '',
+            ];
+        }
+        error_log($_SESSION['error']);
+        echo json_encode($response);
     }
 
     // deconnexion
     public function deconnexion(){
         if(controlPostForm()){
             session_destroy();
-            // redirection acceuil
         }
-        // redirection auto
+        header("Location: index.php");
     }
 
     // mdp oublié
     public function motDePasseOublie(){
         if(controlPostForm()){
                 // verifie email existe
-            $email = filter_input(INPUT_POST, $_POST['email'], FILTER_VALIDATE_EMAIL);
+            $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+            error_log($email);
             if($email){
-                $user = $this->clientModel.findByEmail($email);
+                $user = $this->clientModel->findByEmail($email);
                 if($user){
+                    error_log($user["id"]);
                     // envoie code provisoire email
-                    $newPassword = $this.clientModel.definiMotDePasseClient($user["id"]);
+                    $newPassword = $this->clientModel->definiMotDePasseClient($user["id"]);
                     $mailservice = new MailService();
-                    $mailservice.envoiePassword($email, $newPassword);
+                    $mailservice->envoiePassword($email, $newPassword);
                 }
+
+                $response = [
+                    'status' => 'success',
+                    'msg' => "",
+                ];
+            }else {
+                $response = [
+                    'status' => 'error',
+                    'msg' => 'Email invalide',
+                ];
             }
         }
-        // redirection
+        echo json_encode($response);
     }
 
     // changement mdp

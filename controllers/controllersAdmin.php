@@ -1,38 +1,44 @@
 <?php
 
+
 require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../services/MailService.php';
 require_once __DIR__ . '/../models/Client.php';
 require_once __DIR__ . '/../models/Reservation.php';
+require_once __DIR__ . '/../models/ReservationChambre.php';
+require_once __DIR__ . '/../models/Activite.php';
+require_once __DIR__ . '/../models/Animateur.php';
+require_once __DIR__ . '/../models/DemandeActivite.php';
+require_once __DIR__ . '/../models/ActivitePrevue.php';
 
 class controllersAdmin{
-    private $pdo;
     private $clientModel;
     private $reservationModel;
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
-        $this->clientModel = new Client($pdo);
-        $this->reservationModel = new Reservation($pdo);
+        $this->clientModel = new Client();
+        $this->reservationModel = new Reservation();
     }
 
     public function accepteReservationChambre($idReservationChambre){
-        $reservationChambreModel = new reservationChambre($this->pdo);
+        $reservationChambreModel = new ReservationChambre();
+        $reservationChambre = $reservationChambreModel->findById($idReservationChambre);
         // créer client 
-        $reservation = $this->reservationModel.findById($reservationChambreModel["id_reservation"]);
-        $client = $this->clientModel.findById($reservation["id_client"]);
-        $motDePasse = $client.definiMotDePasseClient($client["id"]);
-        $client.activeClient($client["id"]);
+        $reservation = $this->reservationModel->findById($reservationChambre["id_reservation"]);
+        $client = $this->clientModel->findById($reservation["id_client"]);
+        $motDePasse = $this->clientModel->definiMotDePasseClient($client["id"]);
+        $this->clientModel->activeClient($client["id"]);
         $mailservice = new MailService();
-        $mailservice.envoiePassword($client["email"], $motDePasse);
+        $mailservice->envoiePassword($client["email"], $motDePasse);
         // accepte reservation
-        $reservationChambreModel.validerReservation($idReservationChambre);
+        $reservationChambreModel->validerReservation($idReservationChambre);
     }
 
 
     // refuse acceptation
     public function refuseReservationChambre($idReservationChambre){
-        $reservationChambreModel = new reservationChambre($this->pdo);
+        $reservationChambreModel = new reservationChambre();
         $reservation = $this->reservationModel.findById($reservationChambreModel["id_reservation"]);
         $client = $this->clientModel.findById($reservation["id_client"]);
 
@@ -44,9 +50,26 @@ class controllersAdmin{
         $mailservice.envoieMail($client["email"], "Reservation annulé", "Votre réservation a été annulé", true);
     }
 
-    public function prevoirActivite(){
-        
+    public function prevoirActivite($id_activite, $id_animateur, $id_demandes_actvites, $date, $creneau, $message){
+
+        $activiteModel = new Activite();
+        $activite = $activiteModel.findById($id_activite);
+
+        $animateurModel = new Animateur();
+        $animateur = $animateurModel.findById($id_animateur);
+
+        $capacite_restante = $activite["capacite_min"];
+        $demandeActiviteModel = new DemandeActivite();
+        foreach($id_demandes_actvites as $id){
+            $demandeActivite = $demandeActiviteModel.findById($id);
+            $capacite_restante-= $demandeActivite["nombre_personnes_concernees"];
+        } 
+
+        if($capacite_restante < 0) // Erreur;
+        $activitePrevuModel = new ActivitePrevue();
+        $activitePrevu = $activitePrevuModel.create($id_activite, $id_animateur, $id_demandes_actvites, $date, $creneau, $message, $capacite_restante);
     }
+
 }
 
 ?>

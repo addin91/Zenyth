@@ -3,23 +3,24 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../models/Client.php';
 require_once __DIR__ . '/../models/Reservation.php';
+require_once __DIR__ . '/../models/ReservationChambre.php';
 
 class controllersReservations{
-    private $pdo;
     private $clientModel;
     private $reservationModel;
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
-        $this->clientModel = new Client($pdo);
-        $this->reservationModel = new Reservation($pdo);
+        $this->clientModel = new Client();
+        $this->reservationModel = new Reservation();
     }
 
     public function reservationChambre(){
         if (controlPostForm()) {
-            if (isset($_POST['dateDebut'], $_POST['dateFin'], $_POST['typeChambre'], $_POST['nombrePersonne'], $_POST['commentaire'], $_POST['id_chambre'])) {
-                    
+            if (isset($_POST['dateDebut'], $_POST['dateFin'], $_POST['nombrePersonne'], $_POST['commentaire'], $_POST['id_chambre'])) {
+                
+                
+
                 if(isLoggedIn()) $idClient = $_SESSION["id_client"];
                 else{
                     if (isset($_POST['nom'], $_POST['prenom'], $_POST['email'])) {
@@ -27,13 +28,12 @@ class controllersReservations{
                         $prenom = htmlspecialchars($_POST['prenom'] ?? '');
                         $email = htmlspecialchars($_POST['email'] ?? '');
                                             
-                        $idClient = $this->clientModel.ajoutNouveauClient($nom, $prenom, $email);
+                        $idClient = $this->clientModel->ajoutNouveauClient($nom, $prenom, $email);
                     } 
                 }
 
                 $dateDebut = htmlspecialchars($_POST['dateDebut'] ?? '');
                 $dateFin = htmlspecialchars($_POST['dateFin'] ?? '');
-                $typeChambre = htmlspecialchars($_POST['typeChambre'] ?? '');
                 $nombrePersonne = htmlspecialchars($_POST['nombrePersonne'] ?? '');
                 $commentaire = htmlspecialchars($_POST['commentaire'] ?? '');
                 $idChambre = htmlspecialchars($_POST['id_chambre'] ?? '');
@@ -46,17 +46,21 @@ class controllersReservations{
                     ":statut" => "en_attente", 
                     ":commentaire" => $commentaire
                 ];
-                $idReservation = $this->reservationModel.create($data);
+                $idReservation = $this->reservationModel->create($data);
 
-                $reservationChambreModel = new reservationChambre($this->pdo);
+                $reservationChambreModel = new ReservationChambre();
                 $data = [
-                    ":id_reservation" => $idReservation, 
+                    ":id_reservation"       => $idReservation, 
                     ":id_chambre" => $idChambre
                 ];
-                $this->reservationChambreModel.create($data);
-            }
-        }
-        // redirection
+                $reservationChambreModel->create($data);
+                $response = [
+                    'status' => 'success',
+                    'msg' => 'Réservation enregistré',
+                ];
+            } else $response = ['status' => 'error', 'msg' => 'Donnée manquante'];
+        } else $response = ['status' => 'error', 'msg' => ''];
+        echo json_encode($response);
     }
 
     public function reservationPrestation(){

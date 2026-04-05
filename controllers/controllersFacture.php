@@ -1,5 +1,9 @@
 <?php
 
+require 'vendor/autoload.php';
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
 class controllersFacture{
     private $pdo;
     private $clientModel;
@@ -102,13 +106,3 @@ class controllersFacture{
 ?>
 
 
-// id
-// id_client
-// id_reservation
-// id_reservation_chambre
-// [id_reservation_prestation]
-// [id_demande_activite]
-// montant total = prix_chambre + (prix_prestation TOUT) + (prix_activite TOUT actif)
-// avoirs
-// reduction
-// statut
