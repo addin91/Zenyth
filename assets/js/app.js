@@ -170,7 +170,7 @@ $(document).ready(function() {
         var track = $('#' + $(this).data('cible'));
         var item = track.find('.carrousel-item').first();
         var step = item.outerWidth() + 20;
-        track.scrollLeft(track.scrollLeft() + step * 3);
+        track.scrollLeft(track.scrollLeft() + step);
         setTimeout(function() { majFleches(track); }, 550);
     });
 
@@ -178,7 +178,7 @@ $(document).ready(function() {
         var track = $('#' + $(this).data('cible'));
         var item = track.find('.carrousel-item').first();
         var step = item.outerWidth() + 20;
-        track.scrollLeft(track.scrollLeft() - step * 3);
+        track.scrollLeft(track.scrollLeft() - step);
         setTimeout(function() { majFleches(track); }, 550);
     });
 
