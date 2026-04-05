@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../database/db/JsonDB.php';
+
+
 // models/ReservationPrestation.php
 class ReservationPrestation
 {
@@ -6,7 +10,7 @@ class ReservationPrestation
 
     public function __construct()
     {
-        $this->jsondb = new JsonDB("reservationPrestation");
+        $this->jsondb = new JsonDB("ReservationPrestation");
     }
 
     public function findAll()
@@ -46,8 +50,14 @@ class ReservationPrestation
         // ORDER BY r.date_debut ASC
     }
 
-    public function create($data)
+    public function create($id_reservation, $id_prestation, $reduction, $prix)
     {
+        $data = [
+            'id_reservation' => $id_reservation,
+            'id_prestation' => $id_prestation,
+            'reduction' => $reduction,
+            'prix' => $prix,
+        ];
         $reservationPrestation = $this->jsondb->add($data);
         return $reservationPrestation;
     }
@@ -80,3 +90,9 @@ class ReservationPrestation
         return round($sous_total * (1 - $reduction / 100), 2);
     }
 }
+
+// id 
+// id_reservation 
+// id_prestation  
+// réduction 
+// prix

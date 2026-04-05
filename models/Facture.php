@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../database/db/JsonDB.php';
+
+
 // models/Facture.php
 class Facture
 {
@@ -6,7 +10,7 @@ class Facture
 
     public function __construct()
     {
-        $this->jsondb = new JsonDB("facture");
+        $this->jsondb = new JsonDB("Facture");
     }
 
     public function findAll()
@@ -41,8 +45,20 @@ class Facture
         // ORDER BY f.date_emission DESC
     }
 
-    public function create($data)
+    public function create($id_client, $id_reservation, $id_reservation_chambre, $id_reservation_prestations, $id_demandes_activite, $montant_total, $avoirs, $reduction, $statut, $date_emission)
     {
+        $data = [
+            'id_client' => $id_client,
+            'id_reservation' => $id_reservation,
+            'id_reservation_chambre' => $id_reservation_chambre,
+            'id_reservation_prestations' => $id_reservation_prestations,
+            'id_demandes_activite' => $id_demandes_activite,
+            'montant_total' => $montant_total,
+            'avoirs' => $avoirs,
+            'reduction' => $reduction,
+            'statut' => "Provisoire",
+            'date_emission' => null,
+        ];
         $facture = $this->jsondb->add($data);
         return $facture;
     }
@@ -74,3 +90,15 @@ class Facture
         return round(max(0, $montant_total - $avoirs - $reductions), 2);
     }
 }
+
+// id
+// id_client
+// id_reservation
+// id_reservation_chambre
+// [id_reservation_prestation]
+// [id_demande_activite]
+// montant total = prix_chambre + (prix_prestation TOUT) + (prix_activite TOUT actif)
+// avoirs
+// reduction
+// statut
+// date_emission

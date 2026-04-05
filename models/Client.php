@@ -1,4 +1,7 @@
 <?php
+
+require_once __DIR__ . '/../database/db/JsonDB.php';
+
 // models/Client.php
 class Client
 {
@@ -6,7 +9,7 @@ class Client
 
     public function __construct()
     {
-        $this->jsondb = new JsonDB("client");
+        $this->jsondb = new JsonDB("Client");
     }
 
     public function findAll()
@@ -24,7 +27,9 @@ class Client
     public function findByEmail($email)
     {
         $client = $this->jsondb->where('email', $email);
-        return $client[0] ?? null;
+        if (!empty($client)) return reset($client);
+        return null;
+
     }
 
     public function findByStatut($statut)
@@ -39,7 +44,8 @@ class Client
             'nom'           => $nom,
             'prenom'        => $prenom,
             'email'         => $email,
-            'statut_compte' => $statut_compte,
+            'statut_compte' => "invité",
+            'date_creation' => date('Y-m-d H:i:s')
         ];
         $client = $this->jsondb->add($data);
         return $client;
@@ -47,11 +53,11 @@ class Client
 
     public function definiMotDePasseClient($id)
     {
-        if (!clientExiste($id)) {
+        if (!$this->clientExiste($id)) {
             die("Client introuvable");
         }
 
-        $motDePasseClair = genererMotDePasse(10);
+        $motDePasseClair = $this->genererMotDePasse(10);
         $motDePasseHash  = password_hash($motDePasseClair, PASSWORD_DEFAULT);
 
         $client = $this->jsondb->find($id);
@@ -63,7 +69,7 @@ class Client
 
     public function changementPassword($id, $newPassword)
     {
-        if (!clientExiste($id)) {
+        if (!$this->clientExiste($id)) {
             die("Client introuvable");
         }
 
@@ -77,7 +83,7 @@ class Client
 
     public function activeClient($id)
     {
-        if (!clientExiste($id)) {
+        if (!$this->clientExiste($id)) {
             die("Client introuvable");
         }
 
@@ -89,7 +95,7 @@ class Client
 
     public function desactiveClient($id)
     {
-        if (!clientExiste($id)) {
+        if (!$this->clientExiste($id)) {
             die("Client introuvable");
         }
 
@@ -101,8 +107,9 @@ class Client
 
     public function authentification($email, $password)
     {
-        $client = $this->jsondb->where('email', $email);
-        $client = $client[0] ?? null;
+        $client = reset($this->jsondb->whereData($this->jsondb->where('email', $email), "statut_compte", "actif"));
+        error_log(print_r($client, true));
+        error_log(password_verify($password, $client['password']));
 
         if ($client && password_verify($password, $client['password'])) {
             return $client;
@@ -117,8 +124,7 @@ class Client
 
     private function clientExiste($id)
     {
-        // TODO : adapter manuellement
-        // SELECT COUNT(*) FROM client WHERE id = :id
+        return $this->jsondb->find($id) != null;
     }
 
     private function genererMotDePasse($longueur = 12)
@@ -127,3 +133,12 @@ class Client
         return substr(str_shuffle($chars), 0, $longueur);
     }
 }
+
+
+// id_client 
+// nom 
+// prénom 
+// email 
+// mot_de_passe 
+// statut_compte (invité, actif, inactif) 
+// date_creation

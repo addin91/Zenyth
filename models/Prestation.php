@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../database/db/JsonDB.php';
+
+
 // models/Prestation.php
 class Prestation
 {
@@ -6,7 +10,7 @@ class Prestation
 
     public function __construct()
     {
-        $this->jsondb = new JsonDB("prestation");
+        $this->jsondb = new JsonDB("Prestation");
     }
 
     public function findAll()
@@ -27,8 +31,14 @@ class Prestation
         return $prestation;
     }
 
-    public function create($data)
+    public function create($nom, $description , $prix_unitaire, $actif)
     {
+        $data = [
+            'nom' => $nom,
+            'description' => $description,
+            'prix_unitaire' => $prix_unitaire,
+            'actif' => $actif,
+        ];
         $prestation = $this->jsondb->add($data);
         return $prestation;
     }
@@ -46,3 +56,10 @@ class Prestation
         return $prestation;
     }
 }
+
+
+// id
+// nom 
+// description 
+// prix_unitaire 
+// actif

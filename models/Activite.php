@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../database/db/JsonDB.php';
+
+
 // models/Activite.php
 class Activite
 {
@@ -6,7 +10,7 @@ class Activite
 
     public function __construct()
     {
-        $this->jsondb = new JsonDB("activite");
+        $this->jsondb = new JsonDB("Activite");
     }
 
     public function findAll()

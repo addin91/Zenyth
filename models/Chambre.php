@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../database/db/JsonDB.php';
+
+
 // models/Chambre.php
 class Chambre
 {
@@ -6,7 +10,7 @@ class Chambre
 
     public function __construct()
     {
-        $this->jsondb = new JsonDB("chambre");
+        $this->jsondb = new JsonDB("Chambre");
     }
 
     public function findAll()
@@ -49,8 +53,15 @@ class Chambre
         // ORDER BY ch.nom_chambre ASC
     }
 
-    public function create($data)
+    public function create($nom_chambre, $type_chambre, $capacite, $prix_nuit, $statut)
     {
+        $data = [
+            'nom_chambre' => $nom_chambre,
+            'type_chambre' => $type_chambre,
+            'capacite' => $capacite,
+            'prix_nuit' => $prix_nuit,
+            'statut' => $statut,
+        ];
         $chambre = $this->jsondb->add($data);
         return $chambre;
     }
@@ -76,3 +87,10 @@ class Chambre
         return $chambre;
     }
 }
+
+// id_chambre 
+// nom_chambre 
+// type_chambre 
+// capacité 
+// prix_nuit 
+// statut (occupé, libre)

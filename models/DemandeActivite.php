@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../database/db/JsonDB.php';
+
+
 // models/DemandeActivite.php
 class DemandeActivite
 {
@@ -6,7 +10,7 @@ class DemandeActivite
 
     public function __construct()
     {
-        $this->jsondb = new JsonDB("demandeActivite");
+        $this->jsondb = new JsonDB("DemandeActivite");
     }
 
     public function findAll()
@@ -61,8 +65,15 @@ class DemandeActivite
         // ORDER BY da.creneau ASC
     }
 
-    public function create($data)
+    public function create($id_activite, $date, $creneau, $nombre_personnes_concernees, $message)
     {
+        $data = [
+            'id_activite' => $id_activite,
+            'date' => $date,
+            'creneau' => $creneau,
+            'nombre_personnes_concernees' => $nombre_personnes_concernees,
+            'message' => $message,
+        ];
         $demandeActivite = $this->jsondb->add($data);
         return $demandeActivite;
     }
@@ -89,3 +100,10 @@ class DemandeActivite
         return true;
     }
 }
+
+// id  
+// id_activite 
+// date 
+// créneau 
+// nombre_personnes_concernées 
+// message 

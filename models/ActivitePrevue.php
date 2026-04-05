@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../database/db/JsonDB.php';
+
+
 // models/ActivitePrevue.php
 class ActivitePrevue
 {
@@ -6,7 +10,7 @@ class ActivitePrevue
 
     public function __construct()
     {
-        $this->jsondb = new JsonDB("activitePrevue");
+        $this->jsondb = new JsonDB("ActivitePrevue");
     }
 
     public function findAll()
@@ -63,8 +67,17 @@ class ActivitePrevue
         // ORDER BY ap.creneau ASC
     }
 
-    public function create($data)
+    public function create($id_activite, $id_animateur, $id_demandes_actvites, $date, $creneau, $message, $capacite_restante)
     {
+        $data = [
+            "id_activite" => $id_activite,
+            "id_animateur" => $id_animateur,
+            "id_demandes_actvites" => $id_demandes_actvites,
+            "date" => $date,
+            "creneau" => $creneau,
+            "message" => $message,
+            "capacite_restante" => $capacite_restante,
+        ];
         $activitePrevue = $this->jsondb->add($data);
         return $activitePrevue;
     }
@@ -90,3 +103,12 @@ class ActivitePrevue
         return $activitePrevue;
     }
 }
+
+// id
+// id_activite
+// id_animateur
+// [demandes_actvites]
+// date
+// creneau
+// message
+// capacite_restante

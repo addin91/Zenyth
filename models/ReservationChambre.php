@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../database/db/JsonDB.php';
+
+
 // models/ReservationChambre.php
 class ReservationChambre
 {
@@ -6,7 +10,7 @@ class ReservationChambre
 
     public function __construct()
     {
-        $this->jsondb = new JsonDB("reservationChambre");
+        $this->jsondb = new JsonDB("ReservationChambre");
     }
 
     public function findAll()
@@ -25,6 +29,7 @@ class ReservationChambre
         // FROM reservation_chambres rc
         // JOIN chambres ch ON ch.id = rc.id_chambre
         // WHERE rc.id = ?
+        return $this->jsondb->find($id);
     }
 
     public function findByReservation($id_reservation)
@@ -55,8 +60,12 @@ class ReservationChambre
         return false;
     }
 
-    public function create($data)
+    public function create($id_reservation, $id_chambre)
     {
+        $data = [
+            'id_reservation' => $id_reservation,
+            'id_chambre' => $id_chambre,
+        ];
         $reservationChambre = $this->jsondb->add($data);
         return $reservationChambre;
     }
@@ -91,3 +100,7 @@ class ReservationChambre
         return true;
     }
 }
+
+// id 
+// id_reservation 
+// id_chambre 

@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../database/db/JsonDB.php';
+
+
 // models/Animateur.php
 class Animateur
 {
@@ -6,7 +10,7 @@ class Animateur
 
     public function __construct()
     {
-        $this->jsondb = new JsonDB("animateur");
+        $this->jsondb = new JsonDB("Animateur");
     }
 
     public function findAll()
@@ -33,8 +37,15 @@ class Animateur
         // SELECT * FROM animateurs WHERE specialite LIKE ? ORDER BY nom, prenom ASC
     }
 
-    public function create($data)
+    public function create($id_animateur, $nom, $prenom, $spécialité, $actif)
     {
+        $data = [
+            'id_animateur' => $id_animateur,
+            'nom' => $nom,
+            'prenom' => $prenom,
+            'specialite' => $specialite,
+            'actif' => $actif,
+        ];
         $animateur = $this->jsondb->add($data);
         return $animateur;
     }
@@ -57,3 +68,9 @@ class Animateur
         return trim(($animateur['prenom'] ?? '') . ' ' . ($animateur['nom'] ?? ''));
     }
 }
+
+//id_animateur 
+// nom 
+// prénom 
+// spécialité 
+// actif

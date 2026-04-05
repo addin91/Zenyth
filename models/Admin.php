@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../database/db/JsonDB.php';
+
+
 // models/Admin.php
 class Admin
 {
@@ -6,7 +10,7 @@ class Admin
 
     public function __construct()
     {
-        $this->jsondb = new JsonDB("admin");
+        $this->jsondb = new JsonDB("Admin");
     }
 
     public function findAll()
@@ -39,15 +43,8 @@ class Admin
         return $admin;
     }
 
-    public function update($id, $nom, $prenom, $email, $mot_de_passe)
+    public function update($id, $data)
     {
-        $data = [
-            'id'           => $id,
-            'nom'          => $nom,
-            'prenom'       => $prenom,
-            'email'        => $email,
-            'mot_de_passe' => $mot_de_passe,
-        ];
         $admin = $this->jsondb->update($id, $data);
         return $admin;
     }
