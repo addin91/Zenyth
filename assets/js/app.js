@@ -37,9 +37,9 @@ $(document).ready(function() {
     // ===== FORMULAIRE CONNEXION =====
     $('#form-connexion').on('submit', function(e) {
         e.preventDefault();
-        var formData = $(this).serialize() + '&action=connexion';
+        var formData = $(this).serialize();
 
-        $.post('index.php', formData, function(res) {
+        $.post('index.php?action=login', formData, function(res) {
             if (res.success) {
                 $('#popup-connexion').removeClass('active');
                 $('#nav-connexion').addClass('d-none');
@@ -60,7 +60,7 @@ $(document).ready(function() {
     // ===== DECONNEXION =====
     $('#btn-deconnexion').on('click', function(e) {
         e.preventDefault();
-        $.post('index.php', { action: 'deconnexion' }, function(res) {
+        $.post('index.php?action=logout', {}, function(res) {
             if (res.success) {
                 $('#nav-connexion').removeClass('d-none');
                 $('#nav-dashboard').addClass('d-none');
@@ -73,9 +73,9 @@ $(document).ready(function() {
     // ===== FORMULAIRE MOT DE PASSE OUBLIE =====
     $('#form-mdp-oublie').on('submit', function(e) {
         e.preventDefault();
-        var formData = $(this).serialize() + '&action=mdp_oublie';
+        var formData = $(this).serialize();
 
-        $.post('index.php', formData, function(res) {
+        $.post('index.php?action=motdepasseoublie', formData, function(res) {
             alert(res.message || res.error);
             $('#bloc-mdp-oublie').slideUp(300);
         }, 'json');
@@ -84,9 +84,9 @@ $(document).ready(function() {
     // ===== FORMULAIRE RESERVATION =====
     $('#form-reservation').on('submit', function(e) {
         e.preventDefault();
-        var formData = $(this).serialize() + '&action=reservation';
+        var formData = $(this).serialize();
 
-        $.post('index.php', formData, function(res) {
+        $.post('index.php?action=reservationchambre', formData, function(res) {
             if (res.success) {
                 alert(res.message);
                 $('#popup-reservation').removeClass('active');
