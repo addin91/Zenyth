@@ -475,6 +475,103 @@ main section {
 .badge-terminee { background: #6e8fa5; }
 .badge-annulee { background: #a57c7c; }
 
+/* ===== RESPONSIVE ===== */
+
+/* Tablette */
+@media (max-width: 992px) {
+    .hero h1 {
+        font-size: 2.5rem;
+        letter-spacing: 6px;
+    }
+
+    .carrousel-track .carrousel-item {
+        min-width: calc((100% - 20px) / 2);
+        max-width: calc((100% - 20px) / 2);
+    }
+
+    .popup-panel {
+        padding: 1.5rem;
+        width: 95%;
+    }
+
+    .dash-tab {
+        padding: 8px 12px;
+        font-size: 0.82rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+    .hero {
+        min-height: calc(100vh - 100px);
+        padding: 1.5rem;
+    }
+
+    .hero h1 {
+        font-size: 1.8rem;
+        letter-spacing: 4px;
+    }
+
+    .hero p {
+        font-size: 0.95rem;
+    }
+
+    .btn-accent, .btn-outline-accent {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+    }
+
+    .carrousel-track .carrousel-item {
+        min-width: 100%;
+        max-width: 100%;
+    }
+
+    .carrousel-track {
+        gap: 0;
+    }
+
+    .carrousel-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .popup-panel {
+        padding: 1.2rem;
+        max-height: 95vh;
+        border-radius: 8px;
+    }
+
+    .popup-panel-large {
+        max-width: 100%;
+    }
+
+    .dash-tabs {
+        gap: 0;
+    }
+
+    .dash-tab {
+        padding: 8px 10px;
+        font-size: 0.78rem;
+    }
+
+    .lieu-img-placeholder {
+        height: 180px;
+    }
+}
+
+/* Navbar toggler icon visible sur fond sombre */
+.navbar-toggler {
+    border-color: var(--border);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(163,196,181,0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
 /* ===== FOOTER ===== */
 footer {
     background: var(--bg-section) !important;
