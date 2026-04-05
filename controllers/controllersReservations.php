@@ -15,9 +15,20 @@ class controllersReservations{
         $this->reservationModel = new Reservation();
     }
 
+    public function recupeRereservations(){
+        header('Content-Type: application/json');
+        if (isset($_SESSION['user_id'])) {
+            $reservations = $this->reservationModel->findByClient($_SESSION['user_id']);
+            echo json_encode(['success' => true, 'data' => $reservations ?: []]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Non connecte.']);
+        }
+    }
+    
+
     public function reservationChambre(){
         if (controlPostForm()) {
-            if (isset($_POST['dateDebut'], $_POST['dateFin'], $_POST['nombrePersonne'], $_POST['commentaire'], $_POST['id_chambre'])) {
+            if (isset($_POST['dateDebut'], $_POST['dateFin'], $_POST['nombrePersonne'], $_POST['commentaire'], $_POST['id_chambre'], $_POST['activites'])) {
                 
                 
 
@@ -37,30 +48,16 @@ class controllersReservations{
                 $nombrePersonne = htmlspecialchars($_POST['nombrePersonne'] ?? '');
                 $commentaire = htmlspecialchars($_POST['commentaire'] ?? '');
                 $idChambre = htmlspecialchars($_POST['id_chambre'] ?? '');
+                $idsActivite = array_map(function($v) { return htmlspecialchars($v);}, $_POST['activites']);
                 
-                $data = [
-                    ":id_client" => $idClient, 
-                    ":date_debut" => $dateDebut, 
-                    ":date_fin" => $dateFin, 
-                    ":nombre_personnes" => $nombrePersonne, 
-                    ":statut" => "en_attente", 
-                    ":commentaire" => $commentaire
-                ];
-                $idReservation = $this->reservationModel->create($data);
-
                 $reservationChambreModel = new ReservationChambre();
-                $data = [
-                    ":id_reservation"       => $idReservation, 
-                    ":id_chambre" => $idChambre
-                ];
-                $reservationChambreModel->create($data);
-                $response = [
-                    'status' => 'success',
-                    'msg' => 'Réservation enregistré',
-                ];
-            } else $response = ['status' => 'error', 'msg' => 'Donnée manquante'];
-        } else $response = ['status' => 'error', 'msg' => ''];
-        echo json_encode($response);
+                $idReservationChambre = $reservationChambreModel->create($idClient, $idChambre);
+
+                $idReservation = $this->reservationModel->create($idClient, $idReservationChambre, $idsActivite, [], $dateDebut, $dateFin, $nombrePersonne, $commentaire);
+            } 
+        }  
+        header('Content-Type: application/json');        
+        echo json_encode(['success' => true, 'message' => 'Votre demande de reservation a ete envoyee.']);
     }
 
     public function reservationPrestation(){
@@ -71,28 +68,23 @@ class controllersReservations{
                 $idPrestation = $_POST['id_prestation'];
 
                 // recupere prestation
-                $prestationModel = new Prestation($this->pdo);
-                $prestation = $prestationModel.findById($idPrestation);
+                $prestationModel = new Prestation();
+                $prestation = $prestationModel->findById($idPrestation);
 
                 // recupere reservation
-                $reservation = $this->reservationModel.findByClient($idClient);
+                $reservation = $this->reservationModel->findByClient($idClient);
 
                 // créer reservation prestation
 
-                $reservationPrestationModel = new reservationPrestation($this->pdo);
-                $qte = 0;
+                $reservationPrestationModel = new reservationPrestation();
                 $reduction  = 0;
-                $data = [
-                    ":id_reservation" => $reservation['id'], 
-                    ":id_prestation" => $idPrestation,
-                    ":quantite" => $qte,
-                    ":reduction" => $reduction,
-                    ":total" => ($prestation["prix_unitaire"] * $qte) * (1 - $reduction / 100)
-                ];
-                $this->reservationPrestationModel.create($data);
+
+                $reservationPrestationModel->create($reservation['id'], $idPrestation, $reduction, ($prestation["prix_unitaire"]) * (1 - $reduction / 100));
             }
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'message' => 'Prestation ajoutee.']);
         }
-        // redirection
+        
     }
 
     public function reservationActivite(){
@@ -107,32 +99,26 @@ class controllersReservations{
                 $idActivite = htmlspecialchars($_POST['id_activite'] ?? '');
                 
                 // recupere activite
-                $activiteModel = new Activite($this->pdo);
-                $activite = $activiteModel.findById($idActivite);
+                $activiteModel = new Activite();
+                $activite = $activiteModel->findById($idActivite);
 
                 // recupere reservation
-                $reservation = $this->reservationModel.findByClient($idClient);
+                $reservation = $this->reservationModel->findByClient($idClient);
 
                 // verifie date
                 // verifie capacite
-                if($reservation.estDansIntervalleTemps($reservation, $date) && activite.capaciteSuffisante($activite, $nombrePersonne)){
+                if($reservation->estDansIntervalleTemps($reservation, $date) && activite->capaciteSuffisante($activite, $nombrePersonne)){
                     // enregistre
-                    $data = [
-                        ":id_reservation" => $idReservation, 
-                        ":id_activite" => $idActivite, 
-                        ":date" => $date, 
-                        ":creneau" => $creneau, 
-                        ":nombre_personnes" => $nombrePersonne, 
-                        ":message" => $message
-                    ];
 
-                    $reservationActiviteModel = new reservationActivite($this->pdo);
-                    $this->reservationActiviteModel.create($data);
+                    $reservationActiviteModel = new reservationActivite();
+                    $this->reservationActiviteModel->create($idActivite, $date, $creneau, $nombrePersonne, $message);
                 } else $_SESSION["error"] = "La demande d'activite est pas bonne";
                 // redirect
             }
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'message' => "Demande d'activite envoyee."]);
         }
-        // redirection
+        
     }
 
 }

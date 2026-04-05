@@ -39,35 +39,35 @@ class controllersAdmin{
     // refuse acceptation
     public function refuseReservationChambre($idReservationChambre){
         $reservationChambreModel = new reservationChambre();
-        $reservation = $this->reservationModel.findById($reservationChambreModel["id_reservation"]);
-        $client = $this->clientModel.findById($reservation["id_client"]);
+        $reservation = $this->reservationModel->findById($reservationChambreModel["id_reservation"]);
+        $client = $this->clientModel->findById($reservation["id_client"]);
 
-        $reservationChambreModel.delete($idReservationChambre);
-        $reservation.delete($reservationChambreModel["id_reservation"]);
-        if($client["statut_compte"] == "invité") $client.delete($reservation["id_client"]);
+        $reservationChambreModel->delete($idReservationChambre);
+        $reservation->delete($reservationChambreModel["id_reservation"]);
+        if($client["statut_compte"] == "invité") $client->delete($reservation["id_client"]);
 
         $mailservice = new MailService();
-        $mailservice.envoieMail($client["email"], "Reservation annulé", "Votre réservation a été annulé", true);
+        $mailservice->envoieMail($client["email"], "Reservation annulé", "Votre réservation a été annulé", true);
     }
 
     public function prevoirActivite($id_activite, $id_animateur, $id_demandes_actvites, $date, $creneau, $message){
 
         $activiteModel = new Activite();
-        $activite = $activiteModel.findById($id_activite);
+        $activite = $activiteModel->findById($id_activite);
 
         $animateurModel = new Animateur();
-        $animateur = $animateurModel.findById($id_animateur);
+        $animateur = $animateurModel->findById($id_animateur);
 
         $capacite_restante = $activite["capacite_min"];
         $demandeActiviteModel = new DemandeActivite();
         foreach($id_demandes_actvites as $id){
-            $demandeActivite = $demandeActiviteModel.findById($id);
+            $demandeActivite = $demandeActiviteModel->findById($id);
             $capacite_restante-= $demandeActivite["nombre_personnes_concernees"];
         } 
 
         if($capacite_restante < 0) // Erreur;
         $activitePrevuModel = new ActivitePrevue();
-        $activitePrevu = $activitePrevuModel.create($id_activite, $id_animateur, $id_demandes_actvites, $date, $creneau, $message, $capacite_restante);
+        $activitePrevu = $activitePrevuModel->create($id_activite, $id_animateur, $id_demandes_actvites, $date, $creneau, $message, $capacite_restante);
     }
 
 }

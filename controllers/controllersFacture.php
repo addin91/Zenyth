@@ -1,33 +1,48 @@
 <?php
 
+
+require_once __DIR__ . '/../models/Reservation.php';
+require_once __DIR__ . '/../models/Facture.php';
+require_once __DIR__ . '/../models/Client.php';
+
 require 'vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
 class controllersFacture{
-    private $pdo;
     private $clientModel;
     private $reservationModel;
     private $factureModel;
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
-        $this->clientModel = new Client($pdo);
-        $this->reservationModel = new Reservation($pdo);
-        $this->factureModel = new Facture($pdo);
+        $this->clientModel = new Client();
+        $this->reservationModel = new Reservation();
+        $this->factureModel = new Facture();
     }
     // recup toute les factures client
-    public function recupereFactures($idClient){
+    private function toutesFactures($idClient){
         $reservations = $this->reservationModel->findByClient($idClient);
 
         $factures = [];
         foreach($reservations as $reservation){
-            $facture = $this->factureModel.findByReservation($reservation["id"]);
+            $facture = $this->factureModel->findByReservation($reservation["id"]);
             if($facture) $factures[] = $facture;
         }
         return $factures;
     }
+    
+    public function recupereFactures(){
+        header('Content-Type: application/json');
+        if (isset($_SESSION['user_id'])) {
+            $factures = $this->toutesFactures($_SESSION['user_id']);
+            echo json_encode(['success' => true, 'data' => $factures]);
+        }else {
+            echo json_encode(['success' => false, 'error' => 'Non connecte.']);
+        }
+    }
+
+
     // recup facture en cours
     public function recupereFactureEnCours($idReservation){
         return $this->factureModel->findByReservation($idReservation);
