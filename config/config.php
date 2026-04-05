@@ -129,7 +129,7 @@ function generateCsrfToken()
 
 /** Vérifie le token CSRF soumis par le formulaire */
 function verifyCsrfToken(string $token) 
-{
+{  
     if (!isset($_SESSION['csrf_token'])) {
         return false;
     }
@@ -149,6 +149,7 @@ function csrfField()
 
 function controlPostForm(){
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
         if (verifyCsrfToken($_POST['csrf_token'] ?? '')) {
             return true;
         } else $_SESSION['error'] = "Erreur de sécurité (CSRF).";
