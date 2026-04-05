@@ -424,6 +424,57 @@ main section {
     font-size: 1.05rem;
 }
 
+/* ===== TOASTS ===== */
+.toast {
+    min-width: 280px;
+}
+
+/* ===== PRESTATIONS DASHBOARD ===== */
+.dash-presta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.dash-presta-item:last-child {
+    border-bottom: none;
+}
+
+.dash-presta-info h6 {
+    color: var(--text-heading);
+    margin-bottom: 2px;
+    font-size: 0.95rem;
+}
+
+.dash-presta-info small {
+    color: var(--text-muted);
+}
+
+/* ===== HISTORIQUE RESERVATIONS / FACTURES ===== */
+.dash-history-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.8rem;
+}
+
+.dash-history-card h6 {
+    color: var(--text-heading);
+    margin-bottom: 0.4rem;
+}
+
+.dash-history-card .badge {
+    font-size: 0.75rem;
+}
+
+.badge-en-attente { background: #c4a882; }
+.badge-confirmee { background: #7c9a8e; }
+.badge-terminee { background: #6e8fa5; }
+.badge-annulee { background: #a57c7c; }
+
 /* ===== FOOTER ===== */
 footer {
     background: var(--bg-section) !important;

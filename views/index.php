@@ -335,6 +335,11 @@
                 <div class="mb-3">
                     <label for="mdp-nouveau" class="form-label">Nouveau mot de passe</label>
                     <input type="password" class="form-control" id="mdp-nouveau" name="nouvellePassword" required>
+                    <small class="text-muted">Min. 8 caracteres, 1 majuscule, 1 chiffre, 1 caractere special</small>
+                </div>
+                <div class="mb-3">
+                    <label for="mdp-confirmer" class="form-label">Confirmer le nouveau mot de passe</label>
+                    <input type="password" class="form-control" id="mdp-confirmer" required>
                 </div>
                 <button type="submit" class="btn btn-accent">Modifier</button>
             </form>
@@ -342,5 +347,17 @@
 
     </div>
 </div>
+
+<!-- Toast container -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;"></div>
+
+<script>
+    var SESSION_USER = <?= isset($_SESSION['user_id']) ? json_encode([
+        'connecte' => true,
+        'nom' => $_SESSION['user_name'] ?? '',
+        'prenom' => $_SESSION['user_prenom'] ?? '',
+        'email' => $_SESSION['user_email'] ?? ''
+    ]) : '{"connecte": false}' ?>;
+</script>
 
 <?php include __DIR__ . '/footer.php'; ?>

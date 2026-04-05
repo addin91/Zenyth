@@ -5,23 +5,19 @@ $(document).ready(function() {
         e.preventDefault();
         var nom = $(this).data('popup');
         $('#popup-' + nom).addClass('active');
-        // Ferme le menu mobile si ouvert
         $('.navbar-collapse').collapse('hide');
     });
 
-    // Fermer avec le bouton X
     $('.popup-close').on('click', function() {
         $(this).closest('.popup-overlay').removeClass('active');
     });
 
-    // Fermer en cliquant sur le fond
     $('.popup-overlay').on('click', function(e) {
         if (e.target === this) {
             $(this).removeClass('active');
         }
     });
 
-    // Fermer avec Echap
     $(document).on('keydown', function(e) {
         if (e.key === 'Escape') {
             $('.popup-overlay.active').removeClass('active');
@@ -37,22 +33,30 @@ $(document).ready(function() {
     // ===== FORMULAIRE CONNEXION =====
     $('#form-connexion').on('submit', function(e) {
         e.preventDefault();
+
+        if (!validerEmail($('#co-email').val())) {
+            showToast("Veuillez entrer une adresse email valide.", "error");
+            return;
+        }
+
         var formData = $(this).serialize();
 
         $.post('index.php?action=login', formData, function(res) {
             if (res.success) {
+                var d = res.data || {};
                 $('#popup-connexion').removeClass('active');
                 $('#nav-connexion').addClass('d-none');
                 $('#nav-dashboard').removeClass('d-none');
                 $('#nav-deconnexion').removeClass('d-none');
                 $('#bloc-info-client').hide();
-                // Remplir les infos perso dans le dashboard
-                $('#info-nom').val(res.nom);
-                $('#info-prenom').val(res.prenom);
-                $('#info-email').val(res.email);
-                alert('Bienvenue ' + res.prenom + ' ' + res.nom + ' !');
+                $('#info-nom').val(d.nom || '');
+                $('#info-prenom').val(d.prenom || '');
+                $('#info-email').val(d.email || '');
+                chargerDashboard();
+                $('#popup-dashboard').addClass('active');
+                showToast('Bienvenue ' + (d.prenom || '') + ' ' + (d.nom || '') + ' !');
             } else {
-                alert(res.error);
+                showToast(res.error || 'Erreur de connexion.', 'error');
             }
         }, 'json');
     });
@@ -66,6 +70,21 @@ $(document).ready(function() {
                 $('#nav-dashboard').addClass('d-none');
                 $('#nav-deconnexion').addClass('d-none');
                 $('#bloc-info-client').show();
+                // Fermer le dashboard si ouvert
+                $('#popup-dashboard').removeClass('active');
+                // Vider les infos perso
+                $('#info-nom').val('');
+                $('#info-prenom').val('');
+                $('#info-email').val('');
+                // Vider les onglets du dashboard
+                $('#dash-liste-reservations').html('<p class="text-muted">Aucune reservation pour le moment.</p>');
+                $('#dash-liste-prestations').html('<p class="text-muted">Chargement...</p>');
+                $('#dash-activites-validees').html('<p class="text-muted">Aucune activite validee pour le moment.</p>');
+                $('#dash-liste-factures').html('<p class="text-muted">Aucune facture pour le moment.</p>');
+                // Reset les formulaires du dashboard
+                $('#form-demande-activite')[0].reset();
+                $('#form-change-mdp')[0].reset();
+                showToast('Deconnexion reussie.');
             }
         }, 'json');
     });
@@ -73,26 +92,75 @@ $(document).ready(function() {
     // ===== FORMULAIRE MOT DE PASSE OUBLIE =====
     $('#form-mdp-oublie').on('submit', function(e) {
         e.preventDefault();
+
+        if (!validerEmail($('#oubli-email').val())) {
+            showToast("Veuillez entrer une adresse email valide.", "error");
+            return;
+        }
+
         var formData = $(this).serialize();
 
         $.post('index.php?action=motdepasseoublie', formData, function(res) {
-            alert(res.message || res.error);
+            if (res.success) {
+                showToast(res.message || 'Si ce mail existe, un lien a ete envoye.');
+            } else {
+                showToast(res.error || 'Erreur lors de la demande.', 'error');
+            }
             $('#bloc-mdp-oublie').slideUp(300);
         }, 'json');
     });
 
     // ===== FORMULAIRE RESERVATION =====
+    var today = new Date().toISOString().split('T')[0];
+    $('#res-date-debut').attr('min', today);
+    $('#da-date').attr('min', today);
+
+    $('#res-date-debut').on('change', function() {
+        var debut = $(this).val();
+        $('#res-date-fin').attr('min', debut);
+        if ($('#res-date-fin').val() && $('#res-date-fin').val() <= debut) {
+            $('#res-date-fin').val('');
+        }
+    });
+
     $('#form-reservation').on('submit', function(e) {
         e.preventDefault();
+
+        var debut = $('#res-date-debut').val();
+        var fin = $('#res-date-fin').val();
+
+        var emailVisible = $('#bloc-info-client').is(':visible');
+        if (emailVisible && !validerEmail($('#res-email').val())) {
+            showToast("Veuillez entrer une adresse email valide.", "error");
+            return;
+        }
+
+        if (debut < today) {
+            showToast("La date d'arrivee ne peut pas etre dans le passe.", "error");
+            return;
+        }
+        if (fin <= debut) {
+            showToast("La date de depart doit etre apres la date d'arrivee.", "error");
+            return;
+        }
+
+        var chambreOption = $('#res-chambre option:selected');
+        var capacite = parseInt(chambreOption.data('capacite'));
+        var personnes = parseInt($('#res-personnes').val());
+        if (capacite && personnes > capacite) {
+            showToast("Cette chambre a une capacite de " + capacite + " personnes maximum.", "error");
+            return;
+        }
+
         var formData = $(this).serialize();
 
         $.post('index.php?action=reservationchambre', formData, function(res) {
             if (res.success) {
-                alert(res.message);
+                showToast(res.message || 'Reservation envoyee.');
                 $('#popup-reservation').removeClass('active');
                 $('#form-reservation')[0].reset();
             } else {
-                alert(res.error);
+                showToast(res.error || 'Erreur lors de la reservation.', 'error');
             }
         }, 'json');
     });
@@ -122,6 +190,86 @@ $(document).ready(function() {
         $('#' + $(this).data('tab')).addClass('active');
     });
 
+    // ===== FORMULAIRE CHANGEMENT MDP =====
+    $('#form-change-mdp').on('submit', function(e) {
+        e.preventDefault();
+
+        var ancien = $('#mdp-ancien').val();
+        var nouveau = $('#mdp-nouveau').val();
+        var confirmer = $('#mdp-confirmer').val();
+
+        if (nouveau === ancien) {
+            showToast("Le nouveau mot de passe doit etre different de l'ancien.", "error");
+            return;
+        }
+        if (nouveau !== confirmer) {
+            showToast("Les deux mots de passe ne correspondent pas.", "error");
+            return;
+        }
+        if (!validerMotDePasse(nouveau)) {
+            return;
+        }
+
+        var formData = $(this).serialize();
+        $.post('index.php?action=changementmotdepasse', formData, function(res) {
+            if (res.success) {
+                showToast(res.message || 'Mot de passe modifie.');
+                $('#form-change-mdp')[0].reset();
+            } else {
+                showToast(res.error || 'Erreur lors du changement.', 'error');
+            }
+        }, 'json');
+    });
+
+    // ===== FORMULAIRE DEMANDE ACTIVITE =====
+    $('#form-demande-activite').on('submit', function(e) {
+        e.preventDefault();
+
+        var date = $('#da-date').val();
+
+        if (date < today) {
+            showToast("La date ne peut pas etre dans le passe.", "error");
+            return;
+        }
+
+        var formData = $(this).serialize();
+        $.post('index.php?action=reservationactivite', formData, function(res) {
+            if (res.success) {
+                showToast(res.message || "Demande d'activite envoyee.");
+                $('#form-demande-activite')[0].reset();
+            } else {
+                showToast(res.error || "Erreur lors de la demande.", "error");
+            }
+        }, 'json');
+    });
+
+    // ===== AJOUT PRESTATION (delegation) =====
+    $('#dash-liste-prestations').on('click', '.btn-ajout-presta', function() {
+        var btn = $(this);
+        var idPrestation = btn.data('id');
+
+        $.post('index.php?action=reservationprestation', { id_prestation: idPrestation }, function(res) {
+            if (res.success) {
+                showToast(res.message || 'Prestation ajoutee.');
+                btn.text('Ajoutee').addClass('disabled').prop('disabled', true);
+            } else {
+                showToast(res.error || "Erreur lors de l'ajout.", 'error');
+            }
+        }, 'json');
+    });
+
+    // ===== SESSION : RESTAURER L'ETAT CONNECTE =====
+    if (typeof SESSION_USER !== 'undefined' && SESSION_USER.connecte) {
+        $('#nav-connexion').addClass('d-none');
+        $('#nav-dashboard').removeClass('d-none');
+        $('#nav-deconnexion').removeClass('d-none');
+        $('#bloc-info-client').hide();
+        $('#info-nom').val(SESSION_USER.nom);
+        $('#info-prenom').val(SESSION_USER.prenom);
+        $('#info-email').val(SESSION_USER.email);
+        chargerDashboard();
+    }
+
     // ===== CHARGEMENT INITIAL (AJAX) =====
     chargerChambresAccueil();
     chargerActivitesAccueil();
@@ -130,6 +278,29 @@ $(document).ready(function() {
     chargerActivitesFormulaire();
 
 });
+
+
+// ===== TOAST =====
+function showToast(message, type) {
+    type = type || 'success';
+    var bgClass = type === 'success' ? 'bg-success' : 'bg-danger';
+    var id = 'toast-' + Date.now();
+
+    var html = '<div id="' + id + '" class="toast align-items-center text-white ' + bgClass + ' border-0" role="alert">';
+    html += '<div class="d-flex">';
+    html += '<div class="toast-body">' + message + '</div>';
+    html += '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>';
+    html += '</div></div>';
+
+    $('.toast-container').append(html);
+    var toastEl = document.getElementById(id);
+    var toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+    toast.show();
+
+    toastEl.addEventListener('hidden.bs.toast', function() {
+        toastEl.remove();
+    });
+}
 
 
 // ===== CARROUSEL - MAJ FLECHES =====
@@ -143,14 +314,123 @@ function majFleches(track) {
 }
 
 
-// ===== FONCTIONS AJAX =====
+// ===== VALIDATION EMAIL =====
+function validerEmail(email) {
+    var regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+}
+
+
+// ===== VALIDATION MOT DE PASSE =====
+function validerMotDePasse(mdp) {
+    var erreurs = [];
+    if (mdp.length < 8) erreurs.push("au moins 8 caracteres");
+    if (!/[A-Z]/.test(mdp)) erreurs.push("au moins une majuscule");
+    if (!/[0-9]/.test(mdp)) erreurs.push("au moins un chiffre");
+    if (!/[\W_]/.test(mdp)) erreurs.push("au moins un caractere special");
+
+    if (erreurs.length > 0) {
+        showToast("Le mot de passe doit contenir : " + erreurs.join(", ") + ".", "error");
+        return false;
+    }
+    return true;
+}
+
+
+// ===== CHARGEMENT DASHBOARD =====
+function chargerDashboard() {
+    chargerDashReservations();
+    chargerDashPrestations();
+    chargerDashActivitesSelect();
+    chargerDashFactures();
+}
+
+function chargerDashReservations() {
+    $.ajax({ url: 'index.php?action=recuperereservations', method: 'GET', dataType: 'json' })
+    .done(function(res) {
+        if (res.success && res.data && res.data.length > 0) {
+            var html = '';
+            $.each(res.data, function(i, r) {
+                var badgeClass = 'badge-' + (r.statut || 'en-attente').replace('_', '-');
+                html += '<div class="dash-history-card">';
+                html += '<div class="d-flex justify-content-between align-items-center">';
+                html += '<h6>Reservation #' + r.id + '</h6>';
+                html += '<span class="badge ' + badgeClass + '">' + (r.statut || 'en attente') + '</span>';
+                html += '</div>';
+                html += '<small class="text-muted">Du ' + r.date_debut + ' au ' + r.date_fin + '</small>';
+                html += '<br><small class="text-muted">' + (r.nombre_personnes || '') + ' personne(s)</small>';
+                html += '</div>';
+            });
+            $('#dash-liste-reservations').html(html);
+        } else {
+            $('#dash-liste-reservations').html('<p class="text-muted">Aucune reservation pour le moment.</p>');
+        }
+    })
+    .fail(function() {
+        $('#dash-liste-reservations').html('<p class="text-muted">Aucune reservation pour le moment.</p>');
+    });
+}
+
+function chargerDashPrestations() {
+    $.ajax({ url: 'api/prestations.php', method: 'GET', dataType: 'json' })
+    .done(function(prestations) {
+        var html = '';
+        $.each(prestations, function(i, p) {
+            html += '<div class="dash-presta-item">';
+            html += '<div class="dash-presta-info">';
+            html += '<h6>' + p.nom + '</h6>';
+            html += '<small>' + (p.description || '') + ' — ' + p.prix_unitaire + ' &euro;</small>';
+            html += '</div>';
+            html += '<button class="btn btn-sm btn-outline-accent btn-ajout-presta" data-id="' + p.id + '">Ajouter</button>';
+            html += '</div>';
+        });
+        $('#dash-liste-prestations').html(html);
+    })
+    .fail(function() {
+        $('#dash-liste-prestations').html('<p class="text-muted">Prestations indisponibles.</p>');
+    });
+}
+
+function chargerDashActivitesSelect() {
+    $.ajax({ url: 'api/activites.php', method: 'GET', dataType: 'json' })
+    .done(function(activites) {
+        var html = '<option value="" selected disabled>Choisir...</option>';
+        $.each(activites, function(i, act) {
+            html += '<option value="' + act.id + '">' + act.nom + ' (' + act.prix + ' &euro;)</option>';
+        });
+        $('#da-activite').html(html);
+    });
+}
+
+function chargerDashFactures() {
+    $.ajax({ url: 'index.php?action=recuperefactures', method: 'GET', dataType: 'json' })
+    .done(function(res) {
+        if (res.success && res.data && res.data.length > 0) {
+            var html = '';
+            $.each(res.data, function(i, f) {
+                html += '<div class="dash-history-card">';
+                html += '<div class="d-flex justify-content-between align-items-center">';
+                html += '<h6>Facture #' + f.id + '</h6>';
+                html += '<span class="prix">' + (f.montant_total || '0.00') + ' &euro;</span>';
+                html += '</div>';
+                html += '<small class="text-muted">Reservation #' + f.id_reservation + '</small>';
+                html += '</div>';
+            });
+            $('#dash-liste-factures').html(html);
+        } else {
+            $('#dash-liste-factures').html('<p class="text-muted">Aucune facture pour le moment.</p>');
+        }
+    })
+    .fail(function() {
+        $('#dash-liste-factures').html('<p class="text-muted">Aucune facture pour le moment.</p>');
+    });
+}
+
+
+// ===== FONCTIONS AJAX - ACCUEIL =====
 
 function chargerChambresAccueil() {
-    $.ajax({
-        url: 'api/chambres.php',
-        method: 'GET',
-        dataType: 'json'
-    })
+    $.ajax({ url: 'api/chambres.php', method: 'GET', dataType: 'json' })
     .done(function(chambres) {
         var html = '';
         $.each(chambres, function(i, ch) {
@@ -171,11 +451,7 @@ function chargerChambresAccueil() {
 }
 
 function chargerActivitesAccueil() {
-    $.ajax({
-        url: 'api/activites.php',
-        method: 'GET',
-        dataType: 'json'
-    })
+    $.ajax({ url: 'api/activites.php', method: 'GET', dataType: 'json' })
     .done(function(activites) {
         var html = '';
         $.each(activites, function(i, act) {
@@ -207,11 +483,7 @@ function chargerActivitesAccueil() {
 }
 
 function chargerPrestationsAccueil() {
-    $.ajax({
-        url: 'api/prestations.php',
-        method: 'GET',
-        dataType: 'json'
-    })
+    $.ajax({ url: 'api/prestations.php', method: 'GET', dataType: 'json' })
     .done(function(prestations) {
         var html = '';
         $.each(prestations, function(i, p) {
@@ -235,15 +507,11 @@ function chargerPrestationsAccueil() {
 // ===== REMPLISSAGE FORMULAIRE RESERVATION =====
 
 function chargerChambresFormulaire() {
-    $.ajax({
-        url: 'api/chambres.php',
-        method: 'GET',
-        dataType: 'json'
-    })
+    $.ajax({ url: 'api/chambres.php', method: 'GET', dataType: 'json' })
     .done(function(chambres) {
         var html = '<option value="" selected disabled>Choisir une chambre...</option>';
         $.each(chambres, function(i, ch) {
-            html += '<option value="' + ch.id + '">';
+            html += '<option value="' + ch.id + '" data-capacite="' + ch.capacite + '">';
             html += ch.nom + ' (' + ch.type + ') - ' + ch.capacite + ' pers. - ' + ch.prix_nuit + ' &euro;/nuit';
             html += '</option>';
         });
@@ -252,11 +520,7 @@ function chargerChambresFormulaire() {
 }
 
 function chargerActivitesFormulaire() {
-    $.ajax({
-        url: 'api/activites.php',
-        method: 'GET',
-        dataType: 'json'
-    })
+    $.ajax({ url: 'api/activites.php', method: 'GET', dataType: 'json' })
     .done(function(activites) {
         var html = '';
         $.each(activites, function(i, act) {

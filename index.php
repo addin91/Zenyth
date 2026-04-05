@@ -15,12 +15,15 @@ switch ($action) {
         if (isset($_SESSION['user_id'])) {
             echo json_encode([
                 'success' => true,
-                'nom' => $_SESSION['user_name'],
-                'prenom' => $_SESSION['user_prenom'],
-                'email' => $_SESSION['user_email']
+                'message' => 'Connexion reussie.',
+                'data' => [
+                    'nom' => $_SESSION['user_name'],
+                    'prenom' => $_SESSION['user_prenom'],
+                    'email' => $_SESSION['user_email']
+                ]
             ]);
         } else {
-            echo json_encode(['success' => false, 'error' => $_SESSION['error'] ?? 'Erreur de connexion']);
+            echo json_encode(['success' => false, 'error' => $_SESSION['error'] ?? 'Erreur de connexion.']);
             unset($_SESSION['error']);
         }
         break;
@@ -80,6 +83,19 @@ switch ($action) {
         $controller = new controllersReservations();
         $controller->reservationActivite();
         echo json_encode(['success' => true, 'message' => "Demande d'activite envoyee."]);
+        break;
+
+    // --- RESERVATIONS CLIENT ---
+    case 'recuperereservations':
+        header('Content-Type: application/json');
+        if (isset($_SESSION['user_id'])) {
+            require_once __DIR__ . '/models/Reservation.php';
+            $reservationModel = new Reservation();
+            $reservations = $reservationModel->findByClient($_SESSION['user_id']);
+            echo json_encode(['success' => true, 'data' => $reservations ?: []]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Non connecte.']);
+        }
         break;
 
     // --- FACTURES ---
