@@ -1,0 +1,106 @@
+{
+    "1": {
+        "id_reservation": 1,
+        "id_client": 1,
+        "date_debut": "2025-06-01",
+        "date_fin": "2025-06-05",
+        "nombre_personnes": 2,
+        "statut": "valid\u00e9e",
+        "commentaire": "Vue mer souhait\u00e9e",
+        "date_demande": "2025-05-01"
+    },
+    "2": {
+        "id_reservation": 2,
+        "id_client": 2,
+        "date_debut": "2025-07-10",
+        "date_fin": "2025-07-15",
+        "nombre_personnes": 4,
+        "statut": "en_attente",
+        "commentaire": "",
+        "date_demande": "2025-06-01"
+    },
+    "3": {
+        "id_reservation": 3,
+        "nom_temp": "Durand",
+        "email_temp": "durand@mail.com",
+        "date_debut": "2025-08-01",
+        "date_fin": "2025-08-03",
+        "nombre_personnes": 1,
+        "statut": "refus\u00e9e",
+        "commentaire": "Derni\u00e8re minute",
+        "date_demande": "2025-07-20"
+    },
+    "4": {
+        "id_reservation": 4,
+        "id_client": 1,
+        "date_debut": "2025-09-12",
+        "date_fin": "2025-09-18",
+        "nombre_personnes": 2,
+        "statut": "valid\u00e9e",
+        "commentaire": "",
+        "date_demande": "2025-08-01"
+    },
+    "5": {
+        ":id_client": 6,
+        ":date_debut": "0001-01-01",
+        ":date_fin": "0001-01-01",
+        ":nombre_personnes": "8",
+        ":statut": "en_attente",
+        ":commentaire": "",
+        "id": 5
+    },
+    "6": {
+        ":id_client": 7,
+        ":date_debut": "0001-01-01",
+        ":date_fin": "0001-01-01",
+        ":nombre_personnes": "8",
+        ":statut": "en_attente",
+        ":commentaire": "",
+        "id": 6
+    },
+    "7": {
+        ":id_client": 8,
+        ":date_debut": "0001-01-01",
+        ":date_fin": "0001-01-01",
+        ":nombre_personnes": "8",
+        ":statut": "en_attente",
+        ":commentaire": "",
+        "id": 7
+    },
+    "8": {
+        ":id_client": 9,
+        ":date_debut": "0001-01-01",
+        ":date_fin": "0001-01-01",
+        ":nombre_personnes": "8",
+        ":statut": "en_attente",
+        ":commentaire": "",
+        "id": 8
+    },
+    "9": {
+        ":id_client": 10,
+        ":date_debut": "0001-01-01",
+        ":date_fin": "0001-01-01",
+        ":nombre_personnes": "8",
+        ":statut": "en_attente",
+        ":commentaire": "",
+        "id": 9
+    },
+    "10": {
+        ":id_client": 11,
+        ":date_debut": "0001-01-01",
+        ":date_fin": "0001-01-01",
+        ":nombre_personnes": "8",
+        ":statut": "en_attente",
+        ":commentaire": "",
+        "id": 10
+    },
+    "11": {
+        "id_client": 12,
+        "date_debut": "0001-01-01",
+        "date_fin": "0001-01-01",
+        "nombre_personnes": "8",
+        "statut": "en_attente",
+        "commentaire": "",
+        "id": 11
+    }
+}

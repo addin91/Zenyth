@@ -1,0 +1,37 @@
+{
+    "1": {
+        "id": 1,
+        "id_reservation": 1,
+        "id_chambre": 1
+    },
+    "2": {
+        "id": 2,
+        "id_reservation": 2,
+        "id_chambre": 2
+    },
+    "3": {
+        "id": 3,
+        "id_reservation": 4,
+        "id_chambre": 3
+    },
+    "4": {
+        "id": 4,
+        "id_reservation": 1,
+        "id_chambre": 3
+    },
+    "5": {
+        ":id_reservation": 9,
+        ":id_chambre": "undefined",
+        "id": 5
+    },
+    "6": {
+        ":id_reservation": 10,
+        ":id_chambre": "undefined",
+        "id": 6
+    },
+    "7": {
+        "id_reservation": 11,
+        "id_chambre": "undefined",
+        "id": 7
+    }
+}

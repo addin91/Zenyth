@@ -1,0 +1,26 @@
+{
+  "1": {
+    "id": 1,
+    "id_client": 1,
+    "id_reservation": 1,
+    "id_reservation_chambre": 1,
+    "id_reservation_prestation": [1, 2],
+    "id_demande_activite": [1],
+    "montant_total": 900,
+    "avoirs": 0,
+    "reduction": 20,
+    "statut": "payée"
+  },
+  "2": {
+    "id": 2,
+    "id_client": 2,
+    "id_reservation": 2,
+    "id_reservation_chambre": 2,
+    "id_reservation_prestation": [3],
+    "id_demande_activite": [2],
+    "montant_total": 600,
+    "avoirs": 50,
+    "reduction": 0,
+    "statut": "en_attente"
+  }
+}

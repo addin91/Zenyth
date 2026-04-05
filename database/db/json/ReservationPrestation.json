@@ -1,0 +1,6 @@
+{
+  "1": {"id": 1, "id_reservation": 1, "id_prestation": 1, "quantite": 4, "reduction": 0, "total": 48},
+  "2": {"id": 2, "id_reservation": 1, "id_prestation": 2, "quantite": 2, "reduction": 10, "total": 54},
+  "3": {"id": 3, "id_reservation": 2, "id_prestation": 1, "quantite": 5, "reduction": 0, "total": 60},
+  "4": {"id": 4, "id_reservation": 4, "id_prestation": 4, "quantite": 3, "reduction": 5, "total": 57}
+}

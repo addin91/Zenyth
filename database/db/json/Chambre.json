@@ -1,0 +1,6 @@
+{
+  "1": {"id_chambre": 1, "nom_chambre": "Suite Océan", "type_chambre": "suite", "capacite": 4, "prix_nuit": 180, "statut": "occupé"},
+  "2": {"id_chambre": 2, "nom_chambre": "Chambre Standard 1", "type_chambre": "standard", "capacite": 2, "prix_nuit": 80, "statut": "libre"},
+  "3": {"id_chambre": 3, "nom_chambre": "Chambre Deluxe", "type_chambre": "deluxe", "capacite": 3, "prix_nuit": 120, "statut": "occupé"},
+  "4": {"id_chambre": 4, "nom_chambre": "Studio Jardin", "type_chambre": "studio", "capacite": 2, "prix_nuit": 90, "statut": "libre"}
+}

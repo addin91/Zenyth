@@ -1,0 +1,6 @@
+{
+  "1": {"id_animateur": 1, "nom": "Lefevre", "prenom": "Paul", "specialite": "Yoga", "actif": true},
+  "2": {"id_animateur": 2, "nom": "Moreau", "prenom": "Sophie", "specialite": "Randonnée", "actif": true},
+  "3": {"id_animateur": 3, "nom": "Garcia", "prenom": "Luis", "specialite": "Cuisine", "actif": true},
+  "4": {"id_animateur": 4, "nom": "Roux", "prenom": "Anna", "specialite": "Plongée", "actif": false}
+}

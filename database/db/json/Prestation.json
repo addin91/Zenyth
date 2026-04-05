@@ -1,0 +1,6 @@
+{
+  "1": {"id_prestation": 1, "nom": "Petit déjeuner", "description": "Buffet complet", "prix_unitaire": 12, "actif": true},
+  "2": {"id_prestation": 2, "nom": "Spa", "description": "Accès spa 2h", "prix_unitaire": 30, "actif": true},
+  "3": {"id_prestation": 3, "nom": "Navette", "description": "Transport aéroport", "prix_unitaire": 25, "actif": false},
+  "4": {"id_prestation": 4, "nom": "Room service", "description": "Service en chambre", "prix_unitaire": 20, "actif": true}
+}

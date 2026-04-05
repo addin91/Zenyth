@@ -1,10 +1,6 @@
-[
-    {
-        "id" : 1,
-        "nom" : "A"
-    },
-    {
-        "id" : 2,
-        "nom" : "B"
-    }
-]
+{
+  "1": {"id_activite": 1, "nom": "Yoga", "type": "bien-être", "duree": 60, "capacite_min": 2, "capacite_max": 10, "prix": 15, "actif": true},
+  "2": {"id_activite": 2, "nom": "Randonnée", "type": "sport", "duree": 180, "capacite_min": 4, "capacite_max": 15, "prix": 25, "actif": true},
+  "3": {"id_activite": 3, "nom": "Atelier cuisine", "type": "loisir", "duree": 120, "capacite_min": 2, "capacite_max": 8, "prix": 40, "actif": true},
+  "4": {"id_activite": 4, "nom": "Plongée", "type": "sport", "duree": 90, "capacite_min": 2, "capacite_max": 6, "prix": 60, "actif": false}
+}

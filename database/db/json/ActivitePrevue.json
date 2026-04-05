@@ -1,0 +1,5 @@
+{
+  "1": {"id_activite_prevue": 1, "id_activite": 1, "date": "2025-06-02", "creneau": "matin", "id_animateur": 1, "message": "", "capacite_restante": 5},
+  "2": {"id_activite_prevue": 2, "id_activite": 2, "date": "2025-07-12", "creneau": "après-midi", "id_animateur": 2, "message": "", "capacite_restante": 10},
+  "3": {"id_activite_prevue": 3, "id_activite": 3, "date": "2025-09-14", "creneau": "soir", "id_animateur": 3, "message": "", "capacite_restante": 6}
+}
