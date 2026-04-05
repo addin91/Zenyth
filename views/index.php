@@ -93,6 +93,7 @@
         <hr class="section-divider">
 
         <form id="form-reservation" method="POST">
+            <?= csrfField() ?>
 
             <!-- Infos personnelles (visiteur non connecte) -->
             <div id="bloc-info-client">
@@ -177,6 +178,7 @@
         <hr class="section-divider">
 
         <form id="form-connexion" method="POST">
+            <?= csrfField() ?>
             <div class="mb-3">
                 <label for="co-email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="co-email" name="email" required>
@@ -196,6 +198,7 @@
             <hr class="my-4" style="border-color: var(--border);">
             <h5 class="section-title" style="font-size:1.2rem;">Reinitialiser le mot de passe</h5>
             <form id="form-mdp-oublie" method="POST">
+                <?= csrfField() ?>
                 <div class="mb-3">
                     <label for="oubli-email" class="form-label">Votre email</label>
                     <input type="email" class="form-control" id="oubli-email" name="email" required>
@@ -243,6 +246,7 @@
         <div class="dash-panel" id="dash-activites">
             <h5>Demander une activite</h5>
             <form id="form-demande-activite" method="POST">
+                <?= csrfField() ?>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="da-activite" class="form-label">Activite</label>
@@ -323,6 +327,7 @@
 
             <h5>Changer le mot de passe</h5>
             <form id="form-change-mdp" method="POST">
+                <?= csrfField() ?>
                 <div class="mb-3">
                     <label for="mdp-ancien" class="form-label">Mot de passe actuel</label>
                     <input type="password" class="form-control" id="mdp-ancien" name="ancienPassword" required>
