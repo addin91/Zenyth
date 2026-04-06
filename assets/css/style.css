@@ -483,6 +483,126 @@ main section {
 .badge-terminee { background: #6e8fa5; }
 .badge-annulee { background: #a57c7c; }
 
+/* ===== FACTURE CARD ===== */
+.facture-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.facture-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.facture-titre {
+    color: var(--text-heading);
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+}
+
+.facture-dates {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.facture-badge {
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.facture-badge-provisoire {
+    background: rgba(196, 168, 130, 0.15);
+    color: var(--accent-warm);
+}
+
+.facture-badge-emise {
+    background: rgba(110, 143, 165, 0.15);
+    color: #6e8fa5;
+}
+
+.facture-badge-payee {
+    background: rgba(124, 154, 142, 0.15);
+    color: var(--accent-light);
+}
+
+.facture-lignes {
+    padding: 0.5rem 1.2rem;
+}
+
+.facture-ligne {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.facture-ligne:last-child {
+    border-bottom: none;
+}
+
+.facture-ligne-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.facture-ligne-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.facture-ligne-desc {
+    color: var(--text-heading);
+    font-size: 0.9rem;
+}
+
+.facture-ligne-prix {
+    color: var(--text-heading);
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.facture-ligne-deduction .facture-ligne-prix {
+    color: var(--accent-light);
+}
+
+.facture-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1.2rem;
+    border-top: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.facture-total {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.facture-total-prix {
+    color: var(--text-heading);
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
 /* ===== RESPONSIVE ===== */
 
 /* Tablette */

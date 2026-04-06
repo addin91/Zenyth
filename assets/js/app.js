@@ -264,7 +264,7 @@ $(document).ready(function() {
         var btn = $(this);
         var idPrestation = btn.data('id');
 
-        if (btn.prop('disabled') || prestationsAjoutees.indexOf(idPrestation) !== -1) {
+        if (btn.prop('disabled') || prestationsAjoutees.indexOf(String(idPrestation)) !== -1) {
             showToast('Cette prestation a deja ete ajoutee.', 'error');
             return;
         }
@@ -273,9 +273,13 @@ $(document).ready(function() {
 
         $.post('index.php?action=reservationprestation', { id_prestation: idPrestation, csrf_token: $('#csrf-global').val() }, function(res) {
             if (res.success) {
-                prestationsAjoutees.push(idPrestation);
+                prestationsAjoutees.push(String(idPrestation));
                 showToast(res.message || 'Prestation ajoutee.');
                 btn.text('Ajoutee').addClass('disabled');
+                setTimeout(function() {
+                    chargerDashFactures();
+                    chargerDashPrestations();
+                }, 300);
             } else {
                 showToast(res.error || "Erreur lors de l'ajout.", 'error');
                 btn.prop('disabled', false).text('Ajouter');
@@ -407,16 +411,14 @@ function chargerDashReservations() {
 }
 
 function chargerDashPrestations() {
-    $.ajax({ url: 'index.php?action=recuperereservations', method: 'GET', dataType: 'json' })
-    .done(function(resResa) {
+    $.ajax({ url: 'index.php?action=recuperefactures', method: 'GET', dataType: 'json' })
+    .done(function(resFact) {
         var prestasDejaReservees = [];
-        if (resResa.success && resResa.data) {
-            $.each(resResa.data, function(i, r) {
-                if (r.id_reservation_prestations && r.id_reservation_prestations.length) {
-                    $.each(r.id_reservation_prestations, function(j, idP) {
-                        prestasDejaReservees.push(String(idP));
-                    });
-                }
+        if (resFact.success && resFact.data) {
+            $.each(resFact.data, function(i, f) {
+                $.each(f.prestations || [], function(j, p) {
+                    if (p.id_prestation) prestasDejaReservees.push(String(p.id_prestation));
+                });
             });
         }
         prestationsAjoutees = prestasDejaReservees.slice();
@@ -490,67 +492,92 @@ function chargerDashFactures() {
         if (res.success && res.data && res.data.length > 0) {
             var html = '';
             $.each(res.data, function(i, f) {
-                html += '<div class="dash-history-card">';
+                var badgeClass = f.statut === 'payée' ? 'facture-badge-payee' : (f.statut === 'emise' ? 'facture-badge-emise' : 'facture-badge-provisoire');
+
+                html += '<div class="facture-card">';
 
                 // En-tête
-                html += '<div class="d-flex justify-content-between align-items-center mb-2">';
-                html += '<h6>Facture #' + f.id + '</h6>';
-                var badgeClass = f.statut === 'payée' ? 'bg-success' : 'bg-warning text-dark';
-                html += '<span class="badge ' + badgeClass + '">' + (f.statut || 'en attente') + '</span>';
+                html += '<div class="facture-header">';
+                html += '<div>';
+                html += '<h6 class="facture-titre">Facture #' + f.id + '</h6>';
+                if (f.date_debut && f.date_fin) {
+                    html += '<span class="facture-dates">' + f.date_debut + '  &rarr;  ' + f.date_fin + '</span>';
+                }
+                html += '</div>';
+                html += '<span class="facture-badge ' + badgeClass + '">' + (f.statut || 'en attente') + '</span>';
                 html += '</div>';
 
-                // Dates
-                if (f.date_debut && f.date_fin) {
-                    html += '<small class="text-muted">Du ' + f.date_debut + ' au ' + f.date_fin + '</small><br>';
-                }
-
-                // Tableau détail
-                html += '<table class="table table-sm mt-2" style="font-size:0.85rem;">';
-                html += '<thead><tr><th>Type</th><th>Description</th><th class="text-end">Prix</th></tr></thead>';
-                html += '<tbody>';
+                // Lignes détail
+                html += '<div class="facture-lignes">';
 
                 // Chambre
                 if (f.chambre) {
                     var prixChambre = (f.prix_nuit || 0) * (f.nuits || 0);
-                    html += '<tr><td>Chambre</td><td>' + f.chambre + '<br><small>' + f.nuits + ' nuit(s)</small></td>';
-                    html += '<td class="text-end">' + prixChambre.toFixed(2) + ' &euro;</td></tr>';
+                    html += '<div class="facture-ligne">';
+                    html += '<div class="facture-ligne-info">';
+                    html += '<span class="facture-ligne-label">Chambre</span>';
+                    html += '<span class="facture-ligne-desc">' + f.chambre + ' &mdash; ' + f.nuits + ' nuit(s) x ' + parseFloat(f.prix_nuit).toFixed(0) + ' &euro;</span>';
+                    html += '</div>';
+                    html += '<span class="facture-ligne-prix">' + prixChambre.toFixed(2) + ' &euro;</span>';
+                    html += '</div>';
                 }
 
                 // Prestations
                 $.each(f.prestations || [], function(j, p) {
-                    html += '<tr><td>Prestation</td><td>' + p.nom;
+                    html += '<div class="facture-ligne">';
+                    html += '<div class="facture-ligne-info">';
+                    html += '<span class="facture-ligne-label">Prestation</span>';
+                    html += '<span class="facture-ligne-desc">' + p.nom;
                     if (p.quantite > 1) html += ' x' + p.quantite;
-                    if (p.reduction > 0) html += ' <small>(-' + p.reduction + '%)</small>';
-                    html += '</td><td class="text-end">' + parseFloat(p.total).toFixed(2) + ' &euro;</td></tr>';
+                    if (p.reduction > 0) html += ' (-' + p.reduction + '%)';
+                    html += '</span></div>';
+                    html += '<span class="facture-ligne-prix">' + parseFloat(p.total).toFixed(2) + ' &euro;</span>';
+                    html += '</div>';
                 });
 
                 // Activités
                 $.each(f.activites || [], function(j, a) {
-                    html += '<tr><td>Activite</td><td>' + a.nom + '</td>';
-                    html += '<td class="text-end">' + parseFloat(a.prix).toFixed(2) + ' &euro;</td></tr>';
+                    html += '<div class="facture-ligne">';
+                    html += '<div class="facture-ligne-info">';
+                    html += '<span class="facture-ligne-label">Activite</span>';
+                    html += '<span class="facture-ligne-desc">' + a.nom + '</span>';
+                    html += '</div>';
+                    html += '<span class="facture-ligne-prix">' + parseFloat(a.prix).toFixed(2) + ' &euro;</span>';
+                    html += '</div>';
                 });
 
                 // Avoirs
                 if (f.avoirs > 0) {
-                    html += '<tr><td>Avoirs</td><td>Depot / arrhes</td>';
-                    html += '<td class="text-end text-success">-' + parseFloat(f.avoirs).toFixed(2) + ' &euro;</td></tr>';
+                    html += '<div class="facture-ligne facture-ligne-deduction">';
+                    html += '<div class="facture-ligne-info">';
+                    html += '<span class="facture-ligne-label">Avoirs</span>';
+                    html += '<span class="facture-ligne-desc">Depot / arrhes</span>';
+                    html += '</div>';
+                    html += '<span class="facture-ligne-prix">-' + parseFloat(f.avoirs).toFixed(2) + ' &euro;</span>';
+                    html += '</div>';
                 }
 
                 // Réduction
                 if (f.reduction > 0) {
-                    html += '<tr><td>Reduction</td><td>' + f.reduction + '%</td>';
-                    html += '<td class="text-end text-success">-' + parseFloat(f.reduction).toFixed(2) + ' &euro;</td></tr>';
+                    html += '<div class="facture-ligne facture-ligne-deduction">';
+                    html += '<div class="facture-ligne-info">';
+                    html += '<span class="facture-ligne-label">Reduction</span>';
+                    html += '<span class="facture-ligne-desc">' + f.reduction + '%</span>';
+                    html += '</div>';
+                    html += '<span class="facture-ligne-prix">-' + parseFloat(f.reduction).toFixed(2) + ' &euro;</span>';
+                    html += '</div>';
                 }
 
-                html += '</tbody>';
+                html += '</div>';
 
-                // Total
-                html += '<tfoot><tr><td colspan="2" class="text-end"><strong>Total</strong></td>';
-                html += '<td class="text-end"><strong>' + parseFloat(f.montant_final || f.montant_total).toFixed(2) + ' &euro;</strong></td></tr></tfoot>';
-                html += '</table>';
-
-                // Bouton télécharger
+                // Total + bouton
+                html += '<div class="facture-footer">';
+                html += '<div class="facture-total">';
+                html += '<span>Total</span>';
+                html += '<span class="facture-total-prix">' + parseFloat(f.montant_final || f.montant_total).toFixed(2) + ' &euro;</span>';
+                html += '</div>';
                 html += '<button class="btn btn-sm btn-outline-accent btn-telecharger-facture" data-id-reservation="' + f.id_reservation + '">Telecharger PDF</button>';
+                html += '</div>';
 
                 html += '</div>';
             });
