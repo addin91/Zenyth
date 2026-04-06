@@ -309,6 +309,22 @@ main section {
     color: var(--text-main);
 }
 
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    padding-right: 40px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 38px;
+    cursor: pointer;
+    color: #666;
+}
+
 /* ===== CARROUSEL ===== */
 .carrousel-wrapper {
     display: flex;

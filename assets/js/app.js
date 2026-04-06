@@ -732,3 +732,17 @@ function chargerActivitesFormulaire() {
         $('#res-activites').html(html);
     });
 }
+
+const toggles = document.querySelectorAll(".toggle-password");
+
+toggles.forEach(function (toggle) {
+    toggle.addEventListener("click", function () {
+        const input = this.parentElement.querySelector("input");
+
+        const isPassword = input.type === "password";
+        input.type = isPassword ? "text" : "password";
+
+        this.classList.toggle("fa-eye");
+        this.classList.toggle("fa-eye-slash");
+    });
+});
