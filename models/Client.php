@@ -67,7 +67,7 @@ class Client
         return $motDePasseClair;
     }
 
-    public function changementPassword($id, $newPassword)
+    public function changementMotDePasse($id, $newPassword)
     {
         if (!$this->clientExiste($id)) {
             die("Client introuvable");
@@ -109,8 +109,6 @@ class Client
     {
         $clients = $this->jsondb->whereData($this->jsondb->where('email', $email), "statut_compte", "actif");
         $client = reset($clients);
-        error_log(print_r($client, true));
-        error_log(password_verify($password, $client['password']));
 
         if ($client && password_verify($password, $client['password'])) {
             return $client;

@@ -67,12 +67,12 @@ class ActivitePrevue
         // ORDER BY ap.creneau ASC
     }
 
-    public function create($id_activite, $id_animateur, $id_demandes_actvites, $date, $creneau, $message, $capacite_restante)
+    public function create($id_activite, $id_animateur, $id_demandes_activites, $date, $creneau, $message, $capacite_restante)
     {
         $data = [
             "id_activite" => $id_activite,
             "id_animateur" => $id_animateur,
-            "id_demandes_actvites" => $id_demandes_actvites,
+            "id_demandes_activites" => $id_demandes_activites,
             "date" => $date,
             "creneau" => $creneau,
             "message" => $message,

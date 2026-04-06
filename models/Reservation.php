@@ -44,12 +44,23 @@ class Reservation
 
     public function findByPeriode($date_debut, $date_fin)
     {
-        // TODO : adapter manuellement (necessite un filtre de chevauchement de dates + JOIN clients)
-        // SELECT r.*, c.nom, c.prenom
-        // FROM reservations r
-        // LEFT JOIN clients c ON c.id = r.id_client
-        // WHERE r.date_debut <= ? AND r.date_fin >= ?
-        // ORDER BY r.date_debut ASC
+        // Convertir en timestamp pour comparaison
+        $debutDemande = strtotime($date_debut);
+        $finDemande   = strtotime($date_fin);
+
+        $reservations = $this->jsondb->selectAll();
+        $resultat = [];
+
+        foreach ($reservations as $reservation) {
+            $resDebut = strtotime($reservation['date_debut']);
+            $resFin   = strtotime($reservation['date_fin']);
+
+            if ($debutDemande < $resFin && $finDemande > $resDebut) {
+                $resultat[] = $reservation;
+            }
+        }
+
+        return $resultat;
     }
 
     public function create($id_client, $id_reservation_chambre, $id_demandes_activite, $id_reservations_prestation, $date_debut , $date_fin , $nombre_personnes , $commentaire)
@@ -82,6 +93,23 @@ class Reservation
         $reservation['statut'] = $statut;
         $reservation = $this->jsondb->update($id, $reservation);
         return $reservation;
+    }
+
+    public function validerReservation($idReservation)
+    {
+        $reservation = $this->jsondb->find($idReservation);
+        if (!$reservation) return false;
+
+        $this->updateStatut($idReservation, 'validée');
+
+        $reservationChambreModel = new ReservationChambre();
+        $reservationChambre = $reservationChambreModel->findById($reservation['id_reservation_chambre']);
+
+        $chambreModel = new Chambre();
+
+        $chambreModel->updateStatut($reservationChambre['id_chambre'], 'occupé');
+
+        return true;
     }
 
     public function delete($id)

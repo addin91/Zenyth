@@ -27,12 +27,7 @@ class DemandeActivite
 
     public function findById($id)
     {
-        // TODO : adapter manuellement (necessite un JOIN activites + reservations)
-        // SELECT da.*, a.nom AS nom_activite, a.prix, r.date_debut, r.date_fin
-        // FROM demandes_activites da
-        // JOIN activites a ON a.id = da.id_activite
-        // JOIN reservations r ON r.id = da.id_reservation
-        // WHERE da.id = ?
+        return $this->jsondb->find($id);
     }
 
     public function findByReservation($id_reservation)
@@ -65,6 +60,12 @@ class DemandeActivite
         // ORDER BY da.creneau ASC
     }
 
+
+    public function findByStatut($statut)
+    {
+        return $this->jsondb->where("statut", $statut);
+    }
+
     public function create($id_activite, $date, $creneau, $nombre_personnes_concernees, $message)
     {
         $data = [
@@ -73,6 +74,7 @@ class DemandeActivite
             'creneau' => $creneau,
             'nombre_personnes_concernees' => $nombre_personnes_concernees,
             'message' => $message,
+            'statut' => "en_attente"
         ];
         return $this->jsondb->add($data);
     }
@@ -83,6 +85,15 @@ class DemandeActivite
         $demandeActivite = $this->jsondb->update($id, $data);
         return $demandeActivite;
     }
+
+    public function updateStatut($id, $statut)
+    {
+        $reservation = $this->jsondb->find($id);
+        $reservation['statut'] = $statut;
+        $reservation = $this->jsondb->update($id, $reservation);
+        return $reservation;
+    }
+
 
     public function delete($id)
     {
@@ -106,3 +117,4 @@ class DemandeActivite
 // créneau 
 // nombre_personnes_concernées 
 // message 
+// statut (en_attente, validée, refusée)

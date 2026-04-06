@@ -24,11 +24,7 @@ class ReservationPrestation
 
     public function findById($id)
     {
-        // TODO : adapter manuellement (necessite un JOIN prestations)
-        // SELECT rp.*, p.nom, p.prix_unitaire
-        // FROM reservation_prestations rp
-        // JOIN prestations p ON p.id = rp.id_prestation
-        // WHERE rp.id = ?
+        return $this->jsondb->find($id);
     }
 
     public function findByReservation($id_reservation)

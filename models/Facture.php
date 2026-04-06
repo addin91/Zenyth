@@ -31,7 +31,7 @@ class Facture
     public function findByReservation($id_reservation)
     {
         $facture = $this->jsondb->where('id_reservation', $id_reservation);
-        return $facture[0] ?? null;
+        return !empty($facture) ? reset($facture) : null;    
     }
 
     public function findByStatut($statut)
@@ -45,13 +45,13 @@ class Facture
         // ORDER BY f.date_emission DESC
     }
 
-    public function create($id_client, $id_reservation, $id_reservation_chambre, $id_reservation_prestations, $id_demandes_activite, $montant_total, $avoirs, $reduction, $statut, $date_emission)
+    public function create($id_client, $id_reservation, $id_reservation_chambre, $id_reservations_prestation, $id_demandes_activite, $montant_total, $avoirs, $reduction)
     {
         $data = [
             'id_client' => $id_client,
             'id_reservation' => $id_reservation,
             'id_reservation_chambre' => $id_reservation_chambre,
-            'id_reservation_prestations' => $id_reservation_prestations,
+            'id_reservations_prestation' => $id_reservations_prestation,
             'id_demandes_activite' => $id_demandes_activite,
             'montant_total' => $montant_total,
             'avoirs' => $avoirs,

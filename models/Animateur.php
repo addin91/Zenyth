@@ -37,7 +37,7 @@ class Animateur
         // SELECT * FROM animateurs WHERE specialite LIKE ? ORDER BY nom, prenom ASC
     }
 
-    public function create($id_animateur, $nom, $prenom, $spécialité, $actif)
+    public function create($id_animateur, $nom, $prenom, $specialite, $actif)
     {
         $data = [
             'id_animateur' => $id_animateur,

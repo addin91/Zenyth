@@ -37,10 +37,10 @@ class Admin
             'nom'          => $nom,
             'prenom'       => $prenom,
             'email'        => $email,
-            'mot_de_passe' => $mot_de_passe,
+            'mot_de_passe' => password_hash($mot_de_passe, PASSWORD_DEFAULT),
         ];
         return $this->jsondb->add($data);
-    }
+    }   
 
     public function update($id, $data)
     {
@@ -54,8 +54,19 @@ class Admin
         return $admin;
     }
 
-    public function getDisplayName($animateur)
+    public function authentification($email, $password)
     {
-        return trim(($animateur['prenom'] ?? '') . ' ' . ($animateur['nom'] ?? ''));
+        $admins = $this->jsondb->where('email', $email);
+        $admin = reset($admins);
+
+        if ($admin && password_verify($password, $admin['mot_de_passe'])) {
+            return $admin;
+        }
+        return false;
+    }
+
+    public function getDisplayName($admin)
+    {
+        return trim(($admin['prenom'] ?? '') . ' ' . ($admin['nom'] ?? ''));
     }
 }

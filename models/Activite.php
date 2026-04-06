@@ -76,6 +76,6 @@ class Activite
 
     public function capaciteSuffisante($activite, $nbPersonne)
     {
-        return ($activite['capacite_max'] <= $nbPersonne);
+        return ($activite['capacite_max'] >= $nbPersonne);
     }
 }

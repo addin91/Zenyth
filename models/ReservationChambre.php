@@ -76,14 +76,6 @@ class ReservationChambre
         return $reservationChambre;
     }
 
-    public function validerReservation($idReservationChambre)
-    {
-        // TODO : adapter manuellement (necessite de modifier chambres + reservations en meme temps, sans transaction)
-        // 1. Recuperer id_reservation et id_chambre depuis reservation_chambre WHERE id = $idReservationChambre
-        // 2. UPDATE chambre SET statut = 'occupé' WHERE id = $idChambre
-        // 3. UPDATE reservation SET statut = 'validée' WHERE id = $idReservation
-    }
-
     public function delete($id)
     {
         $reservationChambre = $this->jsondb->delete($id);
