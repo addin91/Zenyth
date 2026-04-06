@@ -381,7 +381,7 @@ function chargerDashPrestations() {
             html += '<h6>' + p.nom + '</h6>';
             html += '<small>' + (p.description || '') + ' — ' + p.prix_unitaire + ' &euro;</small>';
             html += '</div>';
-            html += '<button class="btn btn-sm btn-outline-accent btn-ajout-presta" data-id="' + p.id + '">Ajouter</button>';
+            html += '<button class="btn btn-sm btn-outline-accent btn-ajout-presta" data-id="' + p.id_prestation + '">Ajouter</button>';
             html += '</div>';
         });
         $('#dash-liste-prestations').html(html);
@@ -396,7 +396,7 @@ function chargerDashActivitesSelect() {
     .done(function(activites) {
         var html = '<option value="" selected disabled>Choisir...</option>';
         $.each(activites, function(i, act) {
-            html += '<option value="' + act.id + '">' + act.nom + ' (' + act.prix + ' &euro;)</option>';
+            html += '<option value="' + act.id_activite + '">' + act.nom + ' (' + act.prix + ' &euro;)</option>';
         });
         $('#da-activite').html(html);
     });
@@ -436,8 +436,8 @@ function chargerChambresAccueil() {
         $.each(chambres, function(i, ch) {
             html += '<div class="carrousel-item">';
             html += '  <div class="glass-card">';
-            html += '    <h5>' + ch.nom + '</h5>';
-            html += '    <p class="text-muted">' + ch.type + ' - ' + ch.capacite + ' pers.</p>';
+            html += '    <h5>' + ch.nom_chambre + '</h5>';
+            html += '    <p class="text-muted">' + ch.type_chambre + ' - ' + ch.capacite + ' pers.</p>';
             html += '    <p class="prix">' + ch.prix_nuit + ' &euro; / nuit</p>';
             html += '  </div>';
             html += '</div>';
@@ -511,8 +511,8 @@ function chargerChambresFormulaire() {
     .done(function(chambres) {
         var html = '<option value="" selected disabled>Choisir une chambre...</option>';
         $.each(chambres, function(i, ch) {
-            html += '<option value="' + ch.id + '" data-capacite="' + ch.capacite + '">';
-            html += ch.nom + ' (' + ch.type + ') - ' + ch.capacite + ' pers. - ' + ch.prix_nuit + ' &euro;/nuit';
+            html += '<option value="' + ch.id_chambre + '" data-capacite="' + ch.capacite + '">';
+            html += ch.nom_chambre + ' (' + ch.type_chambre + ') - ' + ch.capacite + ' pers. - ' + ch.prix_nuit + ' &euro;/nuit';
             html += '</option>';
         });
         $('#res-chambre').html(html);
@@ -526,8 +526,8 @@ function chargerActivitesFormulaire() {
         $.each(activites, function(i, act) {
             html += '<div class="col-md-6 mb-2">';
             html += '  <div class="form-check">';
-            html += '    <input class="form-check-input" type="checkbox" name="activites[]" value="' + act.id + '" id="act-' + act.id + '">';
-            html += '    <label class="form-check-label" for="act-' + act.id + '">';
+            html += '    <input class="form-check-input" type="checkbox" name="activites[]" value="' + act.id_activite + '" id="act-' + act.id_activite + '">';
+            html += '    <label class="form-check-label" for="act-' + act.id_activite + '">';
             html += '      ' + act.nom + ' <small class="text-muted">(' + act.prix + ' &euro;)</small>';
             html += '    </label>';
             html += '  </div>';
