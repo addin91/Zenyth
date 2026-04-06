@@ -32,7 +32,7 @@ class MailService{
     public function envoiePassword($destinataire, $password){
         try{
             // Expéditeur et destinataire
-            $this->mail->setFrom('tonemail@gmail.com', 'Mon App');
+            $this->mail->setFrom('zenyth.tourisme@gmail.com', 'Zenyth');
             $this->mail->addAddress($destinataire);
 
             // Contenu
@@ -41,6 +41,7 @@ class MailService{
             $this->mail->Body = 'Voici votre mot de passe : <b>'. $password .'</b>';
 
             $this->mail->send();
+            $this->mail->clearAddresses();
         } catch (Exception $e) {
             echo "Erreur : {$this->mail->ErrorInfo}";
         }
@@ -49,7 +50,7 @@ class MailService{
     public function envoieMail($destinataire, $objet, $message, $isHTML){
         try{    
             // Expéditeur et destinataire
-            $this->mail->setFrom('tonemail@gmail.com', 'Mon App');
+            $this->mail->setFrom('zenyth.tourisme@gmail.com', 'Zenyth');
             $this->mail->addAddress($destinataire);
 
             // Contenu
@@ -58,6 +59,7 @@ class MailService{
             $this->mail->Body = $message;
 
             $this->mail->send();
+            $this->mail->clearAddresses();
         } catch (Exception $e) {
             echo "Erreur : {$this->mail->ErrorInfo}";
         }
