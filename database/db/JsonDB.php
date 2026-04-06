@@ -34,6 +34,7 @@ class JsonDB{
         if(!isset($data[$id])) return false;
         $data[$id] = array_merge($data[$id] ?? [], $newData);
         file_put_contents($this->file, json_encode($data, JSON_PRETTY_PRINT), LOCK_EX);
+        return $data[$id];
     }
 
     public function add($newData){
