@@ -36,7 +36,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
         'path'     => '/',
-        'secure'   => false,   // utilisation en local
+        'secure'   => false,   // local
         'httponly' => true,
         'samesite' => 'Strict',
     ]);
@@ -50,13 +50,13 @@ if (session_status() === PHP_SESSION_NONE) {
 /** Vérifie si un client est connecté */
 function isLoggedIn()
 {
-    return isset($_SESSION['id_client']);
+    return isset($_SESSION['user_id']);
 }
 
 /** Vérifie si l'utilisateur connecté est un administrateur */
 function isAdmin()
 {
-    return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+    return isset($_SESSION['admin']) && $_SESSION['admin'] === true;
 }
 
 /** Redirige vers $path si l'utilisateur n'est pas connecté */
