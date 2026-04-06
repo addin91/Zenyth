@@ -8,6 +8,7 @@ require_once __DIR__ . '/controllers/controllersFacture.php';
 
 $action = isset($_GET['action']) ? strtolower($_GET['action']) : 'index';
 
+
 switch ($action) {
 
     // --- CONNEXION ---
@@ -56,6 +57,18 @@ switch ($action) {
     case 'recuperereservations':
         $controller = new controllersReservations();
         $controller->recupeRereservations();
+        break;
+    
+    // --- CHAMBRES DISPONIBLES ---
+    case 'chambresdisponibles':
+        $controller = new controllersReservations();
+        $controller->chambresDispo();
+        break;
+    
+    // --- ACTIVITES VALIDEES ---
+    case 'recupereactivitesvalidees':
+        $controller = new controllersReservations();
+        $controller->ActivitesValidees();
         break;
 
     // --- FACTURES ---
