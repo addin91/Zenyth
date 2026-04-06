@@ -42,5 +42,14 @@
         "statut_compte": "actif",
         "id": 12,
         "password": "$2y$10$nhrqymT8rMZWWpE3qbU58Or7igkMQzbH8J77hArvl\/LLsiuQkc7tS"
+    },
+    "13": {
+        "id_client": 13,
+        "nom": "Test",
+        "prenom": "Adel",
+        "email": "adel@test.com",
+        "password": "$2y$12$VDTWjN5wq633C2sgaGpWFO89oXQng66VoT13bBeAtQgKyR26vxoPy",
+        "statut_compte": "actif",
+        "date_creation": "2026-04-06"
     }
 }
