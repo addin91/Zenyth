@@ -69,16 +69,19 @@ class controllersReservations{
     }
 
     public function chambresDisponibles(){
-        if(isset($_GET["date_debut"], $_GET["date_fin"])){
+        if(isset($_GET["date_debut"], $_GET["date_fin"], $_GET['nombre_personnes'])){
             $dateDebut = $_GET['date_debut'];
             $dateFin = $_GET['date_fin'];
-            $capacite = 4;
+            $capacite = $_GET['nombre_personnes'];
             if (strtotime($dateDebut) < strtotime($dateFin)) {
                 $reservationsDurantPeriode = $this->reservationModel->findByPeriode($dateDebut, $dateFin);
                 $chambresOccupees = [];
                 foreach($reservationsDurantPeriode as $reservation){
+                    error_log(print_r($reservation, true));
+                    error_log($reservation["id_reservation_chambre"]);
                     $reservationChambreModel = new ReservationChambre();
-                    $reservationChambre = $reservationChambreModel->findById($reservation["id_reservation_chambre"]);
+                    $idReservationChambre = $reservation["id_reservation_chambre"];
+                    $reservationChambre = $reservationChambreModel->findById($idReservationChambre);
                     $chambresOccupees[] = $reservationChambre["id_chambre"];
                 }
                 $chambreModel = new Chambre();
@@ -87,10 +90,10 @@ class controllersReservations{
                 $chambresDisponibles = array_filter($toutesChambres, function($chambre) use ($chambresOccupees) {
                     return !in_array($chambre['id_chambre'], $chambresOccupees);
                 });
-                $chambresDisponiblesCapaciteSuffisante = array_filter($toutesChambres, function($chambre) use ($chambresDisponibles) {
+                $chambresDisponiblesCapaciteSuffisante = array_filter($chambresDisponibles, function($chambre) use ($capacite) {
                     return $chambre["capacite"] >= $capacite;
                 });
-                echo json_encode(['success' => true, 'data' => array_values($chambresDisponibles)]);
+                echo json_encode(['success' => true, 'data' => array_values($chambresDisponiblesCapaciteSuffisante)]);
                 return;
             }
         }
