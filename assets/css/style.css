@@ -274,6 +274,14 @@ main section {
     color: var(--text-main);
 }
 
+.form-control:disabled {
+    background-color: var(--bg-card);
+    color: var(--text-muted);
+    opacity: 1;
+    cursor: not-allowed;
+    border-style: dashed;
+}
+
 .form-control:focus, .form-select:focus {
     background-color: var(--bg-section);
     border-color: var(--accent);
