@@ -64,7 +64,7 @@ $(document).ready(function() {
     // ===== DECONNEXION =====
     $('#btn-deconnexion').on('click', function(e) {
         e.preventDefault();
-        $.post('index.php?action=logout', {}, function(res) {
+        $.post('index.php?action=logout', { csrf_token: $('#csrf-global').val() }, function(res) {
             if (res.success) {
                 $('#nav-connexion').removeClass('d-none');
                 $('#nav-dashboard').addClass('d-none');
@@ -121,6 +121,15 @@ $(document).ready(function() {
         if ($('#res-date-fin').val() && $('#res-date-fin').val() <= debut) {
             $('#res-date-fin').val('');
         }
+        majChambresDisponibles();
+    });
+
+    $('#res-date-fin').on('change', function() {
+        majChambresDisponibles();
+    });
+
+    $('#res-personnes').on('change', function() {
+        majChambresDisponibles();
     });
 
     $('#form-reservation').on('submit', function(e) {
@@ -248,14 +257,23 @@ $(document).ready(function() {
         var btn = $(this);
         var idPrestation = btn.data('id');
 
-        $.post('index.php?action=reservationprestation', { id_prestation: idPrestation }, function(res) {
+        $.post('index.php?action=reservationprestation', { id_prestation: idPrestation, csrf_token: $('#csrf-global').val() }, function(res) {
             if (res.success) {
                 showToast(res.message || 'Prestation ajoutee.');
                 btn.text('Ajoutee').addClass('disabled').prop('disabled', true);
             } else {
                 showToast(res.error || "Erreur lors de l'ajout.", 'error');
             }
-        }, 'json');
+        }, 'json').fail(function(xhr) {
+            console.log('Erreur prestation:', xhr.status, xhr.responseText);
+            showToast("Erreur serveur lors de l'ajout.", 'error');
+        });
+    });
+
+    // ===== TELECHARGER FACTURE PDF =====
+    $('#dash-liste-factures').on('click', '.btn-telecharger-facture', function() {
+        var idReservation = $(this).data('id-reservation');
+        window.open('index.php?action=telechargementfacture&id_reservation=' + idReservation, '_blank');
     });
 
     // ===== SESSION : RESTAURER L'ETAT CONNECTE =====
@@ -342,6 +360,7 @@ function chargerDashboard() {
     chargerDashReservations();
     chargerDashPrestations();
     chargerDashActivitesSelect();
+    chargerDashActivitesValidees();
     chargerDashFactures();
 }
 
@@ -402,6 +421,33 @@ function chargerDashActivitesSelect() {
     });
 }
 
+function chargerDashActivitesValidees() {
+    $.ajax({ url: 'index.php?action=recupereactivitesvalidees', method: 'GET', dataType: 'json' })
+    .done(function(res) {
+        if (res.success && res.data && res.data.length > 0) {
+            var html = '';
+            $.each(res.data, function(i, a) {
+                html += '<div class="dash-history-card">';
+                html += '<div class="d-flex justify-content-between align-items-center">';
+                html += '<h6>' + a.nom + '</h6>';
+                html += '<span class="badge bg-success">Validee</span>';
+                html += '</div>';
+                html += '<small class="text-muted">' + a.date + ' — ' + a.creneau + '</small>';
+                if (a.message) {
+                    html += '<br><small class="text-muted">' + a.message + '</small>';
+                }
+                html += '</div>';
+            });
+            $('#dash-activites-validees').html(html);
+        } else {
+            $('#dash-activites-validees').html('<p class="text-muted">Aucune activite validee pour le moment.</p>');
+        }
+    })
+    .fail(function() {
+        $('#dash-activites-validees').html('<p class="text-muted">Aucune activite validee pour le moment.</p>');
+    });
+}
+
 function chargerDashFactures() {
     $.ajax({ url: 'index.php?action=recuperefactures', method: 'GET', dataType: 'json' })
     .done(function(res) {
@@ -409,11 +455,67 @@ function chargerDashFactures() {
             var html = '';
             $.each(res.data, function(i, f) {
                 html += '<div class="dash-history-card">';
-                html += '<div class="d-flex justify-content-between align-items-center">';
+
+                // En-tête
+                html += '<div class="d-flex justify-content-between align-items-center mb-2">';
                 html += '<h6>Facture #' + f.id + '</h6>';
-                html += '<span class="prix">' + (f.montant_total || '0.00') + ' &euro;</span>';
+                var badgeClass = f.statut === 'payée' ? 'bg-success' : 'bg-warning text-dark';
+                html += '<span class="badge ' + badgeClass + '">' + (f.statut || 'en attente') + '</span>';
                 html += '</div>';
-                html += '<small class="text-muted">Reservation #' + f.id_reservation + '</small>';
+
+                // Dates
+                if (f.date_debut && f.date_fin) {
+                    html += '<small class="text-muted">Du ' + f.date_debut + ' au ' + f.date_fin + '</small><br>';
+                }
+
+                // Tableau détail
+                html += '<table class="table table-sm mt-2" style="font-size:0.85rem;">';
+                html += '<thead><tr><th>Type</th><th>Description</th><th class="text-end">Prix</th></tr></thead>';
+                html += '<tbody>';
+
+                // Chambre
+                if (f.chambre) {
+                    var prixChambre = (f.prix_nuit || 0) * (f.nuits || 0);
+                    html += '<tr><td>Chambre</td><td>' + f.chambre + '<br><small>' + f.nuits + ' nuit(s)</small></td>';
+                    html += '<td class="text-end">' + prixChambre.toFixed(2) + ' &euro;</td></tr>';
+                }
+
+                // Prestations
+                $.each(f.prestations || [], function(j, p) {
+                    html += '<tr><td>Prestation</td><td>' + p.nom;
+                    if (p.quantite > 1) html += ' x' + p.quantite;
+                    if (p.reduction > 0) html += ' <small>(-' + p.reduction + '%)</small>';
+                    html += '</td><td class="text-end">' + parseFloat(p.total).toFixed(2) + ' &euro;</td></tr>';
+                });
+
+                // Activités
+                $.each(f.activites || [], function(j, a) {
+                    html += '<tr><td>Activite</td><td>' + a.nom + '</td>';
+                    html += '<td class="text-end">' + parseFloat(a.prix).toFixed(2) + ' &euro;</td></tr>';
+                });
+
+                // Avoirs
+                if (f.avoirs > 0) {
+                    html += '<tr><td>Avoirs</td><td>Depot / arrhes</td>';
+                    html += '<td class="text-end text-success">-' + parseFloat(f.avoirs).toFixed(2) + ' &euro;</td></tr>';
+                }
+
+                // Réduction
+                if (f.reduction > 0) {
+                    html += '<tr><td>Reduction</td><td>' + f.reduction + '%</td>';
+                    html += '<td class="text-end text-success">-' + parseFloat(f.reduction).toFixed(2) + ' &euro;</td></tr>';
+                }
+
+                html += '</tbody>';
+
+                // Total
+                html += '<tfoot><tr><td colspan="2" class="text-end"><strong>Total</strong></td>';
+                html += '<td class="text-end"><strong>' + parseFloat(f.montant_final || f.montant_total).toFixed(2) + ' &euro;</strong></td></tr></tfoot>';
+                html += '</table>';
+
+                // Bouton télécharger
+                html += '<button class="btn btn-sm btn-outline-accent btn-telecharger-facture" data-id-reservation="' + f.id_reservation + '">Telecharger PDF</button>';
+
                 html += '</div>';
             });
             $('#dash-liste-factures').html(html);
@@ -516,6 +618,37 @@ function chargerChambresFormulaire() {
             html += '</option>';
         });
         $('#res-chambre').html(html);
+    });
+}
+
+function majChambresDisponibles() {
+    var debut = $('#res-date-debut').val();
+    var fin = $('#res-date-fin').val();
+    var personnes = parseInt($('#res-personnes').val()) || 0;
+
+    if (!debut || !fin) return;
+
+    $.ajax({
+        url: 'index.php?action=chambresdisponibles&date_debut=' + debut + '&date_fin=' + fin,
+        method: 'GET',
+        dataType: 'json'
+    })
+    .done(function(res) {
+        if (res.success) {
+            var html = '<option value="" selected disabled>Choisir une chambre...</option>';
+            var count = 0;
+            $.each(res.data, function(i, ch) {
+                if (personnes > 0 && ch.capacite < personnes) return;
+                html += '<option value="' + ch.id_chambre + '" data-capacite="' + ch.capacite + '">';
+                html += ch.nom_chambre + ' (' + ch.type_chambre + ') - ' + ch.capacite + ' pers. - ' + ch.prix_nuit + ' &euro;/nuit';
+                html += '</option>';
+                count++;
+            });
+            if (count === 0) {
+                html = '<option value="" selected disabled>Aucune chambre disponible</option>';
+            }
+            $('#res-chambre').html(html);
+        }
     });
 }
 
