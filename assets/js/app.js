@@ -692,7 +692,7 @@ function majChambresDisponibles() {
     if (!debut || !fin) return;
 
     $.ajax({
-        url: 'index.php?action=chambresdisponibles&date_debut=' + debut + '&date_fin=' + fin,
+        url: 'index.php?action=chambresdisponibles&date_debut=' + debut + '&date_fin=' + fin + '&nombre_personnes=' + personnes,
         method: 'GET',
         dataType: 'json'
     })
