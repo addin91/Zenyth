@@ -84,6 +84,11 @@ $(document).ready(function() {
                 // Reset les formulaires du dashboard
                 $('#form-demande-activite')[0].reset();
                 $('#form-change-mdp')[0].reset();
+                // Mettre à jour le CSRF token
+                if (res.csrf_token) {
+                    $('#csrf-global').val(res.csrf_token);
+                    $('input[name="csrf_token"]').val(res.csrf_token);
+                }
                 showToast('Deconnexion reussie.');
             }
         }, 'json');
@@ -253,20 +258,31 @@ $(document).ready(function() {
     });
 
     // ===== AJOUT PRESTATION (delegation) =====
+    var prestationsAjoutees = [];
+
     $('#dash-liste-prestations').on('click', '.btn-ajout-presta', function() {
         var btn = $(this);
         var idPrestation = btn.data('id');
 
+        if (btn.prop('disabled') || prestationsAjoutees.indexOf(idPrestation) !== -1) {
+            showToast('Cette prestation a deja ete ajoutee.', 'error');
+            return;
+        }
+
+        btn.prop('disabled', true).text('Ajout...');
+
         $.post('index.php?action=reservationprestation', { id_prestation: idPrestation, csrf_token: $('#csrf-global').val() }, function(res) {
             if (res.success) {
+                prestationsAjoutees.push(idPrestation);
                 showToast(res.message || 'Prestation ajoutee.');
-                btn.text('Ajoutee').addClass('disabled').prop('disabled', true);
+                btn.text('Ajoutee').addClass('disabled');
             } else {
                 showToast(res.error || "Erreur lors de l'ajout.", 'error');
+                btn.prop('disabled', false).text('Ajouter');
             }
         }, 'json').fail(function(xhr) {
-            console.log('Erreur prestation:', xhr.status, xhr.responseText);
             showToast("Erreur serveur lors de l'ajout.", 'error');
+            btn.prop('disabled', false).text('Ajouter');
         });
     });
 
@@ -367,7 +383,7 @@ function chargerDashboard() {
 function chargerDashReservations() {
     $.ajax({ url: 'index.php?action=recuperereservations', method: 'GET', dataType: 'json' })
     .done(function(res) {
-        if (res.success && res.data && res.data.length > 0) {
+        if (res.success && res.data && Object.keys(res.data).length > 0) {
             var html = '';
             $.each(res.data, function(i, r) {
                 var badgeClass = 'badge-' + (r.statut || 'en-attente').replace('_', '-');
@@ -391,22 +407,42 @@ function chargerDashReservations() {
 }
 
 function chargerDashPrestations() {
-    $.ajax({ url: 'api/prestations.php', method: 'GET', dataType: 'json' })
-    .done(function(prestations) {
-        var html = '';
-        $.each(prestations, function(i, p) {
-            html += '<div class="dash-presta-item">';
-            html += '<div class="dash-presta-info">';
-            html += '<h6>' + p.nom + '</h6>';
-            html += '<small>' + (p.description || '') + ' — ' + p.prix_unitaire + ' &euro;</small>';
-            html += '</div>';
-            html += '<button class="btn btn-sm btn-outline-accent btn-ajout-presta" data-id="' + p.id_prestation + '">Ajouter</button>';
-            html += '</div>';
+    $.ajax({ url: 'index.php?action=recuperereservations', method: 'GET', dataType: 'json' })
+    .done(function(resResa) {
+        var prestasDejaReservees = [];
+        if (resResa.success && resResa.data) {
+            $.each(resResa.data, function(i, r) {
+                if (r.id_reservation_prestations && r.id_reservation_prestations.length) {
+                    $.each(r.id_reservation_prestations, function(j, idP) {
+                        prestasDejaReservees.push(String(idP));
+                    });
+                }
+            });
+        }
+        prestationsAjoutees = prestasDejaReservees.slice();
+
+        $.ajax({ url: 'api/prestations.php', method: 'GET', dataType: 'json' })
+        .done(function(prestations) {
+            var html = '';
+            $.each(prestations, function(i, p) {
+                var dejaAjoutee = prestationsAjoutees.indexOf(String(p.id_prestation)) !== -1;
+                html += '<div class="dash-presta-item">';
+                html += '<div class="dash-presta-info">';
+                html += '<h6>' + p.nom + '</h6>';
+                html += '<small>' + (p.description || '') + ' — ' + p.prix_unitaire + ' &euro;</small>';
+                html += '</div>';
+                if (dejaAjoutee) {
+                    html += '<button class="btn btn-sm btn-outline-accent btn-ajout-presta disabled" data-id="' + p.id_prestation + '" disabled>Ajoutee</button>';
+                } else {
+                    html += '<button class="btn btn-sm btn-outline-accent btn-ajout-presta" data-id="' + p.id_prestation + '">Ajouter</button>';
+                }
+                html += '</div>';
+            });
+            $('#dash-liste-prestations').html(html);
+        })
+        .fail(function() {
+            $('#dash-liste-prestations').html('<p class="text-muted">Prestations indisponibles.</p>');
         });
-        $('#dash-liste-prestations').html(html);
-    })
-    .fail(function() {
-        $('#dash-liste-prestations').html('<p class="text-muted">Prestations indisponibles.</p>');
     });
 }
 
