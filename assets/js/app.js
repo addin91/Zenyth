@@ -524,25 +524,27 @@ function chargerDashFactures() {
 
                 // Prestations
                 $.each(f.prestations || [], function(j, p) {
+                    if (!p) return;
                     html += '<div class="facture-ligne">';
                     html += '<div class="facture-ligne-info">';
                     html += '<span class="facture-ligne-label">Prestation</span>';
-                    html += '<span class="facture-ligne-desc">' + p.nom;
-                    if (p.quantite > 1) html += ' x' + p.quantite;
-                    if (p.reduction > 0) html += ' (-' + p.reduction + '%)';
+                    html += '<span class="facture-ligne-desc">' + (p.nom || 'Prestation');
+                    if (p.quantite && p.quantite > 1) html += ' x' + p.quantite;
+                    if (p.reduction && p.reduction > 0) html += ' (-' + p.reduction + '%)';
                     html += '</span></div>';
-                    html += '<span class="facture-ligne-prix">' + parseFloat(p.total).toFixed(2) + ' &euro;</span>';
+                    html += '<span class="facture-ligne-prix">' + (parseFloat(p.prix_total) || 0).toFixed(2) + ' &euro;</span>';
                     html += '</div>';
                 });
 
                 // Activités
                 $.each(f.activites || [], function(j, a) {
+                    if (!a) return;
                     html += '<div class="facture-ligne">';
                     html += '<div class="facture-ligne-info">';
                     html += '<span class="facture-ligne-label">Activite</span>';
-                    html += '<span class="facture-ligne-desc">' + a.nom + '</span>';
+                    html += '<span class="facture-ligne-desc">' + (a.nom || 'Activite') + '</span>';
                     html += '</div>';
-                    html += '<span class="facture-ligne-prix">' + parseFloat(a.prix).toFixed(2) + ' &euro;</span>';
+                    html += '<span class="facture-ligne-prix">' + (parseFloat(a.prix) || 0).toFixed(2) + ' &euro;</span>';
                     html += '</div>';
                 });
 
