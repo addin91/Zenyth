@@ -51,7 +51,9 @@ class controllersAuthentification{
     // deconnexion
     public function deconnexion(){
         if(controlPostForm()){
+            $_SESSION = [];
             session_destroy();
+            session_start();
             header('Content-Type: application/json');
             echo json_encode(['success' => true, "csrf_token" => generateCsrfToken()]);
         }

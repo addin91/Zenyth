@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../database/db/JsonDB.php';
+require_once __DIR__ . '/Chambre.php';
 
 
 // models/ReservationChambre.php
@@ -32,13 +33,14 @@ class ReservationChambre
         return $this->jsondb->find($id);
     }
 
-    public function findByReservation($id_reservation)
+    public function findByClient($id_client)
     {
         // TODO : adapter manuellement (necessite un JOIN chambres)
         // SELECT rc.*, ch.nom_chambre, ch.type_chambre, ch.capacite, ch.prix_nuit
         // FROM reservation_chambres rc
         // JOIN chambres ch ON ch.id = rc.id_chambre
         // WHERE rc.id_reservation = ?
+        return $this->jsondb->where("id_client", $id_client);
     }
 
     public function findByChambre($id_chambre)
@@ -89,6 +91,13 @@ class ReservationChambre
             $this->jsondb->delete($rc['id']);
         }
         return true;
+    }
+
+    public function prixTotalReservationChambre($id, $nbNuit){
+        $reservationChambre = $this->findById($id);
+        $chambreModel = new Chambre();
+        $chambre = $chambreModel->findById($reservationChambre['id_chambre']);
+        return $chambre["prix_nuit"] * $nbNuit;
     }
 }
 

@@ -52,6 +52,9 @@ class Reservation
         $resultat = [];
 
         foreach ($reservations as $reservation) {
+            if (!isset($reservation['date_debut'], $reservation['date_fin'])) {
+                continue;
+            }
             $resDebut = strtotime($reservation['date_debut']);
             $resFin   = strtotime($reservation['date_fin']);
 
@@ -93,6 +96,16 @@ class Reservation
         $reservation['statut'] = $statut;
         $reservation = $this->jsondb->update($id, $reservation);
         return $reservation;
+    }
+
+    public function aReservePrestation($id, $idReservationPrestation){
+        $reservation = $this->jsondb->find($id);
+        return in_array($idReservationPrestation, $reservation["id_reservation_prestations"]);
+    }
+    public function ajoutReservationPrestation($id, $idReservationPrestation){
+        $reservation = $this->jsondb->find($id);
+        if(!$this->aReservePrestation($id, $idReservationPrestation)) array_push($reservation["id_reservation_prestations"], $idReservationPrestation);
+        return $this->update($id, $reservation);
     }
 
     public function validerReservation($idReservation)

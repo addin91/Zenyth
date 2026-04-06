@@ -61,7 +61,9 @@ class controllersReservations{
                 echo json_encode(['success' => true, 'message' => 'Votre demande de reservation a ete envoyee.']);
             } else echo json_encode(['success' => false, 'error' => 'Champs manquant']);
 
-        }  
+        }  else error_log("csrf");
+
+        error_log("autre");
               
         
     }
@@ -70,6 +72,7 @@ class controllersReservations{
         if(isset($_GET["date_debut"], $_GET["date_fin"])){
             $dateDebut = $_GET['date_debut'];
             $dateFin = $_GET['date_fin'];
+            $capacite = 4;
             if (strtotime($dateDebut) < strtotime($dateFin)) {
                 $reservationsDurantPeriode = $this->reservationModel->findByPeriode($dateDebut, $dateFin);
                 $chambresOccupees = [];
@@ -79,10 +82,13 @@ class controllersReservations{
                     $chambresOccupees[] = $reservationChambre["id_chambre"];
                 }
                 $chambreModel = new Chambre();
-                $toutesChambres = $chambreModel->selectAll();
+                $toutesChambres = $chambreModel->findAll();
 
                 $chambresDisponibles = array_filter($toutesChambres, function($chambre) use ($chambresOccupees) {
-                    return !in_array($chambre['id'], $chambresOccupees);
+                    return !in_array($chambre['id_chambre'], $chambresOccupees);
+                });
+                $chambresDisponiblesCapaciteSuffisante = array_filter($toutesChambres, function($chambre) use ($chambresDisponibles) {
+                    return $chambre["capacite"] >= $capacite;
                 });
                 echo json_encode(['success' => true, 'data' => array_values($chambresDisponibles)]);
                 return;
@@ -105,15 +111,19 @@ class controllersReservations{
                 // recupere reservation
                 $reservations = $this->reservationModel->findByClient($idClient);
                 $reservation = !empty($reservations) ? end($reservations) : null;
-
-                // créer reservation prestation
-
-                $reservationPrestationModel = new ReservationPrestation();
-                $reduction  = 0;
                 if (!$reservation) {
                     echo json_encode(['success' => false, 'error' => 'Aucune réservation trouvée.']);
                     return;
                 }
+                if($this->reservationModel->aReservePrestation($reservation["id"], $idPrestation)){
+                    echo json_encode(['success' => false, 'error' => 'Vous avez déjà réservé cette prestation']);
+                    return;
+                }
+                $this->reservationModel->ajoutReservationPrestation($reservation["id"], $idPrestation);
+                // créer reservation prestation
+                $reservationPrestationModel = new ReservationPrestation();
+                $reduction  = 0;
+                
                 $reservationPrestationModel->create($reservation['id'], $idPrestation, $reduction, ($prestation["prix_unitaire"]) * (1 - $reduction / 100));
             }
             header('Content-Type: application/json');

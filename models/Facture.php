@@ -45,7 +45,7 @@ class Facture
         // ORDER BY f.date_emission DESC
     }
 
-    public function create($id_client, $id_reservation, $id_reservation_chambre, $id_reservations_prestation, $id_demandes_activite, $montant_total, $avoirs, $reduction)
+    public function create($id_client, $id_reservation, $id_reservation_chambre, $id_reservations_prestation = [], $id_demandes_activite = [], $montant_total, $avoirs, $reduction)
     {
         $data = [
             'id_client' => $id_client,

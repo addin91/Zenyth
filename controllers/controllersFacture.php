@@ -43,37 +43,43 @@ class controllersFacture{
         header('Content-Type: application/json');
         if (isset($_SESSION['user_id'])) {
             $factures = $this->toutesFactures($_SESSION['user_id']);
-            $reservation = $this->reservationModel->findById($factures['id_reservation']);
+            foreach($factures as &$facture){
+                $reservation = $this->reservationModel->findById($facture['id_reservation']);
             
-            $debut = new DateTime($reservation['date_debut']);
-            $fin = new DateTime($reservation['date_fin']);
-            $interval = $debut->diff($fin);
-            $nbNuits = $interval->days;
+                $debut = new DateTime($reservation['date_debut']);
+                $fin = new DateTime($reservation['date_fin']);
+                $interval = $debut->diff($fin);
+                $nbNuits = $interval->days;
 
-            $reservationChambreModel = new ReservationChambre();
-            $reservationChambre = $reservationChambreModel->findById($facture["id_reservation_chambre"]);
-            $chambreModel = new Chambre();
-            $chambre = $chambreModel->findById($reservationChambre["id_chambre"]);
-            
-            $reservationPrestationModel = new ReservationPrestation();
-            $reservationActiviteModel = new DemandeActivite();
-            $reservationPrestations = [];
-            $reservationActivites = [];
-            foreach($facture["id_reservation_prestation"] as $id) $reservationPrestations[] = $reservationPrestationModel->findById($id);
-            foreach($facture["id_demande_activite"] as $id) $reservationActivites[] = $reservationActiviteModel->findById($id);
-            $factures[] = [
-                'date_debut' => $reservation['date_debut'],
-                'date_fin' => $reservation['date_fin'],
-                'nuits' => $nbNuits,
-                'chambre' => $chambre['nom_chambre'],
-                'prix_nuit' => $chambre['prix_nuit'],
-                'prestations' => $reservationPrestations,
-                'activites' => $reservationActivites,
-            ];
+                $reservationChambreModel = new ReservationChambre();
+                $reservationChambre = $reservationChambreModel->findById($facture["id_reservation_chambre"]);
+                $chambreModel = new Chambre();
+                $chambre = $chambreModel->findById($reservationChambre["id_chambre"]);
+                
+                $reservationPrestationModel = new ReservationPrestation();
+                $reservationActiviteModel = new DemandeActivite();
+                $reservationPrestations = [];
+                $reservationActivites = [];
+                foreach($reservation["id_reservation_prestations"] as $id) $reservationPrestations[] = $reservationPrestationModel->findById($id);
+                foreach($reservation["id_demandes_activite"] as $id) $reservationActivites[] = $reservationActiviteModel->findById($id);
+                $facture['date_debut'] = $reservation['date_debut'];
+                $facture['date_fin'] = $reservation['date_fin'];
+                $facture['nuits'] = $nbNuits;
+                $facture['chambre'] = $chambre['nom_chambre'];
+                $facture['prix_nuit'] = $chambre['prix_nuit'];
+                $facture['prestations'] = $reservationPrestations;
+                $facture['activites'] = $reservationActivites;
+                
+            }
+            $this->factureModel->update($facture["id"],
+                [
+                    "id_reservations_prestation" => $reservation["id_reservation_prestations"],
+                    "id_demandes_activite" => $reservation["id_demandes_activite"]
+                ]
+            );
             echo json_encode(['success' => true, 'data' => $factures]);
             return;
-        }
-        echo json_encode(['success' => false, 'error' => 'Non connecte.']);   
+        } echo json_encode(['success' => false, 'error' => 'Non connecte.']); 
     }
 
 
@@ -83,7 +89,8 @@ class controllersFacture{
     }
 
     // télécharger facture
-    public function telechargementFacture($idFacture){
+    public function telechargementFacture(){
+        if(isset($_GET["id_facture"])) $idFacture = $_GET["id_facture"];
         // 🔹 Récupération de la facture
         $facture = $this->factureModel->findById($idFacture);
 
@@ -91,9 +98,9 @@ class controllersFacture{
             die("Facture introuvable");
         }
 
-        //if (!isLoggedIn() || ($facture['id_client'] !== $_SESSION['user_id'] && !isAdmin())) {
-        //    die("Accès non autorisé");
-        //}
+        if (!isLoggedIn() || ($facture['id_client'] !== $_SESSION['user_id'] && !isAdmin())) {
+            die("Accès non autorisé");
+        }
 
         // 🔹 Récupération des données liées
         $client = $this->clientModel->findById($facture["id_client"]);
