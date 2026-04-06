@@ -21,6 +21,7 @@
     "montant_total": 600,
     "avoirs": 50,
     "reduction": 0,
-    "statut": "en_attente"
+    "statut": "en_attente",
+    "date_emission" : null
   }
 }
