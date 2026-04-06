@@ -21,30 +21,26 @@ class controllersAdmin{
         $this->reservationModel = new Reservation();
     }
 
-    public function accepteReservationChambre($idReservationChambre){
-        $reservationChambreModel = new ReservationChambre();
-        $reservationChambre = $reservationChambreModel->findById($idReservationChambre);
+    public function accepteReservationChambre($idReservation){
         // créer client 
-        $reservation = $this->reservationModel->findById($reservationChambre["id_reservation"]);
-        $client = $this->clientModel->findById($reservation["id_client"]);
+        $client = $this->clientModel->findById($idReservation);
         $motDePasse = $this->clientModel->definiMotDePasseClient($client["id"]);
         $this->clientModel->activeClient($client["id"]);
         $mailservice = new MailService();
         $mailservice->envoiePassword($client["email"], $motDePasse);
         // accepte reservation
-        $reservationChambreModel->validerReservation($idReservationChambre);
+        $this->reservationModel->validerReservation($idReservation);
     }
 
 
     // refuse acceptation
-    public function refuseReservationChambre($idReservationChambre){
-        $reservationChambreModel = new reservationChambre();
-        $reservation = $this->reservationModel->findById($reservationChambreModel["id_reservation"]);
+    public function refuseReservationChambre($idReservation){
+        $reservation = $this->reservationModel->findById($idReservation);
         $client = $this->clientModel->findById($reservation["id_client"]);
-
-        $reservationChambreModel->delete($idReservationChambre);
-        $reservation->delete($reservationChambreModel["id_reservation"]);
-        if($client["statut_compte"] == "invité") $client->delete($reservation["id_client"]);
+        $reservationChambreModel = new ReservationChambre();
+        $reservationChambreModel->delete($reservation["id_client"]);
+        $this->reservationModel->delete($idReservation);
+        if($client["statut_compte"] == "invité") $this->clientModel->delete($reservation["id_client"]);
 
         $mailservice = new MailService();
         $mailservice->envoieMail($client["email"], "Reservation annulé", "Votre réservation a été annulé", true);
@@ -58,14 +54,14 @@ class controllersAdmin{
         $animateurModel = new Animateur();
         $animateur = $animateurModel->findById($id_animateur);
 
-        $capacite_restante = $activite["capacite_min"];
+        $capacite_restante = $activite["capacite_max"];
         $demandeActiviteModel = new DemandeActivite();
         foreach($id_demandes_actvites as $id){
             $demandeActivite = $demandeActiviteModel->findById($id);
             $capacite_restante-= $demandeActivite["nombre_personnes_concernees"];
         } 
 
-        if($capacite_restante < 0) // Erreur;
+        if($capacite_restante < 0); // Erreur;
         $activitePrevuModel = new ActivitePrevue();
         $activitePrevu = $activitePrevuModel->create($id_activite, $id_animateur, $id_demandes_actvites, $date, $creneau, $message, $capacite_restante);
     }

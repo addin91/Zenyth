@@ -4,6 +4,8 @@ require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../models/Client.php';
 require_once __DIR__ . '/../models/Reservation.php';
 require_once __DIR__ . '/../models/ReservationChambre.php';
+require_once __DIR__ . '/../models/ReservationPrestation.php';
+require_once __DIR__ . '/../models/Prestation.php';
 
 class controllersReservations{
     private $clientModel;
@@ -15,7 +17,7 @@ class controllersReservations{
         $this->reservationModel = new Reservation();
     }
 
-    public function recupeRereservations(){
+    public function recupereReservations(){
         header('Content-Type: application/json');
         if (isset($_SESSION['user_id'])) {
             $reservations = $this->reservationModel->findByClient($_SESSION['user_id']);
@@ -27,12 +29,11 @@ class controllersReservations{
     
 
     public function reservationChambre(){
+        header('Content-Type: application/json');  
         if (controlPostForm()) {
             if (isset($_POST['dateDebut'], $_POST['dateFin'], $_POST['nombrePersonne'], $_POST['commentaire'], $_POST['id_chambre'], $_POST['activites'])) {
-                
-                
 
-                if(isLoggedIn()) $idClient = $_SESSION["id_client"];
+                if(isLoggedIn()) $idClient = $_SESSION["user_id"];
                 else{
                     if (isset($_POST['nom'], $_POST['prenom'], $_POST['email'])) {
                         $nom = htmlspecialchars($_POST['nom'] ?? '');
@@ -40,6 +41,9 @@ class controllersReservations{
                         $email = htmlspecialchars($_POST['email'] ?? '');
                                             
                         $idClient = $this->clientModel->ajoutNouveauClient($nom, $prenom, $email);
+                    }  else{
+                        echo json_encode(['success' => false, 'error' => 'Connectez vous ou reserver avec votre nom, prénom et mail']);
+                        return;
                     } 
                 }
 
@@ -54,17 +58,44 @@ class controllersReservations{
                 $idReservationChambre = $reservationChambreModel->create($idClient, $idChambre);
 
                 $idReservation = $this->reservationModel->create($idClient, $idReservationChambre, $idsActivite, [], $dateDebut, $dateFin, $nombrePersonne, $commentaire);
-            } 
+                echo json_encode(['success' => true, 'message' => 'Votre demande de reservation a ete envoyee.']);
+            } else echo json_encode(['success' => false, 'error' => 'Champs manquant']);
+
         }  
-        header('Content-Type: application/json');        
-        echo json_encode(['success' => true, 'message' => 'Votre demande de reservation a ete envoyee.']);
+              
+        
     }
+
+    public function chambresDisponibles(){
+        if(isset($_GET["date_debut"], $_GET["date_fin"])){
+            $dateDebut = $_GET['date_debut'];
+            $dateFin = $_GET['date_fin'];
+            if (strtotime($dateDebut) < strtotime($dateFin)) {
+                $reservationsDurantPeriode = $this->reservationModel->findByPeriode($dateDebut, $dateFin);
+                $chambresOccupees = [];
+                foreach($reservationsDurantPeriode as $reservation){
+                    $reservationChambreModel = new ReservationChambre();
+                    $reservationChambre = $reservationChambreModel->findById($reservation["id_reservation_chambre"]);
+                    $chambresOccupees[] = $reservationChambre["id_chambre"];
+                }
+                $chambreModel = new Chambre();
+                $toutesChambres = $chambreModel->selectAll();
+
+                $chambresDisponibles = array_filter($toutesChambres, function($chambre) use ($chambresOccupees) {
+                    return !in_array($chambre['id'], $chambresOccupees);
+                });
+                echo json_encode(['success' => true, 'data' => array_values($chambresDisponibles)]);
+                return;
+            }
+        }
+        echo json_encode(['success' => false]);
+    }   
 
     public function reservationPrestation(){
         if (controlPostForm() && isLoggedIn()) {
             if (isset($_POST['id_prestation'])) {
                     
-                $idClient = $_SESSION["id_client"];
+                $idClient = $_SESSION["user_id"];
                 $idPrestation = $_POST['id_prestation'];
 
                 // recupere prestation
@@ -72,13 +103,17 @@ class controllersReservations{
                 $prestation = $prestationModel->findById($idPrestation);
 
                 // recupere reservation
-                $reservation = $this->reservationModel->findByClient($idClient);
+                $reservations = $this->reservationModel->findByClient($idClient);
+                $reservation = !empty($reservations) ? end($reservations) : null;
 
                 // créer reservation prestation
 
-                $reservationPrestationModel = new reservationPrestation();
+                $reservationPrestationModel = new ReservationPrestation();
                 $reduction  = 0;
-
+                if (!$reservation) {
+                    echo json_encode(['success' => false, 'error' => 'Aucune réservation trouvée.']);
+                    return;
+                }
                 $reservationPrestationModel->create($reservation['id'], $idPrestation, $reduction, ($prestation["prix_unitaire"]) * (1 - $reduction / 100));
             }
             header('Content-Type: application/json');
@@ -88,10 +123,11 @@ class controllersReservations{
     }
 
     public function reservationActivite(){
+        header('Content-Type: application/json');
         if (controlPostForm() && isLoggedIn()) {
             if (isset($_POST['date'], $_POST['creneau'], $_POST['nombrePersonne'], $_POST['message'], $_POST['id_activite'])) {
                     
-                $idClient = $_SESSION["id_client"];
+                $idClient = $_SESSION["user_id"];
                 $date = htmlspecialchars($_POST['date'] ?? '');
                 $creneau = htmlspecialchars($_POST['creneau'] ?? '');
                 $nombrePersonne = htmlspecialchars($_POST['nombrePersonne'] ?? '');
@@ -101,24 +137,48 @@ class controllersReservations{
                 // recupere activite
                 $activiteModel = new Activite();
                 $activite = $activiteModel->findById($idActivite);
+                if (!$activite) {
+                    echo json_encode(['success' => false, 'message' => 'Activité inexistante']);
+                    return;
+                }
+
 
                 // recupere reservation
-                $reservation = $this->reservationModel->findByClient($idClient);
+                $reservations = $this->reservationModel->findByClient($idClient);
+                $reservation = !empty($reservations) ? end($reservations) : null;
+                if (!$reservation) {
+                    echo json_encode(['success' => false, 'message' => 'Aucune réservation trouvée']);
+                    return;
+                }
 
-                // verifie date
-                // verifie capacite
-                if($reservation->estDansIntervalleTemps($reservation, $date) && activite->capaciteSuffisante($activite, $nombrePersonne)){
-                    // enregistre
+                $estDansIntervalle = $this->reservationModel->estDansIntervalleTemps($reservation, $date);
+                $capaciteOK = $activiteModel->capaciteSuffisante($activite, $nombrePersonne);
 
-                    $reservationActiviteModel = new reservationActivite();
-                    $this->reservationActiviteModel->create($idActivite, $date, $creneau, $nombrePersonne, $message);
-                } else $_SESSION["error"] = "La demande d'activite est pas bonne";
-                // redirect
-            }
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'message' => "Demande d'activite envoyee."]);
-        }
+                if (!$estDansIntervalle) {
+                    echo json_encode(['success' => false, 'message' => "L'activité ne se déroule pas durant votre réservation"]);
+                    return;
+                }
+
+                if (!$capaciteOK) {
+                    echo json_encode(['success' => false, 'message' => "Capacité insuffisante"]);
+                    return;
+                }
+
+                // enregistrement
+                $reservationActiviteModel = new DemandeActivite();
+                $reservationActiviteModel->create($idActivite, $date, $creneau, $nombrePersonne, $message);
+
+                echo json_encode(['success' => true, 'message' => "Demande d'activité envoyée."]);
+           }
         
+        }
+
+    }
+
+
+    public function activitesValidees(){
+        $reservationActiviteModel = new DemandeActivite();
+        return $reservationActiviteModel->findByStatut("validée");
     }
 
 }

@@ -17,46 +17,44 @@ class controllersAuthentification{
 
     // inscrption
     // connexion
-        public function connexion(){
-            if (controlPostForm()) {
-                        error_log("conn1");
+    public function connexion(){
+        header('Content-Type: application/json');
+        if (controlPostForm()) {
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
 
-                $email = $_POST['email'] ?? '';
-                $password = $_POST['password'] ?? '';
-
-                $user = $this->clientModel->authentification($email, $password);
-                if ($user) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['user_name'] = $user['nom'];
-                    $_SESSION['admin'] = false;
-                } else {
-                    $_SESSION['error'] = "Identifiant ou mot de passe incorrect.";
+            $user = $this->clientModel->authentification($email, $password);
+            if ($user) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_name'] = $user['nom'];
+                $_SESSION['admin'] = false;
+                if (isset($_SESSION['user_id']) && $user) {
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'Connexion reussie.',
+                        'data' => [
+                            'nom' => $user['nom'],
+                            'prenom' => $user['prenom'],
+                            'email' => $user['email'],
+                        ]
+                    ]);
+                    return;
                 }
-            }
-            header('Content-Type: application/json');
-            if (isset($_SESSION['user_id']) && $user) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Connexion reussie.',
-                    'data' => [
-                        'nom' => $user['nom'],
-                        'prenom' => $user['prenom'],
-                        'email' => $user['email'],
-                    ]
-                ]);
             } else {
-                echo json_encode(['success' => false, 'error' => $_SESSION['error'] ?? 'Erreur de connexion.']);
-                unset($_SESSION['error']);
+                $_SESSION['error'] = "Identifiant ou mot de passe incorrect.";
             }
         }
+            echo json_encode(['success' => false, 'error' => $_SESSION['error'] ?? 'Erreur de connexion.']);
+            unset($_SESSION['error']);
+    }
 
     // deconnexion
     public function deconnexion(){
         if(controlPostForm()){
             session_destroy();
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, "csrf_token" => generateCsrfToken()]);
         }
-        header('Content-Type: application/json');
-        echo json_encode(['success' => true]);
     }
 
     // mdp oublié
@@ -82,6 +80,7 @@ class controllersAuthentification{
 
     // changement mdp
     public function changementMotDePasse(){
+        header('Content-Type: application/json');
         if(controlPostForm()){
             if(isLoggedIn()){
                 if(isset($_POST['ancienPassword'], $_POST['nouvellePassword'])){
@@ -97,23 +96,23 @@ class controllersAuthentification{
                     }
                     // Secu nouveau mdp
                     // ancien et nouveau mdp diff
-                    if(verifierMotDePasse($nouvellePassword) && password_verify($nouvellePassword, $user['password'])){
+                    if(verifierMotDePasse($nouvellePassword) && !password_verify($nouvellePassword, $user['password'])){
                         // changement mdp
                         $this->clientModel->changementMotDePasse($id, $nouvellePassword);
+                        echo json_encode(['success' => true, 'message' => 'Mot de passe modifié.']);
+                        return;
                         // redirection réussi
                     } else{
-                        if(empty($_SESSION['error'] = "Il faut que le nouveau mot de passe soit différent de l'ancien"));
+                        if(empty($_SESSION['error'])) $_SESSION['error'] = "Il faut que le nouveau mot de passe soit différent de l'ancien";
                     }  
                 } 
             } 
             
         }
-        header('Content-Type: application/json');
+        
         if (isset($_SESSION['error'])) {
             echo json_encode(['success' => false, 'error' => $_SESSION['error']]);
             unset($_SESSION['error']);
-        } else {
-            echo json_encode(['success' => true, 'message' => 'Mot de passe modifié.']);
         }
     }
 
@@ -125,10 +124,10 @@ class controllersAuthentification{
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
 
-            $admin = $this->adminModel->create($prenom, $nom, $email, $password);
+            $idAdmin = $this->adminModel->create($nom, $prenom, $email, $password);
             if ($admin) {
-                $_SESSION['admin_id'] = $admin['id'];
-                $_SESSION['user_name'] = $admin['nom'];
+                $_SESSION['admin_id'] = $idAdmin;
+                $_SESSION['user_name'] = $nom;
                 $_SESSION['admin'] = true;
                 //redirection auto
             } else {
