@@ -423,7 +423,7 @@ function chargerDashPrestations() {
         }
         prestationsAjoutees = prestasDejaReservees.slice();
 
-        $.ajax({ url: 'api/prestations.php', method: 'GET', dataType: 'json' })
+        $.ajax({ url: 'index.php?action=apiprestation', method: 'GET', dataType: 'json' })
         .done(function(prestations) {
             var html = '';
             $.each(prestations, function(i, p) {
@@ -449,7 +449,7 @@ function chargerDashPrestations() {
 }
 
 function chargerDashActivitesSelect() {
-    $.ajax({ url: 'api/activites.php', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=apiactivite', method: 'GET', dataType: 'json' })
     .done(function(activites) {
         var html = '<option value="" selected disabled>Choisir...</option>';
         $.each(activites, function(i, act) {
@@ -492,8 +492,8 @@ function chargerDashFactures() {
     // donc on resout le nom et le prix cote front via les API de reference.
     $.when(
         $.ajax({ url: 'index.php?action=recuperefactures', method: 'GET', dataType: 'json' }),
-        $.ajax({ url: 'api/prestations.php', method: 'GET', dataType: 'json' }),
-        $.ajax({ url: 'api/activites.php', method: 'GET', dataType: 'json' })
+        $.ajax({ url: 'index.php?action=apiprestation', method: 'GET', dataType: 'json' }),
+        $.ajax({ url: 'index.php?action=apiactivite', method: 'GET', dataType: 'json' })
     ).done(function(resFactArr, prestasArr, activitesArr) {
         var res = resFactArr[0];
         var prestasList = prestasArr[0] || [];
@@ -646,7 +646,7 @@ function chargerDashFactures() {
 // ===== FONCTIONS AJAX - ACCUEIL =====
 
 function chargerChambresAccueil() {
-    $.ajax({ url: 'api/chambres.php', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=apichambre', method: 'GET', dataType: 'json' })
     .done(function(chambres) {
         var html = '';
         $.each(chambres, function(i, ch) {
@@ -667,7 +667,7 @@ function chargerChambresAccueil() {
 }
 
 function chargerActivitesAccueil() {
-    $.ajax({ url: 'api/activites.php', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=apiactivite', method: 'GET', dataType: 'json' })
     .done(function(activites) {
         var html = '';
         $.each(activites, function(i, act) {
@@ -699,7 +699,7 @@ function chargerActivitesAccueil() {
 }
 
 function chargerPrestationsAccueil() {
-    $.ajax({ url: 'api/prestations.php', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=apiprestation', method: 'GET', dataType: 'json' })
     .done(function(prestations) {
         var html = '';
         $.each(prestations, function(i, p) {
@@ -723,7 +723,7 @@ function chargerPrestationsAccueil() {
 // ===== REMPLISSAGE FORMULAIRE RESERVATION =====
 
 function chargerChambresFormulaire() {
-    $.ajax({ url: 'api/chambres.php', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=apichambre', method: 'GET', dataType: 'json' })
     .done(function(chambres) {
         var html = '<option value="" selected disabled>Choisir une chambre...</option>';
         $.each(chambres, function(i, ch) {
@@ -767,7 +767,7 @@ function majChambresDisponibles() {
 }
 
 function chargerActivitesFormulaire() {
-    $.ajax({ url: 'api/activites.php', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=apiactivite', method: 'GET', dataType: 'json' })
     .done(function(activites) {
         var html = '';
         $.each(activites, function(i, act) {

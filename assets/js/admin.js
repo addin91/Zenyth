@@ -383,7 +383,8 @@ function chargerDemandes(statut) {
 
     $.ajax({ url: url, method: 'GET', dataType: 'json' })
     .done(function(res) {
-        if (res.success && res.data && res.data.length > 0) {
+        if (res.success && res.data && Object.keys(res.data).length > 0) {
+            
             var html = '';
             $.each(res.data, function(i, r) {
                 html += renderCarteDemande(r);
@@ -404,7 +405,7 @@ function chargerReservations(statut) {
 
     $.ajax({ url: url, method: 'GET', dataType: 'json' })
     .done(function(res) {
-        if (res.success && res.data && res.data.length > 0) {
+        if (res.success && res.data && Object.keys(res.data).length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
             html += '<thead><tr><th>#</th><th>Client</th><th>Dates</th><th>Pers.</th><th>Statut</th></tr></thead><tbody>';
             $.each(res.data, function(i, r) {
@@ -430,9 +431,9 @@ function chargerReservations(statut) {
 function chargerChambres() {
     $('#admin-liste-chambres').html('<p class="text-muted">Chargement...</p>');
 
-    $.ajax({ url: 'api/chambres.php', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=apichambre', method: 'GET', dataType: 'json' })
     .done(function(chambres) {
-        if (chambres && chambres.length > 0) {
+        if (chambres && Object.values(chambres).length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
             html += '<thead><tr><th>#</th><th>Nom</th><th>Type</th><th>Capacite</th><th>Prix/nuit</th><th>Statut</th></tr></thead><tbody>';
             $.each(chambres, function(i, ch) {
@@ -460,9 +461,9 @@ function chargerChambres() {
 function chargerPrestations() {
     $('#admin-liste-prestations').html('<p class="text-muted">Chargement...</p>');
 
-    $.ajax({ url: 'api/prestations.php', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=apiprestation', method: 'GET', dataType: 'json' })
     .done(function(prestas) {
-        if (prestas && prestas.length > 0) {
+        if (prestas && Object.values(prestas).length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
             html += '<thead><tr><th>#</th><th>Nom</th><th>Description</th><th>Prix unitaire</th><th>Actif</th></tr></thead><tbody>';
             $.each(prestas, function(i, p) {
@@ -489,13 +490,13 @@ function chargerPrestations() {
 }
 
 function chargerDemandesActivites(date) {
-    var url = 'index.php?action=adminrecuperedemandesactivites';
+    var url = 'index.php?action=apidemandesactivites';
     if (date) url += '&date=' + date;
     $('#admin-liste-demandes-activites').html('<p class="text-muted">Chargement...</p>');
 
     $.ajax({ url: url, method: 'GET', dataType: 'json' })
     .done(function(res) {
-        if (res.success && res.data && res.data.length > 0) {
+        if (res.data && Object.values(res.data).length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
             html += '<thead><tr><th>#</th><th>Activite</th><th>Date</th><th>Creneau</th><th>Pers.</th><th>Message</th><th>Action</th></tr></thead><tbody>';
             $.each(res.data, function(i, d) {
@@ -528,9 +529,9 @@ function chargerDemandesActivites(date) {
 function chargerActivitesPrevues() {
     $('#admin-liste-activites-prevues').html('<p class="text-muted">Chargement...</p>');
 
-    $.ajax({ url: 'index.php?action=adminrecupereactivitesprevues', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=apiactivitesprevues', method: 'GET', dataType: 'json' })
     .done(function(res) {
-        if (res.success && res.data && res.data.length > 0) {
+        if (res.data && Object.values(res.data).length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
             html += '<thead><tr><th>#</th><th>Activite</th><th>Date</th><th>Creneau</th><th>Animateur</th><th>Capacite restante</th></tr></thead><tbody>';
             $.each(res.data, function(i, a) {
@@ -557,9 +558,9 @@ function chargerActivitesPrevues() {
 function chargerAnimateurs() {
     $('#admin-liste-animateurs').html('<p class="text-muted">Chargement...</p>');
 
-    $.ajax({ url: 'index.php?action=adminrecupereanimateurs', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=apianimateur', method: 'GET', dataType: 'json' })
     .done(function(res) {
-        if (res.success && res.data && res.data.length > 0) {
+        if (res.data && res.data.length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
             html += '<thead><tr><th>#</th><th>Nom</th><th>Prenom</th><th>Specialite</th><th>Action</th></tr></thead><tbody>';
             $.each(res.data, function(i, a) {
