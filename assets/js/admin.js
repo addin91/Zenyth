@@ -1,5 +1,17 @@
 $(document).ready(function() {
 
+    // ===== TOGGLE AFFICHAGE MOT DE PASSE (icone oeil) =====
+    // Meme comportement que app.js pour les inputs password .password-field > .toggle-password
+    $(document).on('click', '.toggle-password', function() {
+        var $input = $(this).parent().find('input');
+        if ($input.attr('type') === 'password') {
+            $input.attr('type', 'text');
+        } else {
+            $input.attr('type', 'password');
+        }
+        $(this).toggleClass('fa-eye fa-eye-slash');
+    });
+
     // ===== POPUPS (memes handlers que app.js) =====
     $('.popup-close').on('click', function() {
         $(this).closest('.popup-overlay').removeClass('active');

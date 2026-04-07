@@ -232,9 +232,10 @@ include __DIR__ . '/header.php';
                 <label for="adm-email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="adm-email" name="email" required>
             </div>
-            <div class="mb-4">
+            <div class="mb-4 password-field">
                 <label for="adm-password" class="form-label">Mot de passe</label>
                 <input type="password" class="form-control" id="adm-password" name="password" required>
+                <i class="toggle-password fa fa-eye" title="Afficher le mot de passe"></i>
             </div>
             <button type="submit" class="btn btn-accent w-100">Se connecter</button>
         </form>
