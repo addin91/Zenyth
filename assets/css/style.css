@@ -726,3 +726,434 @@ footer p {
     color: var(--text-muted);
     font-size: 0.9rem;
 }
+
+.footer-admin-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-left: 0.4rem;
+    opacity: 0.7;
+    transition: all 0.3s;
+}
+
+.footer-admin-link:hover {
+    color: var(--accent-warm);
+    opacity: 1;
+}
+
+/* =====================================================
+   ESPACE ADMINISTRATEUR
+   ===================================================== */
+
+/* ===== NAVBAR ADMIN ===== */
+.navbar-admin {
+    background: rgba(15, 18, 28, 0.97) !important;
+    border-bottom: 1px solid rgba(196, 168, 130, 0.18);
+}
+
+.navbar-admin .navbar-brand {
+    color: var(--accent-warm) !important;
+}
+
+.badge-admin {
+    display: inline-block;
+    background: var(--accent-warm);
+    color: #1a1f2e;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.admin-tab-link {
+    position: relative;
+    padding: 8px 14px !important;
+    font-size: 0.88rem;
+}
+
+.admin-tab-link.active {
+    color: var(--accent-warm) !important;
+}
+
+.admin-tab-link.active::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 14px;
+    right: 14px;
+    height: 2px;
+    background: var(--accent-warm);
+    border-radius: 2px;
+}
+
+.admin-user-info {
+    color: var(--accent-light) !important;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+/* ===== HERO ADMIN ===== */
+.admin-hero {
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(
+        135deg,
+        var(--bg-section) 0%,
+        rgba(196, 168, 130, 0.10) 50%,
+        rgba(124, 154, 142, 0.06) 100%
+    );
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 2.5rem;
+    padding: 2.5rem 1.5rem;
+}
+
+.admin-hero h1 {
+    font-size: 2.4rem;
+    font-weight: 300;
+    letter-spacing: 6px;
+    margin-bottom: 0.6rem;
+    color: var(--text-heading);
+}
+
+.admin-hero h1 span {
+    color: var(--accent-warm);
+}
+
+.admin-hero p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ===== DASHBOARD ADMIN ===== */
+.admin-dashboard {
+    padding-top: 0.5rem;
+}
+
+.admin-panel {
+    display: none;
+    animation: adminFadeIn 0.3s ease-out;
+}
+
+.admin-panel.active {
+    display: block;
+}
+
+@keyframes adminFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.admin-panel-header {
+    margin-bottom: 1.5rem;
+}
+
+/* ===== CARTE ADMIN ===== */
+.admin-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.3rem 1.5rem;
+}
+
+.admin-card h5 {
+    color: var(--text-heading);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+/* ===== FILTRES ADMIN ===== */
+.admin-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-filter-btn,
+.admin-filter-btn-res,
+.admin-filter-btn-fact {
+    padding: 6px 16px !important;
+    font-size: 0.82rem !important;
+    letter-spacing: 0.3px !important;
+}
+
+.admin-filter-btn.active,
+.admin-filter-btn-res.active,
+.admin-filter-btn-fact.active {
+    background: var(--accent-warm);
+    border-color: var(--accent-warm);
+    color: #1a1f2e;
+}
+
+/* ===== SOUS-ONGLETS (activites) ===== */
+.admin-subtabs {
+    list-style: none;
+    display: flex;
+    gap: 0;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+}
+
+.admin-subtab {
+    padding: 10px 20px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.3s, border-color 0.3s;
+}
+
+.admin-subtab:hover {
+    color: var(--text-heading);
+}
+
+.admin-subtab.active {
+    color: var(--accent-warm);
+    border-bottom-color: var(--accent-warm);
+}
+
+.admin-subpanel {
+    display: none;
+}
+
+.admin-subpanel.active {
+    display: block;
+}
+
+/* ===== CARTE DEMANDE / RESERVATION ADMIN ===== */
+.admin-demande-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+}
+
+.admin-demande-card:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(196, 168, 130, 0.18);
+}
+
+.admin-demande-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+}
+
+.admin-demande-titre {
+    color: var(--text-heading);
+    font-size: 1rem;
+    margin: 0 0 0.2rem;
+}
+
+.admin-demande-sub {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.admin-demande-body {
+    color: var(--text-main);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin-bottom: 0.8rem;
+}
+
+.admin-demande-body strong {
+    color: var(--text-heading);
+}
+
+.admin-demande-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--border);
+}
+
+.admin-demande-actions .btn {
+    padding: 6px 14px;
+    font-size: 0.82rem;
+}
+
+/* ===== TABLE ADMIN ===== */
+.admin-table-wrapper {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    color: var(--text-main);
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+.admin-table thead th {
+    color: var(--text-heading);
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.admin-table tbody td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+    vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* ===== BADGES ADMIN STATUTS ===== */
+.admin-badge {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-en-attente {
+    background: rgba(196, 168, 130, 0.18);
+    color: var(--accent-warm);
+}
+
+.badge-validee {
+    background: rgba(124, 154, 142, 0.18);
+    color: var(--accent-light);
+}
+
+.badge-refusee {
+    background: rgba(165, 124, 124, 0.20);
+    color: #d8a3a3;
+}
+
+.badge-provisoire {
+    background: rgba(196, 168, 130, 0.18);
+    color: var(--accent-warm);
+}
+
+.badge-emise {
+    background: rgba(110, 143, 165, 0.18);
+    color: #9bbfd1;
+}
+
+.badge-payee {
+    background: rgba(124, 154, 142, 0.18);
+    color: var(--accent-light);
+}
+
+/* ===== BOUTONS REDUCTION ===== */
+.btn-reduction {
+    padding: 8px 16px !important;
+    font-size: 0.85rem !important;
+}
+
+.btn-reduction.active {
+    background: var(--accent-warm) !important;
+    border-color: var(--accent-warm) !important;
+    color: #1a1f2e !important;
+}
+
+/* ===== ETAT VIDE ===== */
+.admin-empty {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    font-size: 0.9rem;
+}
+
+.admin-error {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    color: #d8a3a3;
+    background: rgba(165, 124, 124, 0.08);
+    border: 1px dashed rgba(165, 124, 124, 0.3);
+    border-radius: 10px;
+    font-size: 0.88rem;
+}
+
+/* ===== RESPONSIVE ADMIN ===== */
+@media (max-width: 992px) {
+    .admin-hero h1 {
+        font-size: 1.8rem;
+        letter-spacing: 4px;
+    }
+
+    .admin-tab-link {
+        padding: 6px 10px !important;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-hero {
+        min-height: 160px;
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .admin-hero h1 {
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+    }
+
+    .admin-hero p {
+        font-size: 0.85rem;
+    }
+
+    .admin-card {
+        padding: 1rem;
+    }
+
+    .admin-demande-card {
+        padding: 1rem;
+    }
+
+    .admin-subtab {
+        padding: 8px 12px;
+        font-size: 0.82rem;
+    }
+
+    .admin-table thead th,
+    .admin-table tbody td {
+        padding: 0.6rem 0.7rem;
+        font-size: 0.8rem;
+    }
+}

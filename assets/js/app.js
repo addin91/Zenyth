@@ -487,12 +487,35 @@ function chargerDashActivitesValidees() {
 }
 
 function chargerDashFactures() {
-    $.ajax({ url: 'index.php?action=recuperefactures', method: 'GET', dataType: 'json' })
-    .done(function(res) {
-        if (res.success && res.data && res.data.length > 0) {
+    // Recupere en parallele factures + prestations + activites
+    // Le backend renvoie des lignes brutes (sans nom et avec un champ prix incoherent),
+    // donc on resout le nom et le prix cote front via les API de reference.
+    $.when(
+        $.ajax({ url: 'index.php?action=recuperefactures', method: 'GET', dataType: 'json' }),
+        $.ajax({ url: 'api/prestations.php', method: 'GET', dataType: 'json' }),
+        $.ajax({ url: 'api/activites.php', method: 'GET', dataType: 'json' })
+    ).done(function(resFactArr, prestasArr, activitesArr) {
+        var res = resFactArr[0];
+        var prestasList = prestasArr[0] || [];
+        var activitesList = activitesArr[0] || [];
+
+        // Lookup par id pour resoudre nom + prix
+        var prestaById = {};
+        $.each(prestasList, function(i, p) { prestaById[String(p.id_prestation)] = p; });
+        var actById = {};
+        $.each(activitesList, function(i, a) { actById[String(a.id_activite)] = a; });
+
+        if (res && res.success && res.data && (res.data.length > 0 || Object.keys(res.data).length > 0)) {
             var html = '';
             $.each(res.data, function(i, f) {
-                var badgeClass = f.statut === 'payée' ? 'facture-badge-payee' : (f.statut === 'emise' ? 'facture-badge-emise' : 'facture-badge-provisoire');
+                if (!f) return;
+                var statut = (f.statut || '').toLowerCase();
+                var badgeClass = (statut === 'payée' || statut === 'payee') ? 'facture-badge-payee'
+                               : (statut === 'emise' || statut === 'émise') ? 'facture-badge-emise'
+                               : 'facture-badge-provisoire';
+
+                // Cumul du total recalcule a partir des lignes
+                var totalCalcule = 0;
 
                 html += '<div class="facture-card">';
 
@@ -512,7 +535,8 @@ function chargerDashFactures() {
 
                 // Chambre
                 if (f.chambre) {
-                    var prixChambre = (f.prix_nuit || 0) * (f.nuits || 0);
+                    var prixChambre = (parseFloat(f.prix_nuit) || 0) * (parseInt(f.nuits) || 0);
+                    totalCalcule += prixChambre;
                     html += '<div class="facture-ligne">';
                     html += '<div class="facture-ligne-info">';
                     html += '<span class="facture-ligne-label">Chambre</span>';
@@ -522,61 +546,86 @@ function chargerDashFactures() {
                     html += '</div>';
                 }
 
-                // Prestations
+                // Prestations : resolution nom + prix via lookup
                 $.each(f.prestations || [], function(j, p) {
                     if (!p) return;
+                    var presta = prestaById[String(p.id_prestation)] || {};
+                    var nom = presta.nom || 'Prestation';
+                    // Le backend renvoie soit "total" (anciennes lignes) soit "prix" (nouvelles)
+                    // Sinon on calcule depuis prix_unitaire * quantite de la table de reference
+                    var prix = 0;
+                    if (p.total != null) prix = parseFloat(p.total);
+                    else if (p.prix != null) prix = parseFloat(p.prix);
+                    else if (presta.prix_unitaire != null) {
+                        var qte = parseInt(p.quantite) || 1;
+                        prix = parseFloat(presta.prix_unitaire) * qte;
+                    }
+                    if (isNaN(prix)) prix = 0;
+                    totalCalcule += prix;
+
                     html += '<div class="facture-ligne">';
                     html += '<div class="facture-ligne-info">';
                     html += '<span class="facture-ligne-label">Prestation</span>';
-                    html += '<span class="facture-ligne-desc">' + (p.nom || 'Prestation');
+                    html += '<span class="facture-ligne-desc">' + nom;
                     if (p.quantite && p.quantite > 1) html += ' x' + p.quantite;
                     if (p.reduction && p.reduction > 0) html += ' (-' + p.reduction + '%)';
                     html += '</span></div>';
-                    html += '<span class="facture-ligne-prix">' + (parseFloat(p.prix_total) || 0).toFixed(2) + ' &euro;</span>';
+                    html += '<span class="facture-ligne-prix">' + prix.toFixed(2) + ' &euro;</span>';
                     html += '</div>';
                 });
 
-                // Activités
+                // Activités : resolution nom + prix via lookup
                 $.each(f.activites || [], function(j, a) {
                     if (!a) return;
+                    var activite = actById[String(a.id_activite)] || {};
+                    var nom = activite.nom || 'Activite';
+                    var prix = parseFloat(activite.prix) || 0;
+                    totalCalcule += prix;
+
                     html += '<div class="facture-ligne">';
                     html += '<div class="facture-ligne-info">';
                     html += '<span class="facture-ligne-label">Activite</span>';
-                    html += '<span class="facture-ligne-desc">' + (a.nom || 'Activite') + '</span>';
+                    html += '<span class="facture-ligne-desc">' + nom + '</span>';
                     html += '</div>';
-                    html += '<span class="facture-ligne-prix">' + (parseFloat(a.prix) || 0).toFixed(2) + ' &euro;</span>';
+                    html += '<span class="facture-ligne-prix">' + prix.toFixed(2) + ' &euro;</span>';
                     html += '</div>';
                 });
 
-                // Avoirs
+                // Avoirs (deduction du total)
                 if (f.avoirs > 0) {
+                    var avoirs = parseFloat(f.avoirs) || 0;
+                    totalCalcule -= avoirs;
                     html += '<div class="facture-ligne facture-ligne-deduction">';
                     html += '<div class="facture-ligne-info">';
                     html += '<span class="facture-ligne-label">Avoirs</span>';
                     html += '<span class="facture-ligne-desc">Depot / arrhes</span>';
                     html += '</div>';
-                    html += '<span class="facture-ligne-prix">-' + parseFloat(f.avoirs).toFixed(2) + ' &euro;</span>';
+                    html += '<span class="facture-ligne-prix">-' + avoirs.toFixed(2) + ' &euro;</span>';
                     html += '</div>';
                 }
 
-                // Réduction
+                // Réduction (% applique sur le total avant deduction reduction)
                 if (f.reduction > 0) {
+                    var reductionPct = parseFloat(f.reduction) || 0;
+                    var montantReduction = totalCalcule * reductionPct / 100;
+                    totalCalcule -= montantReduction;
                     html += '<div class="facture-ligne facture-ligne-deduction">';
                     html += '<div class="facture-ligne-info">';
                     html += '<span class="facture-ligne-label">Reduction</span>';
-                    html += '<span class="facture-ligne-desc">' + f.reduction + '%</span>';
+                    html += '<span class="facture-ligne-desc">' + reductionPct + '%</span>';
                     html += '</div>';
-                    html += '<span class="facture-ligne-prix">-' + parseFloat(f.reduction).toFixed(2) + ' &euro;</span>';
+                    html += '<span class="facture-ligne-prix">-' + montantReduction.toFixed(2) + ' &euro;</span>';
                     html += '</div>';
                 }
 
                 html += '</div>';
 
-                // Total + bouton
+                // Total + bouton (total recalcule cote front)
+                if (totalCalcule < 0) totalCalcule = 0;
                 html += '<div class="facture-footer">';
                 html += '<div class="facture-total">';
                 html += '<span>Total</span>';
-                html += '<span class="facture-total-prix">' + parseFloat(f.montant_final || f.montant_total).toFixed(2) + ' &euro;</span>';
+                html += '<span class="facture-total-prix">' + totalCalcule.toFixed(2) + ' &euro;</span>';
                 html += '</div>';
                 html += '<button class="btn btn-sm btn-outline-accent btn-telecharger-facture" data-id-reservation="' + f.id_reservation + '">Telecharger PDF</button>';
                 html += '</div>';
