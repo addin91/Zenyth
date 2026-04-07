@@ -25,43 +25,46 @@ $(document).ready(function() {
     }
 
     // ===== FORMULAIRE CONNEXION ADMIN =====
+    // La session serveur est mise a jour par PHP des la reponse OK,
+    // donc les AJAX suivants seront bien authentifies. Pas de reload necessaire.
     $('#form-admin-connexion').on('submit', function(e) {
         e.preventDefault();
         var formData = $(this).serialize();
 
-        $.post('index.php?action=loginadmin', formData, function(res) {
-            if (res.success) {
-                var nom = (res.data && res.data.nom) ? res.data.nom : '';
+        $.ajax({
+            url: 'index.php?action=loginadmin',
+            method: 'POST',
+            data: formData,
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.success) {
+                var nom = (res.data && res.data.nom) || '';
                 $('#popup-admin-connexion').removeClass('active');
                 afficherDashboardAdmin(nom);
                 showToast('Bienvenue ' + nom + ' !');
             } else {
-                showToast(res.error || 'Identifiants incorrects.', 'error');
+                showToast((res && res.error) || 'Identifiants incorrects.', 'error');
             }
-        }, 'json').fail(function() {
-            showToast('Endpoint loginadmin non disponible (en attente backend).', 'error');
+        }).fail(function() {
+            showToast('Erreur serveur lors de la connexion.', 'error');
         });
     });
 
     // ===== DECONNEXION ADMIN =====
+    // On utilise la route 'logout' existante qui detruit toute la session
+    // ($_SESSION = []; session_destroy()). On recharge ensuite la page
+    // pour que PHP regenere ADMIN_SESSION = {connecte: false} et que la
+    // popup de connexion s'affiche proprement.
     $('#btn-admin-deconnexion').on('click', function(e) {
         e.preventDefault();
-        $.post('index.php?action=logoutadmin', { csrf_token: $('#csrf-global').val() }, function(res) {
-            if (res && res.csrf_token) {
-                $('#csrf-global').val(res.csrf_token);
-                $('input[name="csrf_token"]').val(res.csrf_token);
-            }
-            $('#admin-dashboard').addClass('d-none');
-            $('#admin-nav-info').addClass('d-none');
-            $('#admin-nav-deconnexion').addClass('d-none');
-            $('#popup-admin-connexion').addClass('active');
-            showToast('Deconnexion reussie.');
-        }, 'json').fail(function() {
-            // Fallback : on deconnecte en local
-            $('#admin-dashboard').addClass('d-none');
-            $('#admin-nav-info').addClass('d-none');
-            $('#admin-nav-deconnexion').addClass('d-none');
-            $('#popup-admin-connexion').addClass('active');
+        $.ajax({
+            url: 'index.php?action=logout',
+            method: 'POST',
+            data: { csrf_token: $('#csrf-global').val() },
+            dataType: 'json'
+        }).always(function() {
+            // Succes ou echec : on recharge pour forcer la relecture serveur
+            window.location.href = 'index.php?action=admin';
         });
     });
 
@@ -82,6 +85,7 @@ $(document).ready(function() {
             case 'admin-prestations': chargerPrestations(); break;
             case 'admin-activites': chargerDemandesActivites(null); chargerActivitesPrevues(); break;
             case 'admin-animateurs': chargerAnimateurs(); break;
+            case 'admin-clients': chargerClients('all'); break;
             case 'admin-factures': chargerFactures('all'); break;
         }
     });
@@ -114,6 +118,12 @@ $(document).ready(function() {
         chargerFactures($(this).data('statut'));
     });
 
+    $('.admin-filter-btn-client').on('click', function() {
+        $('.admin-filter-btn-client').removeClass('active');
+        $(this).addClass('active');
+        chargerClients($(this).data('statut'));
+    });
+
     // ===== FILTRE DATE ACTIVITES =====
     $('#adm-act-filtre-date').on('change', function() {
         chargerDemandesActivites($(this).val());
@@ -144,42 +154,53 @@ $(document).ready(function() {
             dataType: 'json'
         }).done(function(res) {
             if (res.success && res.data && res.data.length > 0) {
-                var html = '<div class="alert alert-success">' + res.data.length + ' chambre(s) disponible(s) sur la periode :</div>';
-                html += '<ul class="list-group">';
+                var nb = res.data.length;
+                var html = '<div class="admin-dispo-header">';
+                html += '<span class="admin-badge badge-validee">' + nb + ' chambre' + (nb > 1 ? 's' : '') + ' disponible' + (nb > 1 ? 's' : '') + '</span>';
+                html += '<small class="text-muted">du <strong>' + debut + '</strong> au <strong>' + fin + '</strong> &mdash; ' + personnes + ' pers.</small>';
+                html += '</div>';
+                html += '<div class="admin-table-wrapper mt-2"><table class="admin-table">';
+                html += '<thead><tr><th>#</th><th>Nom</th><th>Type</th><th>Capacite</th><th>Prix/nuit</th></tr></thead><tbody>';
                 $.each(res.data, function(i, ch) {
-                    html += '<li class="list-group-item d-flex justify-content-between align-items-center">';
-                    html += '<span><strong>' + ch.nom_chambre + '</strong> (' + ch.type_chambre + ') &mdash; ' + ch.capacite + ' pers.</span>';
-                    html += '<span class="badge bg-success">' + ch.prix_nuit + ' &euro;/nuit</span>';
-                    html += '</li>';
+                    html += '<tr>';
+                    html += '<td>#' + ch.id_chambre + '</td>';
+                    html += '<td><strong>' + ch.nom_chambre + '</strong></td>';
+                    html += '<td>' + ch.type_chambre + '</td>';
+                    html += '<td>' + ch.capacite + ' pers.</td>';
+                    html += '<td>' + ch.prix_nuit + ' &euro;</td>';
+                    html += '</tr>';
                 });
-                html += '</ul>';
+                html += '</tbody></table></div>';
                 $('#adm-ch-resultat').html(html);
             } else {
-                $('#adm-ch-resultat').html('<div class="alert alert-warning">Aucune chambre disponible sur cette periode.</div>');
+                $('#adm-ch-resultat').html('<div class="admin-empty">Aucune chambre disponible sur cette periode.</div>');
             }
         }).fail(function() {
-            $('#adm-ch-resultat').html('<div class="alert alert-danger">Erreur lors de la verification.</div>');
+            $('#adm-ch-resultat').html('<div class="admin-error">Erreur lors de la verification.</div>');
         });
     });
 
     // ===== ACTIONS DEMANDES (delegation) =====
+    // Le backend envoie lui-meme le mail de bienvenue (MailService::envoiePassword)
+    // donc pas besoin d'ouvrir le popup message mail cote front.
     $('#admin-liste-demandes').on('click', '.btn-accepter-resa', function() {
         var id = $(this).data('id');
-        if (!confirm('Confirmer l\'acceptation de cette reservation ? Un compte client va etre cree.')) return;
+        if (!confirm('Confirmer l\'acceptation de cette reservation ? Un compte client va etre cree et un mail envoye.')) return;
 
-        $.post('index.php?action=adminaccepterreservation', { id_reservation: id, csrf_token: $('#csrf-global').val() }, function(res) {
-            if (res.success) {
+        $.ajax({
+            url: 'index.php?action=adminaccepterreservation',
+            method: 'POST',
+            data: { id_reservation: id, csrf_token: $('#csrf-global').val() },
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.success) {
                 showToast(res.message || 'Reservation acceptee.');
-                // Ouvrir le modal message mail si on a les infos
-                if (res.email && res.password) {
-                    afficherMessageMail(res.email, res.nom || '', res.prenom || '', res.password);
-                }
                 chargerDemandes('en_attente');
             } else {
-                showToast(res.error || 'Erreur.', 'error');
+                showToast((res && res.error) || 'Erreur lors de l\'acceptation.', 'error');
             }
-        }, 'json').fail(function() {
-            showToast('Endpoint adminaccepterreservation non disponible.', 'error');
+        }).fail(function() {
+            showToast('Erreur serveur lors de l\'acceptation.', 'error');
         });
     });
 
@@ -187,31 +208,20 @@ $(document).ready(function() {
         var id = $(this).data('id');
         if (!confirm('Refuser cette reservation ?')) return;
 
-        $.post('index.php?action=adminrefuserreservation', { id_reservation: id, csrf_token: $('#csrf-global').val() }, function(res) {
-            if (res.success) {
-                showToast('Reservation refusee.');
+        $.ajax({
+            url: 'index.php?action=adminrefuserreservation',
+            method: 'POST',
+            data: { id_reservation: id, csrf_token: $('#csrf-global').val() },
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.success) {
+                showToast(res.message || 'Reservation refusee.');
                 chargerDemandes('en_attente');
             } else {
-                showToast(res.error || 'Erreur.', 'error');
+                showToast((res && res.error) || 'Erreur lors du refus.', 'error');
             }
-        }, 'json').fail(function() {
-            showToast('Endpoint adminrefuserreservation non disponible.', 'error');
-        });
-    });
-
-    // ===== TOGGLE PRESTATION =====
-    $('#admin-liste-prestations').on('change', '.toggle-presta', function() {
-        var id = $(this).data('id');
-        var actif = $(this).is(':checked') ? 1 : 0;
-
-        $.post('index.php?action=admintoggleprestation', { id_prestation: id, actif: actif, csrf_token: $('#csrf-global').val() }, function(res) {
-            if (res.success) {
-                showToast('Prestation ' + (actif ? 'activee' : 'desactivee') + '.');
-            } else {
-                showToast(res.error || 'Erreur.', 'error');
-            }
-        }, 'json').fail(function() {
-            showToast('Endpoint admintoggleprestation non disponible.', 'error');
+        }).fail(function() {
+            showToast('Erreur serveur lors du refus.', 'error');
         });
     });
 
@@ -234,21 +244,30 @@ $(document).ready(function() {
         $('#popup-valider-activite').addClass('active');
     });
 
+    // NOTE : ces endpoints ne sont PAS encore routes cote backend.
+    // Les formulaires restent fonctionnels (validation, UX) et .fail()
+    // affichera un toast explicite en attendant que le backend les expose.
+
     $('#form-valider-activite').on('submit', function(e) {
         e.preventDefault();
         var formData = $(this).serialize();
 
-        $.post('index.php?action=adminvaliderdemandeactivite', formData, function(res) {
-            if (res.success) {
+        $.ajax({
+            url: 'index.php?action=adminvaliderdemandeactivite',
+            method: 'POST',
+            data: formData,
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.success) {
                 showToast('Activite programmee.');
                 $('#popup-valider-activite').removeClass('active');
                 chargerDemandesActivites($('#adm-act-filtre-date').val() || null);
                 chargerActivitesPrevues();
             } else {
-                showToast(res.error || 'Erreur.', 'error');
+                showToast((res && res.error) || 'Erreur.', 'error');
             }
-        }, 'json').fail(function() {
-            showToast('Endpoint adminvaliderdemandeactivite non disponible.', 'error');
+        }).fail(function() {
+            showToast('En attente backend : validation d\'activite.', 'error');
         });
     });
 
@@ -257,16 +276,21 @@ $(document).ready(function() {
         e.preventDefault();
         var formData = $(this).serialize();
 
-        $.post('index.php?action=admincreeranimateur', formData, function(res) {
-            if (res.success) {
+        $.ajax({
+            url: 'index.php?action=admincreeranimateur',
+            method: 'POST',
+            data: formData,
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.success) {
                 showToast('Animateur ajoute.');
                 $('#form-creation-animateur')[0].reset();
                 chargerAnimateurs();
             } else {
-                showToast(res.error || 'Erreur.', 'error');
+                showToast((res && res.error) || 'Erreur.', 'error');
             }
-        }, 'json').fail(function() {
-            showToast('Endpoint admincreeranimateur non disponible.', 'error');
+        }).fail(function() {
+            showToast('En attente backend : creation d\'animateur.', 'error');
         });
     });
 
@@ -275,15 +299,20 @@ $(document).ready(function() {
         var id = $(this).data('id');
         if (!confirm('Supprimer cet animateur ?')) return;
 
-        $.post('index.php?action=adminsupprimeranimateur', { id_animateur: id, csrf_token: $('#csrf-global').val() }, function(res) {
-            if (res.success) {
+        $.ajax({
+            url: 'index.php?action=adminsupprimeranimateur',
+            method: 'POST',
+            data: { id_animateur: id, csrf_token: $('#csrf-global').val() },
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.success) {
                 showToast('Animateur supprime.');
                 chargerAnimateurs();
             } else {
-                showToast(res.error || 'Erreur.', 'error');
+                showToast((res && res.error) || 'Erreur.', 'error');
             }
-        }, 'json').fail(function() {
-            showToast('Endpoint adminsupprimeranimateur non disponible.', 'error');
+        }).fail(function() {
+            showToast('En attente backend : suppression d\'animateur.', 'error');
         });
     });
 
@@ -314,16 +343,21 @@ $(document).ready(function() {
         e.preventDefault();
         var formData = $(this).serialize();
 
-        $.post('index.php?action=adminediterfacture', formData, function(res) {
-            if (res.success) {
+        $.ajax({
+            url: 'index.php?action=adminediterfacture',
+            method: 'POST',
+            data: formData,
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.success) {
                 showToast('Facture mise a jour.');
                 $('#popup-edit-facture').removeClass('active');
                 chargerFactures('all');
             } else {
-                showToast(res.error || 'Erreur.', 'error');
+                showToast((res && res.error) || 'Erreur.', 'error');
             }
-        }, 'json').fail(function() {
-            showToast('Endpoint adminediterfacture non disponible.', 'error');
+        }).fail(function() {
+            showToast('En attente backend : edition de facture.', 'error');
         });
     });
 
@@ -332,15 +366,20 @@ $(document).ready(function() {
         var id = $(this).data('id');
         if (!confirm('Emettre cette facture definitivement ?')) return;
 
-        $.post('index.php?action=adminemettrefacture', { id_facture: id, csrf_token: $('#csrf-global').val() }, function(res) {
-            if (res.success) {
+        $.ajax({
+            url: 'index.php?action=adminemettrefacture',
+            method: 'POST',
+            data: { id_facture: id, csrf_token: $('#csrf-global').val() },
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.success) {
                 showToast('Facture emise.');
                 chargerFactures('all');
             } else {
-                showToast(res.error || 'Erreur.', 'error');
+                showToast((res && res.error) || 'Erreur.', 'error');
             }
-        }, 'json').fail(function() {
-            showToast('Endpoint adminemettrefacture non disponible.', 'error');
+        }).fail(function() {
+            showToast('En attente backend : emission de facture.', 'error');
         });
     });
 
@@ -378,15 +417,20 @@ function afficherDashboardAdmin(nom) {
 // =============================================
 
 function chargerDemandes(statut) {
-    var url = 'index.php?action=adminrecuperereservations&statut=' + (statut || 'en_attente');
+    // Les statuts contiennent des accents cote backend (validée, refusée) : on encode
+    var url = 'index.php?action=adminrecuperereservations&statut=' + encodeURIComponent(statut || 'en_attente');
     $('#admin-liste-demandes').html('<p class="text-muted">Chargement...</p>');
 
     $.ajax({ url: url, method: 'GET', dataType: 'json' })
     .done(function(res) {
-        if (res.success && res.data && Object.keys(res.data).length > 0) {
-            
+        if (!res || res.success !== true) {
+            $('#admin-liste-demandes').html('<div class="admin-error">' + ((res && res.error) || 'Reponse backend invalide.') + '</div>');
+            return;
+        }
+        var liste = res.data ? Object.values(res.data) : [];
+        if (liste.length > 0) {
             var html = '';
-            $.each(res.data, function(i, r) {
+            $.each(liste, function(i, r) {
                 html += renderCarteDemande(r);
             });
             $('#admin-liste-demandes').html(html);
@@ -395,26 +439,36 @@ function chargerDemandes(statut) {
         }
     })
     .fail(function() {
-        $('#admin-liste-demandes').html('<div class="admin-error">En attente du backend (endpoint adminrecuperereservations non disponible).</div>');
+        $('#admin-liste-demandes').html('<div class="admin-error">Erreur de chargement des demandes (session expiree ou backend indisponible).</div>');
     });
 }
 
 function chargerReservations(statut) {
-    var url = 'index.php?action=adminrecuperereservations&statut=' + (statut || 'all');
+    // Les statuts contiennent des accents cote backend (validée, refusée) : on encode
+    var url = 'index.php?action=adminrecuperereservations&statut=' + encodeURIComponent(statut || 'all');
     $('#admin-liste-reservations').html('<p class="text-muted">Chargement...</p>');
 
     $.ajax({ url: url, method: 'GET', dataType: 'json' })
     .done(function(res) {
-        if (res.success && res.data && Object.keys(res.data).length > 0) {
+        if (!res || res.success !== true) {
+            $('#admin-liste-reservations').html('<div class="admin-error">' + ((res && res.error) || 'Reponse backend invalide.') + '</div>');
+            return;
+        }
+        var liste = res.data ? Object.values(res.data) : [];
+        if (liste.length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
             html += '<thead><tr><th>#</th><th>Client</th><th>Dates</th><th>Pers.</th><th>Statut</th></tr></thead><tbody>';
-            $.each(res.data, function(i, r) {
+            $.each(liste, function(i, r) {
+                var idRes = r.id_reservation || r.id || '?';
+                var clientLabel = r.nom_temp || r.email_temp || (r.id_client ? 'Client #' + r.id_client : '—');
+                var statutBrut = r.statut || 'en_attente';
+                var statutCss = statutBrut.replace(/[éè]/g, 'e').replace('_', '-');
                 html += '<tr>';
-                html += '<td>#' + (r.id || r.id_reservation || '?') + '</td>';
-                html += '<td>' + (r.nom || r.nom_temp || '') + ' ' + (r.prenom || '') + '<br><small class="text-muted">' + (r.email || r.email_temp || '') + '</small></td>';
+                html += '<td>#' + idRes + '</td>';
+                html += '<td>' + clientLabel + '</td>';
                 html += '<td>' + (r.date_debut || '?') + '<br><small>' + (r.date_fin || '?') + '</small></td>';
                 html += '<td>' + (r.nombre_personnes || '?') + '</td>';
-                html += '<td><span class="admin-badge badge-' + (r.statut || 'en-attente').replace(/[éè]/g,'e').replace('_','-') + '">' + (r.statut || '?') + '</span></td>';
+                html += '<td><span class="admin-badge badge-' + statutCss + '">' + statutBrut + '</span></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
@@ -424,7 +478,7 @@ function chargerReservations(statut) {
         }
     })
     .fail(function() {
-        $('#admin-liste-reservations').html('<div class="admin-error">En attente du backend (endpoint adminrecuperereservations non disponible).</div>');
+        $('#admin-liste-reservations').html('<div class="admin-error">Erreur de chargement des reservations (session expiree ou backend indisponible).</div>');
     });
 }
 
@@ -435,16 +489,14 @@ function chargerChambres() {
     .done(function(chambres) {
         if (chambres && Object.values(chambres).length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
-            html += '<thead><tr><th>#</th><th>Nom</th><th>Type</th><th>Capacite</th><th>Prix/nuit</th><th>Statut</th></tr></thead><tbody>';
+            html += '<thead><tr><th>#</th><th>Nom</th><th>Type</th><th>Capacite</th><th>Prix/nuit</th></tr></thead><tbody>';
             $.each(chambres, function(i, ch) {
-                var statutClass = ch.statut === 'libre' ? 'badge-validee' : 'badge-en-attente';
                 html += '<tr>';
                 html += '<td>#' + ch.id_chambre + '</td>';
-                html += '<td>' + ch.nom_chambre + '</td>';
+                html += '<td><strong>' + ch.nom_chambre + '</strong></td>';
                 html += '<td>' + ch.type_chambre + '</td>';
-                html += '<td>' + ch.capacite + '</td>';
+                html += '<td>' + ch.capacite + ' pers.</td>';
                 html += '<td>' + ch.prix_nuit + ' &euro;</td>';
-                html += '<td><span class="admin-badge ' + statutClass + '">' + ch.statut + '</span></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
@@ -465,17 +517,13 @@ function chargerPrestations() {
     .done(function(prestas) {
         if (prestas && Object.values(prestas).length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
-            html += '<thead><tr><th>#</th><th>Nom</th><th>Description</th><th>Prix unitaire</th><th>Actif</th></tr></thead><tbody>';
+            html += '<thead><tr><th>#</th><th>Nom</th><th>Description</th><th>Prix unitaire</th></tr></thead><tbody>';
             $.each(prestas, function(i, p) {
-                var actif = (p.actif === undefined || p.actif === null || p.actif == 1 || p.actif === true);
                 html += '<tr>';
                 html += '<td>#' + p.id_prestation + '</td>';
                 html += '<td><strong>' + p.nom + '</strong></td>';
                 html += '<td>' + (p.description || '') + '</td>';
                 html += '<td>' + p.prix_unitaire + ' &euro;</td>';
-                html += '<td><div class="form-check form-switch">';
-                html += '<input class="form-check-input toggle-presta" type="checkbox" data-id="' + p.id_prestation + '"' + (actif ? ' checked' : '') + '>';
-                html += '</div></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
@@ -490,29 +538,55 @@ function chargerPrestations() {
 }
 
 function chargerDemandesActivites(date) {
-    var url = 'index.php?action=apidemandesactivites';
-    if (date) url += '&date=' + date;
     $('#admin-liste-demandes-activites').html('<p class="text-muted">Chargement...</p>');
 
-    $.ajax({ url: url, method: 'GET', dataType: 'json' })
-    .done(function(res) {
-        if (res.data && Object.values(res.data).length > 0) {
+    // Les APIs renvoient des objets bruts (pas {success, data})
+    // On charge en parallele demandes + activites pour resoudre les noms
+    $.when(
+        $.ajax({ url: 'index.php?action=apidemandesactivites', method: 'GET', dataType: 'json' }),
+        $.ajax({ url: 'index.php?action=apiactivite', method: 'GET', dataType: 'json' })
+    ).done(function(demandesArr, activitesArr) {
+        var demandes = demandesArr[0];
+        var activites = activitesArr[0];
+        var liste = demandes ? Object.values(demandes) : [];
+
+        // Lookup activites par id
+        var actById = {};
+        if (activites) {
+            $.each(Object.values(activites), function(i, a) {
+                actById[String(a.id_activite)] = a;
+            });
+        }
+
+        // On ne garde que les demandes en attente
+        liste = liste.filter(function(d) { return (d.statut || '') === 'en_attente'; });
+
+        // Filtrage date cote client
+        if (date) {
+            liste = liste.filter(function(d) { return d.date === date; });
+        }
+
+        if (liste.length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
             html += '<thead><tr><th>#</th><th>Activite</th><th>Date</th><th>Creneau</th><th>Pers.</th><th>Message</th><th>Action</th></tr></thead><tbody>';
-            $.each(res.data, function(i, d) {
+            $.each(liste, function(i, d) {
+                var id = d.id_demande || d.id || '';
+                var nbPers = d.nombre_personnes_concernees || d.nombre_personnes || '?';
+                var act = actById[String(d.id_activite)];
+                var nomAct = act ? act.nom : ('Activite #' + (d.id_activite || '?'));
                 html += '<tr>';
-                html += '<td>#' + (d.id || '?') + '</td>';
-                html += '<td><strong>' + (d.nom_activite || d.nom || '?') + '</strong></td>';
+                html += '<td>#' + (id || '?') + '</td>';
+                html += '<td><strong>' + nomAct + '</strong></td>';
                 html += '<td>' + (d.date || '?') + '</td>';
                 html += '<td>' + (d.creneau || '?') + '</td>';
-                html += '<td>' + (d.nombre_personnes_concernees || d.nombre_personnes || '?') + '</td>';
+                html += '<td>' + nbPers + '</td>';
                 html += '<td><small>' + (d.message || '') + '</small></td>';
                 html += '<td><button class="btn btn-sm btn-accent btn-valider-activite"';
-                html += ' data-id="' + (d.id || '') + '"';
+                html += ' data-id="' + id + '"';
                 html += ' data-date="' + (d.date || '') + '"';
                 html += ' data-creneau="' + (d.creneau || '') + '"';
-                html += ' data-personnes="' + (d.nombre_personnes_concernees || d.nombre_personnes || '') + '"';
-                html += ' data-nom="' + (d.nom_activite || d.nom || '') + '">Programmer</button></td>';
+                html += ' data-personnes="' + nbPers + '"';
+                html += ' data-nom="' + nomAct + '">Programmer</button></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
@@ -522,26 +596,54 @@ function chargerDemandesActivites(date) {
         }
     })
     .fail(function() {
-        $('#admin-liste-demandes-activites').html('<div class="admin-error">En attente du backend (endpoint adminrecuperedemandesactivites non disponible).</div>');
+        $('#admin-liste-demandes-activites').html('<div class="admin-error">Erreur de chargement des demandes d\'activites.</div>');
     });
 }
 
 function chargerActivitesPrevues() {
     $('#admin-liste-activites-prevues').html('<p class="text-muted">Chargement...</p>');
 
-    $.ajax({ url: 'index.php?action=apiactivitesprevues', method: 'GET', dataType: 'json' })
-    .done(function(res) {
-        if (res.data && Object.values(res.data).length > 0) {
+    // On charge en parallele activites prevues + activites + animateurs
+    // pour resoudre les noms via lookup cote front
+    $.when(
+        $.ajax({ url: 'index.php?action=apiactivitesprevues', method: 'GET', dataType: 'json' }),
+        $.ajax({ url: 'index.php?action=apiactivite', method: 'GET', dataType: 'json' }),
+        $.ajax({ url: 'index.php?action=apianimateur', method: 'GET', dataType: 'json' })
+    ).done(function(prevuesArr, activitesArr, animateursArr) {
+        var prevues = prevuesArr[0];
+        var activites = activitesArr[0];
+        var animateurs = animateursArr[0];
+        var liste = prevues ? Object.values(prevues) : [];
+
+        var actById = {};
+        if (activites) {
+            $.each(Object.values(activites), function(i, a) {
+                actById[String(a.id_activite)] = a;
+            });
+        }
+        var animById = {};
+        if (animateurs) {
+            $.each(Object.values(animateurs), function(i, a) {
+                animById[String(a.id_animateur)] = a;
+            });
+        }
+
+        if (liste.length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
             html += '<thead><tr><th>#</th><th>Activite</th><th>Date</th><th>Creneau</th><th>Animateur</th><th>Capacite restante</th></tr></thead><tbody>';
-            $.each(res.data, function(i, a) {
+            $.each(liste, function(i, a) {
+                var id = a.id_activite_prevue || a.id || '?';
+                var act = actById[String(a.id_activite)];
+                var nomAct = act ? act.nom : ('Activite #' + (a.id_activite || '?'));
+                var anim = animById[String(a.id_animateur)];
+                var nomAnim = anim ? (anim.prenom + ' ' + anim.nom) : ('Animateur #' + (a.id_animateur || '?'));
                 html += '<tr>';
-                html += '<td>#' + (a.id || '?') + '</td>';
-                html += '<td><strong>' + (a.nom_activite || a.nom || '?') + '</strong></td>';
+                html += '<td>#' + id + '</td>';
+                html += '<td><strong>' + nomAct + '</strong></td>';
                 html += '<td>' + (a.date || '?') + '</td>';
                 html += '<td>' + (a.creneau || '?') + '</td>';
-                html += '<td>' + (a.nom_animateur || '?') + '</td>';
-                html += '<td>' + (a.capacite_restante || 0) + '</td>';
+                html += '<td>' + nomAnim + '</td>';
+                html += '<td>' + (a.capacite_restante != null ? a.capacite_restante : 0) + '</td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
@@ -551,25 +653,71 @@ function chargerActivitesPrevues() {
         }
     })
     .fail(function() {
-        $('#admin-liste-activites-prevues').html('<div class="admin-error">En attente du backend (endpoint adminrecupereactivitesprevues non disponible).</div>');
+        $('#admin-liste-activites-prevues').html('<div class="admin-error">Erreur de chargement des activites prevues.</div>');
+    });
+}
+
+function chargerClients(statut) {
+    $('#admin-liste-clients').html('<p class="text-muted">Chargement...</p>');
+
+    // apiclient renvoie un objet brut { "1": {...}, "2": {...} } (pas {success, data})
+    // Le filtrage par statut est fait cote client
+    $.ajax({ url: 'index.php?action=apiclient', method: 'GET', dataType: 'json' })
+    .done(function(clients) {
+        var liste = clients ? Object.values(clients) : [];
+
+        if (statut && statut !== 'all') {
+            liste = liste.filter(function(c) { return (c.statut_compte || '') === statut; });
+        }
+
+        if (liste.length > 0) {
+            var html = '<div class="admin-table-wrapper"><table class="admin-table">';
+            html += '<thead><tr><th>#</th><th>Nom</th><th>Prenom</th><th>Email</th><th>Statut</th><th>Inscrit le</th></tr></thead><tbody>';
+            $.each(liste, function(i, c) {
+                var id = c.id_client || c.id || '?';
+                var stc = (c.statut_compte || 'inconnu');
+                var badge = 'admin-badge ';
+                if (stc === 'actif') badge += 'badge-validee';
+                else if (stc === 'invité') badge += 'badge-provisoire';
+                else badge += 'badge-refusee';
+                html += '<tr>';
+                html += '<td>#' + id + '</td>';
+                html += '<td><strong>' + (c.nom || '?') + '</strong></td>';
+                html += '<td>' + (c.prenom || '?') + '</td>';
+                html += '<td><small>' + (c.email || '?') + '</small></td>';
+                html += '<td><span class="' + badge + '">' + stc + '</span></td>';
+                html += '<td><small>' + (c.date_creation || '?') + '</small></td>';
+                html += '</tr>';
+            });
+            html += '</tbody></table></div>';
+            $('#admin-liste-clients').html(html);
+        } else {
+            $('#admin-liste-clients').html('<div class="admin-empty">Aucun client.</div>');
+        }
+    })
+    .fail(function() {
+        $('#admin-liste-clients').html('<div class="admin-error">Erreur de chargement des clients. (Route <code>apiclient</code> en attente cote backend)</div>');
     });
 }
 
 function chargerAnimateurs() {
     $('#admin-liste-animateurs').html('<p class="text-muted">Chargement...</p>');
 
+    // apianimateur renvoie un tableau/objet brut (pas {success, data})
     $.ajax({ url: 'index.php?action=apianimateur', method: 'GET', dataType: 'json' })
-    .done(function(res) {
-        if (res.data && res.data.length > 0) {
+    .done(function(animateurs) {
+        var liste = animateurs ? Object.values(animateurs) : [];
+        if (liste.length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
             html += '<thead><tr><th>#</th><th>Nom</th><th>Prenom</th><th>Specialite</th><th>Action</th></tr></thead><tbody>';
-            $.each(res.data, function(i, a) {
+            $.each(liste, function(i, a) {
+                var id = a.id_animateur || a.id || '?';
                 html += '<tr>';
-                html += '<td>#' + (a.id || a.id_animateur || '?') + '</td>';
+                html += '<td>#' + id + '</td>';
                 html += '<td>' + (a.nom || '?') + '</td>';
                 html += '<td>' + (a.prenom || '?') + '</td>';
                 html += '<td>' + (a.specialite || '?') + '</td>';
-                html += '<td><button class="btn btn-sm btn-outline-danger btn-supprimer-animateur" data-id="' + (a.id || a.id_animateur) + '">Supprimer</button></td>';
+                html += '<td><button class="btn btn-sm btn-outline-danger btn-supprimer-animateur" data-id="' + id + '">Supprimer</button></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
@@ -579,62 +727,78 @@ function chargerAnimateurs() {
         }
     })
     .fail(function() {
-        $('#admin-liste-animateurs').html('<div class="admin-error">En attente du backend (endpoint adminrecupereanimateurs non disponible).</div>');
+        $('#admin-liste-animateurs').html('<div class="admin-error">Erreur de chargement des animateurs.</div>');
     });
 }
 
 function chargerAnimateursPourSelect() {
-    $.ajax({ url: 'index.php?action=adminrecupereanimateurs', method: 'GET', dataType: 'json' })
-    .done(function(res) {
+    // apianimateur renvoie un tableau/objet brut (pas {success, data})
+    $.ajax({ url: 'index.php?action=apianimateur', method: 'GET', dataType: 'json' })
+    .done(function(animateurs) {
         var html = '<option value="" selected disabled>Choisir...</option>';
-        if (res.success && res.data) {
-            $.each(res.data, function(i, a) {
-                html += '<option value="' + (a.id || a.id_animateur) + '">';
-                html += (a.prenom || '') + ' ' + (a.nom || '') + ' (' + (a.specialite || '') + ')';
-                html += '</option>';
-            });
-        }
+        var liste = animateurs ? Object.values(animateurs) : [];
+        $.each(liste, function(i, a) {
+            var id = a.id_animateur || a.id;
+            html += '<option value="' + id + '">';
+            html += (a.prenom || '') + ' ' + (a.nom || '') + ' (' + (a.specialite || '') + ')';
+            html += '</option>';
+        });
         $('#va-animateur').html(html);
+    })
+    .fail(function() {
+        $('#va-animateur').html('<option value="" disabled>Erreur de chargement</option>');
     });
 }
 
 function chargerFactures(statut) {
+    // Endpoint adminrecuperefactures pas encore route cote backend.
+    // Tant que ce n'est pas expose, on affiche un message d'attente
+    // pour eviter un faux "Aucune facture".
     var url = 'index.php?action=adminrecuperefactures';
-    if (statut && statut !== 'all') url += '&statut=' + statut;
+    if (statut && statut !== 'all') url += '&statut=' + encodeURIComponent(statut);
     $('#admin-liste-factures').html('<p class="text-muted">Chargement...</p>');
 
     $.ajax({ url: url, method: 'GET', dataType: 'json' })
     .done(function(res) {
-        if (res.success && res.data && res.data.length > 0) {
-            var html = '<div class="admin-table-wrapper"><table class="admin-table">';
-            html += '<thead><tr><th>#</th><th>Client</th><th>Reservation</th><th>Total</th><th>Avoirs</th><th>Reduction</th><th>Statut</th><th>Actions</th></tr></thead><tbody>';
-            $.each(res.data, function(i, f) {
-                var total = parseFloat(f.montant_final != null ? f.montant_final : f.montant_total) || 0;
-                var statutClass = (f.statut || '').toLowerCase().replace('é','e');
-                html += '<tr>';
-                html += '<td>#' + (f.id || '?') + '</td>';
-                html += '<td>' + (f.nom || '') + ' ' + (f.prenom || '') + '<br><small class="text-muted">' + (f.email || '') + '</small></td>';
-                html += '<td>#' + (f.id_reservation || '?') + '</td>';
-                html += '<td><strong>' + total.toFixed(2) + ' &euro;</strong></td>';
-                html += '<td>' + (parseFloat(f.avoirs) || 0).toFixed(2) + ' &euro;</td>';
-                html += '<td>' + (parseFloat(f.reduction) || 0) + ' %</td>';
-                html += '<td><span class="admin-badge badge-' + statutClass + '">' + (f.statut || '?') + '</span></td>';
-                html += '<td>';
-                html += '<button class="btn btn-sm btn-outline-accent btn-editer-facture" data-id="' + f.id + '" data-arrhes="' + (f.avoirs || 0) + '" data-reduction="' + (f.reduction || 0) + '">Editer</button> ';
-                if ((f.statut || '').toLowerCase() === 'provisoire') {
-                    html += '<button class="btn btn-sm btn-accent btn-emettre-facture" data-id="' + f.id + '">Emettre</button>';
-                }
-                html += '</td>';
-                html += '</tr>';
-            });
-            html += '</tbody></table></div>';
-            $('#admin-liste-factures').html(html);
-        } else {
-            $('#admin-liste-factures').html('<div class="admin-empty">Aucune facture.</div>');
+        // Si le backend renvoie du HTML (endpoint absent), dataType:'json' declenche .fail()
+        if (!res || res.success !== true) {
+            $('#admin-liste-factures').html('<div class="admin-error">En attente backend : liste des factures admin.</div>');
+            return;
         }
+        var liste = res.data ? Object.values(res.data) : [];
+        if (liste.length === 0) {
+            $('#admin-liste-factures').html('<div class="admin-empty">Aucune facture.</div>');
+            return;
+        }
+        var html = '<div class="admin-table-wrapper"><table class="admin-table">';
+        html += '<thead><tr><th>#</th><th>Client</th><th>Reservation</th><th>Total</th><th>Avoirs</th><th>Reduction</th><th>Statut</th><th>Actions</th></tr></thead><tbody>';
+        $.each(liste, function(i, f) {
+            var total = parseFloat(f.montant_final != null ? f.montant_final : f.montant_total) || 0;
+            var statutBrut = f.statut || '';
+            var statutCss = statutBrut.toLowerCase().replace(/[éè]/g, 'e');
+            var idFact = f.id_facture || f.id || '?';
+            var idRes = f.id_reservation || '?';
+            html += '<tr>';
+            html += '<td>#' + idFact + '</td>';
+            html += '<td>' + (f.id_client ? 'Client #' + f.id_client : '—') + '</td>';
+            html += '<td>#' + idRes + '</td>';
+            html += '<td><strong>' + total.toFixed(2) + ' &euro;</strong></td>';
+            html += '<td>' + (parseFloat(f.avoirs) || 0).toFixed(2) + ' &euro;</td>';
+            html += '<td>' + (parseFloat(f.reduction) || 0) + ' %</td>';
+            html += '<td><span class="admin-badge badge-' + statutCss + '">' + statutBrut + '</span></td>';
+            html += '<td>';
+            html += '<button class="btn btn-sm btn-outline-accent btn-editer-facture" data-id="' + idFact + '" data-arrhes="' + (f.avoirs || 0) + '" data-reduction="' + (f.reduction || 0) + '">Editer</button> ';
+            if (statutBrut.toLowerCase() === 'provisoire') {
+                html += '<button class="btn btn-sm btn-accent btn-emettre-facture" data-id="' + idFact + '">Emettre</button>';
+            }
+            html += '</td>';
+            html += '</tr>';
+        });
+        html += '</tbody></table></div>';
+        $('#admin-liste-factures').html(html);
     })
     .fail(function() {
-        $('#admin-liste-factures').html('<div class="admin-error">En attente du backend (endpoint adminrecuperefactures non disponible).</div>');
+        $('#admin-liste-factures').html('<div class="admin-error">En attente backend : liste des factures admin.</div>');
     });
 }
 
@@ -643,17 +807,22 @@ function chargerFactures(statut) {
 // =============================================
 
 function renderCarteDemande(r) {
+    var idRes = r.id_reservation || r.id || '?';
+    var statutBrut = r.statut || 'en_attente';
+    var statutCss = statutBrut.replace(/[éè]/g, 'e').replace('_', '-');
+    var clientLabel = r.nom_temp || r.email_temp || (r.id_client ? 'Client #' + r.id_client : '—');
+
     var html = '<div class="admin-card admin-demande-card">';
     html += '<div class="d-flex justify-content-between align-items-start mb-2">';
     html += '<div>';
-    html += '<h5 class="mb-1">Demande #' + (r.id || r.id_reservation) + '</h5>';
+    html += '<h5 class="mb-1">Demande #' + idRes + '</h5>';
     html += '<small class="text-muted">' + (r.date_demande || '') + '</small>';
     html += '</div>';
-    html += '<span class="admin-badge badge-' + (r.statut || 'en-attente').replace(/[éè]/g,'e').replace('_','-') + '">' + (r.statut || '?') + '</span>';
+    html += '<span class="admin-badge badge-' + statutCss + '">' + statutBrut + '</span>';
     html += '</div>';
 
     html += '<div class="row mb-3">';
-    html += '<div class="col-md-6"><strong>Client</strong><br>' + (r.nom || r.nom_temp || '') + ' ' + (r.prenom || '') + '<br><small class="text-muted">' + (r.email || r.email_temp || '') + '</small></div>';
+    html += '<div class="col-md-6"><strong>Client</strong><br>' + clientLabel + '</div>';
     html += '<div class="col-md-6"><strong>Sejour</strong><br>Du ' + (r.date_debut || '?') + ' au ' + (r.date_fin || '?') + '<br><small class="text-muted">' + (r.nombre_personnes || '?') + ' personne(s)</small></div>';
     html += '</div>';
 
@@ -661,10 +830,10 @@ function renderCarteDemande(r) {
         html += '<div class="mb-3"><strong>Commentaire</strong><br><small class="text-muted">' + r.commentaire + '</small></div>';
     }
 
-    if ((r.statut || '').toLowerCase() === 'en_attente' || (r.statut || '').toLowerCase() === 'en attente') {
+    if (statutBrut === 'en_attente') {
         html += '<div class="d-flex gap-2">';
-        html += '<button class="btn btn-sm btn-accent btn-accepter-resa" data-id="' + (r.id || r.id_reservation) + '">Accepter</button>';
-        html += '<button class="btn btn-sm btn-outline-danger btn-refuser-resa" data-id="' + (r.id || r.id_reservation) + '">Refuser</button>';
+        html += '<button class="btn btn-sm btn-accent btn-accepter-resa" data-id="' + idRes + '">Accepter</button>';
+        html += '<button class="btn btn-sm btn-outline-danger btn-refuser-resa" data-id="' + idRes + '">Refuser</button>';
         html += '</div>';
     }
 

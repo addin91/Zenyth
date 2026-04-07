@@ -92,7 +92,7 @@ include __DIR__ . '/header.php';
         <div class="admin-panel-header">
             <h2 class="section-title">Gestion des prestations</h2>
             <hr class="section-divider">
-            <p class="section-subtitle">Activer ou desactiver les prestations proposees</p>
+            <p class="section-subtitle">Liste des prestations proposees</p>
         </div>
 
         <div id="admin-liste-prestations">
@@ -173,6 +173,26 @@ include __DIR__ . '/header.php';
 
         <h5>Animateurs existants</h5>
         <div id="admin-liste-animateurs">
+            <p class="text-muted">Chargement...</p>
+        </div>
+    </div>
+
+    <!-- ===== ONGLET : CLIENTS ===== -->
+    <div class="admin-panel" id="admin-clients">
+        <div class="admin-panel-header">
+            <h2 class="section-title">Gestion des clients</h2>
+            <hr class="section-divider">
+            <p class="section-subtitle">Liste des clients inscrits et leur statut</p>
+        </div>
+
+        <div class="admin-filters">
+            <button class="btn btn-sm btn-outline-accent admin-filter-btn-client active" data-statut="all">Tous</button>
+            <button class="btn btn-sm btn-outline-accent admin-filter-btn-client" data-statut="actif">Actifs</button>
+            <button class="btn btn-sm btn-outline-accent admin-filter-btn-client" data-statut="invité">Invites</button>
+            <button class="btn btn-sm btn-outline-accent admin-filter-btn-client" data-statut="inactif">Inactifs</button>
+        </div>
+
+        <div id="admin-liste-clients">
             <p class="text-muted">Chargement...</p>
         </div>
     </div>

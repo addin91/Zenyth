@@ -58,6 +58,9 @@ $pageTitle = (isset($IS_ADMIN_PAGE) && $IS_ADMIN_PAGE === true)
                         <a class="nav-link admin-tab-link" href="#" data-tab="admin-animateurs">Animateurs</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link admin-tab-link" href="#" data-tab="admin-clients">Clients</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link admin-tab-link" href="#" data-tab="admin-factures">Factures</a>
                     </li>
                 </ul>
