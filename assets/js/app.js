@@ -8,6 +8,7 @@ $(document).ready(function() {
         $('.navbar-collapse').collapse('hide');
     });
 
+    // ===== Fermetures =====
     $('.popup-close').on('click', function() {
         $(this).closest('.popup-overlay').removeClass('active');
     });
@@ -428,6 +429,9 @@ function chargerDashPrestations() {
             var html = '';
             $.each(prestations, function(i, p) {
                 var dejaAjoutee = prestationsAjoutees.indexOf(String(p.id_prestation)) !== -1;
+                var actif = (p.actif === undefined || p.actif === null || p.actif == 1 || p.actif === true);
+                // Si la prestation est desactivee cote admin et qu'on ne l'a pas deja ajoutee, on la cache
+                if (!actif && !dejaAjoutee) return;
                 html += '<div class="dash-presta-item">';
                 html += '<div class="dash-presta-info">';
                 html += '<h6>' + p.nom + '</h6>';
@@ -440,6 +444,9 @@ function chargerDashPrestations() {
                 }
                 html += '</div>';
             });
+            if (!html) {
+                html = '<p class="text-muted">Aucune prestation disponible.</p>';
+            }
             $('#dash-liste-prestations').html(html);
         })
         .fail(function() {
@@ -575,8 +582,11 @@ function chargerDashFactures() {
                 });
 
                 // Activités : resolution nom + prix via lookup
+                // On n'affiche que les activites validees par l'admin (les en_attente / refusees ne comptent pas sur la facture)
                 $.each(f.activites || [], function(j, a) {
                     if (!a) return;
+                    var statut = (a.statut || '').toLowerCase();
+                    if (statut !== 'validée' && statut !== 'validee') return;
                     var activite = actById[String(a.id_activite)] || {};
                     var nom = activite.nom || 'Activite';
                     var prix = parseFloat(activite.prix) || 0;
@@ -703,6 +713,9 @@ function chargerPrestationsAccueil() {
     .done(function(prestations) {
         var html = '';
         $.each(prestations, function(i, p) {
+            // On ne montre pas les prestations desactivees sur la vitrine publique
+            var actif = (p.actif === undefined || p.actif === null || p.actif == 1 || p.actif === true);
+            if (!actif) return;
             html += '<div class="carrousel-item">';
             html += '  <div class="glass-card">';
             html += '    <h5>' + p.nom + '</h5>';

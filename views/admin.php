@@ -66,11 +66,11 @@ include __DIR__ . '/header.php';
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label for="adm-ch-debut" class="form-label">Date de debut</label>
-                    <input type="date" class="form-control" id="adm-ch-debut">
+                    <input type="date" class="form-control" id="adm-ch-debut" max="9999-12-31">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="adm-ch-fin" class="form-label">Date de fin</label>
-                    <input type="date" class="form-control" id="adm-ch-fin">
+                    <input type="date" class="form-control" id="adm-ch-fin" max="9999-12-31">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="adm-ch-personnes" class="form-label">Nombre de personnes</label>
@@ -92,7 +92,7 @@ include __DIR__ . '/header.php';
         <div class="admin-panel-header">
             <h2 class="section-title">Gestion des prestations</h2>
             <hr class="section-divider">
-            <p class="section-subtitle">Liste des prestations proposees</p>
+            <p class="section-subtitle">Activer ou desactiver les prestations proposees</p>
         </div>
 
         <div id="admin-liste-prestations">
@@ -120,7 +120,7 @@ include __DIR__ . '/header.php';
                 <label for="adm-act-filtre-date" class="form-label">Filtrer par date</label>
                 <div class="row">
                     <div class="col-md-6">
-                        <input type="date" class="form-control" id="adm-act-filtre-date">
+                        <input type="date" class="form-control" id="adm-act-filtre-date" max="9999-12-31">
                     </div>
                     <div class="col-md-6">
                         <button class="btn btn-outline-accent" id="btn-adm-act-reset">Reinitialiser</button>
@@ -340,7 +340,7 @@ include __DIR__ . '/header.php';
 </div>
 
 <!-- CSRF token global pour AJAX -->
-<input type="hidden" id="csrf-global" value="<?= generateCsrfToken() ?>">
+<input type="hidden" id="csrf-global" value="<?= e(generateCsrfToken()) ?>">
 
 <!-- Toast container -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;"></div>

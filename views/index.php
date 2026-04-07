@@ -8,7 +8,7 @@
             <h1><span>ZENYTH</span></h1>
             <p>Complexe sportif premium au bord du lac, entre montagnes et nature sauvage.</p>
             <a href="#" class="btn btn-accent btn-lg me-2" data-popup="reservation">Reserver un sejour</a>
-            <a href="#chambres" class="btn btn-outline-accent btn-lg">Decouvrir</a>
+            <a href="#chambres" class="btn btn-outline-accent btn-lg">Découvrir</a>
         </div>
     </div>
 
@@ -52,7 +52,7 @@
 
 <!-- ===== ACTIVITES ===== -->
 <section id="activites">
-    <h2 class="section-title">Nos Activites</h2>
+    <h2 class="section-title">Nos Activités</h2>
     <p class="section-subtitle">Sport, nature et dépassement de soi</p>
     <hr class="section-divider">
     <div class="carrousel-wrapper">
@@ -66,8 +66,8 @@
 
 <!-- ===== PRESTATIONS ===== -->
 <section id="prestations">
-    <h2 class="section-title">Nos Prestations</h2>
-    <p class="section-subtitle">Des services pour un sejour sur mesure</p>
+    <h2 class="section-title">Nos Préstations</h2>
+    <p class="section-subtitle">Des services pour un séjour sur mesure</p>
     <hr class="section-divider">
     <div class="carrousel-wrapper">
         <button class="carrousel-btn carrousel-prev" data-cible="liste-prestations"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -80,9 +80,9 @@
 
 <!-- ===== CTA FINAL ===== -->
 <div class="text-center mt-5 mb-4">
-    <h3>Pret a vivre l'experience Zenyth ?</h3>
-    <p class="text-muted mb-4">Reservez votre sejour et composez votre programme sportif ideal.</p>
-    <a href="#" class="btn btn-accent btn-lg" data-popup="reservation">Demander une reservation</a>
+    <h3>Prêt à vivre l'expérience Zenyth ?</h3>
+    <p class="text-muted mb-4">Réservez votre séjour et composez votre programme sportif idéal.</p>
+    <a href="#" class="btn btn-accent btn-lg" data-popup="reservation">Demander une réservation</a>
 </div>
 
 <!-- ===== POPUP RESERVATION ===== -->
@@ -103,7 +103,7 @@
                         <input type="text" class="form-control" id="res-nom" name="nom" required>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="res-prenom" class="form-label">Prenom</label>
+                        <label for="res-prenom" class="form-label">Prénom</label>
                         <input type="text" class="form-control" id="res-prenom" name="prenom" required>
                     </div>
                 </div>
@@ -116,12 +116,12 @@
             <!-- Dates -->
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="res-date-debut" class="form-label">Date d'arrivee</label>
-                    <input type="date" class="form-control" id="res-date-debut" name="dateDebut" required>
+                    <label for="res-date-debut" class="form-label">Date d'arrivée</label>
+                    <input type="date" class="form-control" id="res-date-debut" name="dateDebut" max="9999-12-31" required>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label for="res-date-fin" class="form-label">Date de depart</label>
-                    <input type="date" class="form-control" id="res-date-fin" name="dateFin" required>
+                    <label for="res-date-fin" class="form-label">Date de départ</label>
+                    <input type="date" class="form-control" id="res-date-fin" name="dateFin" max="9999-12-31" required>
                 </div>
             </div>
 
@@ -152,9 +152,9 @@
 
             <!-- Activites souhaitees -->
             <div class="mb-3">
-                <label class="form-label">Activites souhaitees</label>
+                <label class="form-label">Activités souhaitées</label>
                 <div id="res-activites" class="row">
-                    <p class="text-muted">Chargement des activites...</p>
+                    <p class="text-muted">Chargement des activités...</p>
                 </div>
             </div>
 
@@ -190,14 +190,14 @@
             </div>
             <button type="submit" class="btn btn-accent w-100 mb-3">Se connecter</button>
             <div class="text-center">
-                <a href="#" id="lien-mdp-oublie" class="text-muted">Mot de passe oublie ?</a>
+                <a href="#" id="lien-mdp-oublie" class="text-muted">Mot de passe oublié ?</a>
             </div>
         </form>
 
-        <!-- Formulaire mot de passe oublie (cache par defaut) -->
+        <!-- Formulaire mot de passe oublié (caché par défaut) -->
         <div id="bloc-mdp-oublie" style="display:none;">
             <hr class="my-4" style="border-color: var(--border);">
-            <h5 class="section-title" style="font-size:1.2rem;">Reinitialiser le mot de passe</h5>
+            <h5 class="section-title" style="font-size:1.2rem;">Réinitialiser le mot de passe</h5>
             <form id="form-mdp-oublie" method="POST">
                 <?= csrfField() ?>
                 <div class="mb-3">
@@ -226,26 +226,26 @@
             <li class="dash-tab" data-tab="dash-compte">Mon compte</li>
         </ul>
 
-        <!-- ONGLET : Mes reservations -->
+        <!-- ONGLET : Mes réservations -->
         <div class="dash-panel active" id="dash-reservations">
-            <h5>Historique des reservations</h5>
+            <h5>Historique des réservations</h5>
             <div id="dash-liste-reservations">
-                <p class="text-muted">Aucune reservation pour le moment.</p>
+                <p class="text-muted">Aucune réservation pour le moment.</p>
             </div>
         </div>
 
-        <!-- ONGLET : Prestations -->
+        <!-- ONGLET : Préstations -->
         <div class="dash-panel" id="dash-prestations">
-            <h5>Ajouter des prestations</h5>
-            <p class="section-subtitle">Ces services sont ajoutes directement a votre facture.</p>
+            <h5>Ajouter des préstations</h5>
+            <p class="section-subtitle">Ces services sont ajoutés directement à votre facture.</p>
             <div id="dash-liste-prestations">
                 <p class="text-muted">Chargement...</p>
             </div>
         </div>
 
-        <!-- ONGLET : Activites -->
+        <!-- ONGLET : Activités -->
         <div class="dash-panel" id="dash-activites">
-            <h5>Demander une activite</h5>
+            <h5>Demander une activité</h5>
             <form id="form-demande-activite" method="POST">
                 <?= csrfField() ?>
                 <div class="row">
@@ -257,20 +257,20 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="da-date" class="form-label">Date</label>
-                        <input type="date" class="form-control" id="da-date" name="date" required>
+                        <input type="date" class="form-control" id="da-date" name="date" max="9999-12-31" required>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="da-creneau" class="form-label">Creneau</label>
+                        <label for="da-creneau" class="form-label">Créneau</label>
                         <select class="form-select" id="da-creneau" name="creneau" required>
                             <option value="heure">A l'heure</option>
-                            <option value="demi-journee">Demi-journee</option>
-                            <option value="journee">Journee entiere</option>
+                            <option value="demi-journee">Demi-journée</option>
+                            <option value="journee">Journee entière</option>
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="da-personnes" class="form-label">Personnes concernees</label>
+                        <label for="da-personnes" class="form-label">Personnes concernées</label>
                         <select class="form-select" id="da-personnes" name="nombrePersonne" required>
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -292,9 +292,9 @@
             </form>
 
             <hr class="my-4" style="border-color: var(--border);">
-            <h5>Activites validees</h5>
+            <h5>Activités validées</h5>
             <div id="dash-activites-validees">
-                <p class="text-muted">Aucune activite validee pour le moment.</p>
+                <p class="text-muted">Aucune activité validée pour le moment.</p>
             </div>
         </div>
 
@@ -354,7 +354,7 @@
 </div>
 
 <!-- CSRF token global (pour les requetes AJAX hors formulaire) -->
-<input type="hidden" id="csrf-global" value="<?= generateCsrfToken() ?>">
+<input type="hidden" id="csrf-global" value="<?= e(generateCsrfToken()) ?>">
 
 <!-- Toast container -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;"></div>

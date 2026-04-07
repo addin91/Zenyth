@@ -237,6 +237,31 @@ $(document).ready(function() {
         });
     });
 
+    // ===== TOGGLE PRESTATION =====
+    $('#admin-liste-prestations').on('change', '.toggle-presta', function() {
+        var $input = $(this);
+        var id = $input.data('id');
+        var actif = $input.is(':checked') ? 1 : 0;
+
+        $.ajax({
+            url: 'index.php?action=admintoggleprestation',
+            method: 'POST',
+            data: { id_prestation: id, actif: actif, csrf_token: $('#csrf-global').val() },
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.success) {
+                showToast('Prestation ' + (actif ? 'activee' : 'desactivee') + '.');
+            } else {
+                // On remet l'etat precedent du toggle si echec
+                $input.prop('checked', !actif);
+                showToast((res && res.error) || 'Erreur lors du changement de statut.', 'error');
+            }
+        }).fail(function() {
+            $input.prop('checked', !actif);
+            showToast('Erreur serveur lors du changement de statut.', 'error');
+        });
+    });
+
     // ===== VALIDER ACTIVITE (ouverture modal) =====
     $('#admin-liste-demandes-activites').on('click', '.btn-valider-activite', function() {
         var id = $(this).data('id');
@@ -314,7 +339,7 @@ $(document).ready(function() {
         $.ajax({
             url: 'index.php?action=adminsupprimeranimateur',
             method: 'POST',
-            data: { id_animateur: id, csrf_token: $('#csrf-global').val() },
+            data: { id: id, csrf_token: $('#csrf-global').val() },
             dataType: 'json'
         }).done(function(res) {
             if (res && res.success) {
@@ -529,13 +554,17 @@ function chargerPrestations() {
     .done(function(prestas) {
         if (prestas && Object.values(prestas).length > 0) {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
-            html += '<thead><tr><th>#</th><th>Nom</th><th>Description</th><th>Prix unitaire</th></tr></thead><tbody>';
+            html += '<thead><tr><th>#</th><th>Nom</th><th>Description</th><th>Prix unitaire</th><th>Actif</th></tr></thead><tbody>';
             $.each(prestas, function(i, p) {
+                var actif = (p.actif === undefined || p.actif === null || p.actif == 1 || p.actif === true);
                 html += '<tr>';
                 html += '<td>#' + p.id_prestation + '</td>';
                 html += '<td><strong>' + p.nom + '</strong></td>';
                 html += '<td>' + (p.description || '') + '</td>';
                 html += '<td>' + p.prix_unitaire + ' &euro;</td>';
+                html += '<td><div class="form-check form-switch">';
+                html += '<input class="form-check-input toggle-presta" type="checkbox" data-id="' + p.id_prestation + '"' + (actif ? ' checked' : '') + '>';
+                html += '</div></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
@@ -636,7 +665,7 @@ function chargerActivitesPrevues() {
         var animById = {};
         if (animateurs) {
             $.each(Object.values(animateurs), function(i, a) {
-                animById[String(a.id_animateur)] = a;
+                animById[String(a.id)] = a;
             });
         }
 
@@ -647,8 +676,8 @@ function chargerActivitesPrevues() {
                 var id = a.id_activite_prevue || a.id || '?';
                 var act = actById[String(a.id_activite)];
                 var nomAct = act ? act.nom : ('Activite #' + (a.id_activite || '?'));
-                var anim = animById[String(a.id_animateur)];
-                var nomAnim = anim ? (anim.prenom + ' ' + anim.nom) : ('Animateur #' + (a.id_animateur || '?'));
+                var anim = animById[String(a.id)];
+                var nomAnim = anim ? (anim.prenom + ' ' + anim.nom) : ('Animateur #' + (a.id || '?'));
                 html += '<tr>';
                 html += '<td>#' + id + '</td>';
                 html += '<td><strong>' + nomAct + '</strong></td>';
@@ -723,7 +752,7 @@ function chargerAnimateurs() {
             var html = '<div class="admin-table-wrapper"><table class="admin-table">';
             html += '<thead><tr><th>#</th><th>Nom</th><th>Prenom</th><th>Specialite</th><th>Action</th></tr></thead><tbody>';
             $.each(liste, function(i, a) {
-                var id = a.id_animateur || a.id || '?';
+                var id = a.id || '?';
                 html += '<tr>';
                 html += '<td>#' + id + '</td>';
                 html += '<td>' + (a.nom || '?') + '</td>';
@@ -750,7 +779,7 @@ function chargerAnimateursPourSelect() {
         var html = '<option value="" selected disabled>Choisir...</option>';
         var liste = animateurs ? Object.values(animateurs) : [];
         $.each(liste, function(i, a) {
-            var id = a.id_animateur || a.id;
+            var id = a.id;
             html += '<option value="' + id + '">';
             html += (a.prenom || '') + ' ' + (a.nom || '') + ' (' + (a.specialite || '') + ')';
             html += '</option>';
