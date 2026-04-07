@@ -22,6 +22,7 @@ class ActivitePrevue
         // JOIN activites a ON a.id = ap.id_activite
         // LEFT JOIN animateurs an ON an.id = ap.id_animateur
         // ORDER BY ap.date ASC, ap.creneau ASC
+        return $this->jsondb->selectAll();
     }
 
     public function findById($id)

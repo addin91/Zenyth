@@ -127,19 +127,7 @@ class controllersAuthentification{
             $password = $_POST['password'] ?? '';
 
             $idAdmin = $this->adminModel->create($nom, $prenom, $email, $password);
-            if ($admin) {
-                $_SESSION['admin_id'] = $idAdmin;
-                $_SESSION['user_name'] = $nom;
-                $_SESSION['admin'] = true;
-                //redirection auto
-            } else {
-                $_SESSION['error'] = "Identifiant ou mot de passe incorrect.";
-                // redirection error
             }
-        } else {
-            // redirection auto
-        }
-
     }
 
     // connexion admin
@@ -153,16 +141,24 @@ class controllersAuthentification{
                 $_SESSION['admin_id'] = $admin['id'];
                 $_SESSION['user_name'] = $admin['nom'];
                 $_SESSION['admin'] = true;
-                //redirection auto
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Connexion reussie.',
+                    'data' => [
+                        'nom' => $admin['nom'],
+                        'prenom' => $admin['prenom'],
+                        'email' => $admin['email'],
+                    ]
+                ]);
+                return;
             } else {
                 $_SESSION['error'] = "Identifiant ou mot de passe incorrect.";
                 // redirection error
             }
-        } else {
-            // redirection auto
         }
-
-       }
+        echo json_encode(['success' => false, 'error' => $_SESSION['error'] ?? 'Erreur de connexion.']);
+        unset($_SESSION['error']);
+    }
 }
 
 

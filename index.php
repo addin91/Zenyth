@@ -2,9 +2,10 @@
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/database/db/JsonDB.php';
 require_once __DIR__ . '/controllers/controllersAuthentification.php';
+require_once __DIR__ . '/controllers/controllersAdmin.php';
 require_once __DIR__ . '/controllers/controllersReservations.php';
 require_once __DIR__ . '/controllers/controllersFacture.php';
-
+require_once __DIR__ . '/controllers/controllersApi.php';
 
 $action = isset($_GET['action']) ? strtolower($_GET['action']) : 'index';
 
@@ -89,6 +90,63 @@ switch ($action) {
     // --- PAGE ADMIN (front uniquement, la vue ge re l'auth via popup) ---
     case 'admin':
         require_once __DIR__ . '/views/admin.php';
+        break;
+
+    case 'loginadmin':
+        $controller = new controllersAuthentification();
+        $controller->connexionAdmin();
+        break;
+
+    case 'adminrecuperereservations':
+        $controller = new controllersAdmin();
+        $controller->recupereReservation();
+        break;
+    
+    case 'adminaccepterreservation':
+        $controller = new controllersAdmin();
+        $controller->accepteReservationChambre();
+        break;
+
+    case 'adminrefuserreservation':
+        $controller = new controllersAdmin();
+        $controller->refuseReservationChambre();
+        break;
+
+    case 'admintoggleprestation':
+        $controller = new controllersAdmin();
+        $controller->gereActivation();
+        break;
+
+    // --- API ---
+    case 'apichambre':
+        $controller = new controllersApi();
+        $controller->recupereChambre();
+        break;
+
+    case 'apiactivite':
+        $controller = new controllersApi();
+        $controller->recupereActivite();
+        break;     
+
+    case 'apiprestation':
+        $controller = new controllersApi();
+        $controller->recuperePrestations();
+        break;     
+
+    case 'apianimateur':
+        $controller = new controllersApi();
+        $controller->recupereAnimateur();
+        break;
+        
+    case 'apiactivitesprevues':
+        $controller = new controllersApi();
+        $controller->recupereActivitesPrevues();
+        break;
+
+    
+    case 'apidemandesactivites':
+        $controller = new controllersApi();
+        $controller->recupereDemandesActivites();
         break;
 
     // --- PAGE PRINCIPALE ---

@@ -97,6 +97,8 @@ class ReservationChambre
         $reservationChambre = $this->findById($id);
         $chambreModel = new Chambre();
         $chambre = $chambreModel->findById($reservationChambre['id_chambre']);
+        error_log($reservationChambre['id_chambre']);
+        error_log(print_r($chambre, true));
         return $chambre["prix_nuit"] * $nbNuit;
     }
 }

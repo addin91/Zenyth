@@ -23,6 +23,7 @@ class DemandeActivite
         // JOIN reservations r ON r.id = da.id_reservation
         // LEFT JOIN clients c ON c.id = r.id_client
         // ORDER BY da.date ASC, da.creneau ASC
+        return $this->jsondb->selectAll();
     }
 
     public function findById($id)

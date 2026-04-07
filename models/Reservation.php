@@ -20,6 +20,7 @@ class Reservation
         // FROM reservations r
         // LEFT JOIN clients c ON c.id = r.id_client
         // ORDER BY r.date_demande DESC
+        return $this->jsondb->selectAll();
     }
 
     public function findById($id)
@@ -40,6 +41,7 @@ class Reservation
         // FROM reservations r
         // LEFT JOIN clients c ON c.id = r.id_client
         // WHERE r.statut = ? ORDER BY r.date_debut ASC
+        return $this->jsondb->where('statut', $statut);
     }
 
     public function findByPeriode($date_debut, $date_fin)
