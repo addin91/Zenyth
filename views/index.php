@@ -183,9 +183,10 @@
                 <label for="co-email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="co-email" name="email" required>
             </div>
-            <div class="mb-4">
+            <div class="mb-4 password-field">
                 <label for="co-password" class="form-label">Mot de passe</label>
                 <input type="password" class="form-control" id="co-password" name="password" required>
+                <i class="toggle-password fa fa-eye" title="Afficher le mot de passe"></i>
             </div>
             <button type="submit" class="btn btn-accent w-100 mb-3">Se connecter</button>
             <div class="text-center">
@@ -328,18 +329,22 @@
             <h5>Changer le mot de passe</h5>
             <form id="form-change-mdp" method="POST">
                 <?= csrfField() ?>
-                <div class="mb-3">
+                <div class="mb-3 password-field">
                     <label for="mdp-ancien" class="form-label">Mot de passe actuel</label>
                     <input type="password" class="form-control" id="mdp-ancien" name="ancienPassword" required>
+                    <i class="toggle-password fa fa-eye" title="Afficher le mot de passe"></i>
+
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 password-field">
                     <label for="mdp-nouveau" class="form-label">Nouveau mot de passe</label>
                     <input type="password" class="form-control" id="mdp-nouveau" name="nouvellePassword" required>
+                    <i class="toggle-password fa fa-eye" title="Afficher le mot de passe"></i>
                     <small class="text-muted">Min. 8 caracteres, 1 majuscule, 1 chiffre, 1 caractere special</small>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 password-field">
                     <label for="mdp-confirmer" class="form-label">Confirmer le nouveau mot de passe</label>
                     <input type="password" class="form-control" id="mdp-confirmer" required>
+                    <i class="toggle-password fa fa-eye" title="Afficher le mot de passe"></i>
                 </div>
                 <button type="submit" class="btn btn-accent">Modifier</button>
             </form>
