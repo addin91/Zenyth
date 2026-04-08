@@ -28,9 +28,7 @@
             </p>
         </div>
         <div class="col-md-6 mb-4">
-            <div class="lieu-img-placeholder">
-                Image du domaine
-            </div>
+            <img src="assets/img/domaine.png" alt="Vue du domaine Zenyth - lac et montagnes" class="lieu-img">
         </div>
     </div>
 
