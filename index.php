@@ -90,7 +90,7 @@ switch ($action) {
         $controller->chambresDisponibles();
         break;
 
-    // --- PAGE ADMIN (front uniquement, la vue ge re l'auth via popup) ---
+    // --- PAGE ADMIN  ---
     case 'admin':
         require_once __DIR__ . '/views/admin.php';
         break;

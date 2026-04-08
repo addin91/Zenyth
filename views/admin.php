@@ -8,19 +8,19 @@ include __DIR__ . '/header.php';
 <section id="admin-hero" class="admin-hero">
     <div>
         <h1>Espace <span>Administrateur</span></h1>
-        <p>Gestion des reservations, chambres, prestations, activites et factures du complexe Zenyth.</p>
+        <p>Gestion des réservations, chambres, préstations, activités et factures du complexe Zenyth.</p>
     </div>
 </section>
 
-<!-- ===== DASHBOARD ADMIN (cache tant que pas connecte) ===== -->
+<!-- ===== DASHBOARD ADMIN (caché tant que pas connecté) ===== -->
 <section id="admin-dashboard" class="admin-dashboard d-none">
 
     <!-- ===== ONGLET : DEMANDES DE RESERVATION ===== -->
     <div class="admin-panel active" id="admin-demandes">
         <div class="admin-panel-header">
-            <h2 class="section-title">Demandes de reservation</h2>
+            <h2 class="section-title">Demandes de réservation</h2>
             <hr class="section-divider">
-            <p class="section-subtitle">Reservations en attente de validation</p>
+            <p class="section-subtitle">Réservations en attente de validation</p>
         </div>
 
         <div class="admin-filters">
@@ -38,12 +38,12 @@ include __DIR__ . '/header.php';
         <div class="admin-panel-header">
             <h2 class="section-title">Reservations</h2>
             <hr class="section-divider">
-            <p class="section-subtitle">Historique des reservations validees et refusees</p>
+            <p class="section-subtitle">Historique des réservations validées et refusées</p>
         </div>
 
         <div class="admin-filters">
-            <button class="btn btn-sm btn-outline-accent admin-filter-btn-res active" data-statut="validée">Validees</button>
-            <button class="btn btn-sm btn-outline-accent admin-filter-btn-res" data-statut="refusée">Refusees</button>
+            <button class="btn btn-sm btn-outline-accent admin-filter-btn-res active" data-statut="validée">Validées</button>
+            <button class="btn btn-sm btn-outline-accent admin-filter-btn-res" data-statut="refusée">Refusées</button>
             <button class="btn btn-sm btn-outline-accent admin-filter-btn-res" data-statut="all">Toutes</button>
         </div>
 
@@ -57,15 +57,15 @@ include __DIR__ . '/header.php';
         <div class="admin-panel-header">
             <h2 class="section-title">Gestion des chambres</h2>
             <hr class="section-divider">
-            <p class="section-subtitle">Visualisation des chambres et disponibilites</p>
+            <p class="section-subtitle">Visualisation des chambres et disponibilités</p>
         </div>
 
         <!-- Filtre dispo par periode -->
         <div class="admin-card mb-4">
-            <h5>Verifier les disponibilites</h5>
+            <h5>Vérifier les disponibilités</h5>
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <label for="adm-ch-debut" class="form-label">Date de debut</label>
+                    <label for="adm-ch-debut" class="form-label">Date de début</label>
                     <input type="date" class="form-control" id="adm-ch-debut" max="9999-12-31">
                 </div>
                 <div class="col-md-4 mb-3">
@@ -92,7 +92,7 @@ include __DIR__ . '/header.php';
         <div class="admin-panel-header">
             <h2 class="section-title">Gestion des prestations</h2>
             <hr class="section-divider">
-            <p class="section-subtitle">Activer ou desactiver les prestations proposees</p>
+            <p class="section-subtitle">Activer ou désactiver les prestations proposées</p>
         </div>
 
         <div id="admin-liste-prestations">
@@ -103,15 +103,15 @@ include __DIR__ . '/header.php';
     <!-- ===== ONGLET : ACTIVITES ===== -->
     <div class="admin-panel" id="admin-activites">
         <div class="admin-panel-header">
-            <h2 class="section-title">Gestion des activites</h2>
+            <h2 class="section-title">Gestion des activités</h2>
             <hr class="section-divider">
-            <p class="section-subtitle">Demandes en attente et programmation des activites prevues</p>
+            <p class="section-subtitle">Demandes en attente et programmation des activités prévues</p>
         </div>
 
         <!-- Sous-onglets -->
         <ul class="admin-subtabs">
             <li class="admin-subtab active" data-subtab="adm-act-demandes">Demandes en attente</li>
-            <li class="admin-subtab" data-subtab="adm-act-prevues">Activites prevues</li>
+            <li class="admin-subtab" data-subtab="adm-act-prevues">Activités prévues</li>
         </ul>
 
         <!-- SOUS-ONGLET : Demandes -->
@@ -123,7 +123,7 @@ include __DIR__ . '/header.php';
                         <input type="date" class="form-control" id="adm-act-filtre-date" max="9999-12-31">
                     </div>
                     <div class="col-md-6">
-                        <button class="btn btn-outline-accent" id="btn-adm-act-reset">Reinitialiser</button>
+                        <button class="btn btn-outline-accent" id="btn-adm-act-reset">Réinitialiser</button>
                     </div>
                 </div>
             </div>
@@ -146,7 +146,7 @@ include __DIR__ . '/header.php';
         <div class="admin-panel-header">
             <h2 class="section-title">Gestion des animateurs</h2>
             <hr class="section-divider">
-            <p class="section-subtitle">Creer et gerer les animateurs disponibles pour les activites</p>
+            <p class="section-subtitle">Créer et gérer les animateurs disponibles pour les activités</p>
         </div>
 
         <div class="admin-card mb-4">
@@ -159,12 +159,12 @@ include __DIR__ . '/header.php';
                         <input type="text" class="form-control" id="anim-nom" name="nom" required>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="anim-prenom" class="form-label">Prenom</label>
+                        <label for="anim-prenom" class="form-label">Prénom</label>
                         <input type="text" class="form-control" id="anim-prenom" name="prenom" required>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="anim-specialite" class="form-label">Specialite</label>
+                    <label for="anim-specialite" class="form-label">Spécialité</label>
                     <input type="text" class="form-control" id="anim-specialite" name="specialite" placeholder="Ex : tennis, natation, fitness collectif..." required>
                 </div>
                 <button type="submit" class="btn btn-accent">Ajouter l'animateur</button>
@@ -188,7 +188,7 @@ include __DIR__ . '/header.php';
         <div class="admin-filters">
             <button class="btn btn-sm btn-outline-accent admin-filter-btn-client active" data-statut="all">Tous</button>
             <button class="btn btn-sm btn-outline-accent admin-filter-btn-client" data-statut="actif">Actifs</button>
-            <button class="btn btn-sm btn-outline-accent admin-filter-btn-client" data-statut="invité">Invites</button>
+            <button class="btn btn-sm btn-outline-accent admin-filter-btn-client" data-statut="invité">Invités</button>
             <button class="btn btn-sm btn-outline-accent admin-filter-btn-client" data-statut="inactif">Inactifs</button>
         </div>
 
@@ -202,7 +202,7 @@ include __DIR__ . '/header.php';
         <div class="admin-panel-header">
             <h2 class="section-title">Suivi des factures</h2>
             <hr class="section-divider">
-            <p class="section-subtitle">Edition des arrhes, reductions et emission des factures</p>
+            <p class="section-subtitle">Edition des arrhes, réductions et émission des factures</p>
         </div>
 
         <div class="admin-filters">
@@ -224,7 +224,7 @@ include __DIR__ . '/header.php';
     <div class="popup-panel">
         <h2 class="section-title">Connexion administrateur</h2>
         <hr class="section-divider">
-        <p class="text-muted mb-3">Cet espace est reserve aux administrateurs Zenyth.</p>
+        <p class="text-muted mb-3">Cet espace est réservé aux administrateurs Zenyth.</p>
 
         <form id="form-admin-connexion" method="POST">
             <?= csrfField() ?>
@@ -246,35 +246,7 @@ include __DIR__ . '/header.php';
     </div>
 </div>
 
-<!-- ===== MODAL : VALIDATION RESERVATION (message mail) ===== -->
-<div id="popup-message-mail" class="popup-overlay">
-    <div class="popup-panel popup-panel-large">
-        <button class="popup-close">&times;</button>
-        <h2 class="section-title">Message de confirmation</h2>
-        <hr class="section-divider">
-        <p class="text-muted">Copiez ce message dans votre logiciel de mail pour l'envoyer au client.</p>
-
-        <div class="mb-3">
-            <label class="form-label">Destinataire</label>
-            <input type="text" class="form-control" id="mail-destinataire" readonly>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Sujet</label>
-            <input type="text" class="form-control" id="mail-sujet" readonly>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Message</label>
-            <textarea class="form-control" id="mail-corps" rows="12" readonly></textarea>
-        </div>
-
-        <div class="d-flex gap-2">
-            <button class="btn btn-accent" id="btn-copier-message">Copier le message</button>
-            <a href="#" class="btn btn-outline-accent" id="btn-mailto" target="_blank">Ouvrir dans le client mail</a>
-        </div>
-    </div>
-</div>
-
-<!-- ===== MODAL : EDITER FACTURE (arrhes / reduction) ===== -->
+<!-- ===== EDITER FACTURE (arrhes / reduction) ===== -->
 <div id="popup-edit-facture" class="popup-overlay">
     <div class="popup-panel">
         <button class="popup-close">&times;</button>
@@ -288,11 +260,11 @@ include __DIR__ . '/header.php';
             <div class="mb-3">
                 <label for="edit-fact-arrhes" class="form-label">Avoirs / arrhes (en &euro;)</label>
                 <input type="number" class="form-control" id="edit-fact-arrhes" name="avoirs" min="0" step="0.01" value="0">
-                <small class="text-muted">Apparaitra en negatif sur la facture du client.</small>
+                <small class="text-muted">Apparaitra en négatif sur la facture du client.</small>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Reduction</label>
+                <label class="form-label">Réduction</label>
                 <div class="d-flex gap-2 flex-wrap">
                     <button type="button" class="btn btn-outline-accent btn-reduction" data-value="0">0 %</button>
                     <button type="button" class="btn btn-outline-accent btn-reduction" data-value="10">-10 %</button>
@@ -307,11 +279,11 @@ include __DIR__ . '/header.php';
     </div>
 </div>
 
-<!-- ===== MODAL : VALIDER ACTIVITE (choix animateur) ===== -->
+<!-- ===== VALIDER ACTIVITE ===== -->
 <div id="popup-valider-activite" class="popup-overlay">
     <div class="popup-panel">
         <button class="popup-close">&times;</button>
-        <h2 class="section-title">Programmer l'activite</h2>
+        <h2 class="section-title">Programmer l'activité</h2>
         <hr class="section-divider">
 
         <form id="form-valider-activite" method="POST">

@@ -446,22 +446,6 @@ $(document).ready(function() {
         var idFacture = $(this).data('id-facture');
         window.open('index.php?action=telechargementfacture&id_facture=' + idFacture, '_blank');
     });
-
-
-    // ===== COPIER MESSAGE MAIL =====
-    $('#btn-copier-message').on('click', function() {
-        var corps = $('#mail-corps').val();
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(corps).then(function() {
-                showToast('Message copie dans le presse-papier.');
-            });
-        } else {
-            $('#mail-corps').select();
-            document.execCommand('copy');
-            showToast('Message copie.');
-        }
-    });
-
 });
 
 // =============================================
@@ -861,7 +845,7 @@ function chargerFactures(statut) {
             html += '<td>';
             html += '<button class="btn btn-sm btn-outline-accent btn-editer-facture" data-id="' + idFact + '" data-arrhes="' + (f.avoirs || 0) + '" data-reduction="' + (f.reduction || 0) + '">Editer</button> ';
             if (statutBrut.toLowerCase() === 'provisoire') {
-                html += '<button class="btn btn-sm btn-accent btn-emettre-facture" data-id="' + idFact + '">Emettre</button>';
+                html += '<button class="btn btn-sm btn-outline-accent btn-emettre-facture" data-id="' + idFact + '">Emettre</button>';
             }
             html += '<button class="btn btn-sm btn-outline-accent btn-telecharger-facture" data-id-facture="' + idFact + '">Télécharger</button> ';
 
@@ -913,35 +897,6 @@ function renderCarteDemande(r) {
 
     html += '</div>';
     return html;
-}
-
-// =============================================
-//  MESSAGE MAIL DE CONFIRMATION
-// =============================================
-
-function afficherMessageMail(email, nom, prenom, motDePasse) {
-    var url = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
-    var sujet = 'Confirmation de votre reservation - Zenyth';
-    var corps = 'Bonjour ' + prenom + ' ' + nom + ',\n\n';
-    corps += 'Nous avons le plaisir de vous confirmer la validation de votre reservation au complexe Zenyth.\n\n';
-    corps += 'Votre compte client a ete cree avec les identifiants suivants :\n';
-    corps += '  - Email : ' + email + '\n';
-    corps += '  - Mot de passe : ' + motDePasse + '\n\n';
-    corps += 'Vous pouvez vous connecter a votre espace personnel a l\'adresse suivante :\n';
-    corps += url + '\n\n';
-    corps += 'Depuis cet espace vous pourrez :\n';
-    corps += '  - Consulter votre reservation\n';
-    corps += '  - Ajouter des prestations a votre sejour\n';
-    corps += '  - Faire des demandes d\'activites sportives\n';
-    corps += '  - Consulter votre facture previsionnelle\n\n';
-    corps += 'A bientot au complexe Zenyth !\n';
-    corps += 'L\'equipe Zenyth';
-
-    $('#mail-destinataire').val(email);
-    $('#mail-sujet').val(sujet);
-    $('#mail-corps').val(corps);
-    $('#btn-mailto').attr('href', 'mailto:' + email + '?subject=' + encodeURIComponent(sujet) + '&body=' + encodeURIComponent(corps));
-    $('#popup-message-mail').addClass('active');
 }
 
 // =============================================

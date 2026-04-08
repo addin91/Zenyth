@@ -67,6 +67,7 @@ $(document).ready(function() {
     // ===== DECONNEXION =====
     $('#btn-deconnexion').on('click', function(e) {
         e.preventDefault();
+
         $.post('index.php?action=logout', { csrf_token: $('#csrf-global').val() }, function(res) {
             if (res.success) {
                 $('#nav-connexion').removeClass('d-none');
@@ -74,18 +75,14 @@ $(document).ready(function() {
                 $('#nav-deconnexion').addClass('d-none');
                 $('#bloc-info-client').show();
                 $('#bloc-info-client input').prop('required', true);
-                // Fermer le dashboard si ouvert
                 $('#popup-dashboard').removeClass('active');
-                // Vider les infos perso
                 $('#info-nom').val('');
                 $('#info-prenom').val('');
                 $('#info-email').val('');
-                // Vider les onglets du dashboard
                 $('#dash-liste-reservations').html('<p class="text-muted">Aucune reservation pour le moment.</p>');
                 $('#dash-liste-prestations').html('<p class="text-muted">Chargement...</p>');
                 $('#dash-activites-validees').html('<p class="text-muted">Aucune activite validee pour le moment.</p>');
                 $('#dash-liste-factures').html('<p class="text-muted">Aucune facture pour le moment.</p>');
-                // Reset les formulaires du dashboard
                 $('#form-demande-activite')[0].reset();
                 $('#form-change-mdp')[0].reset();
                 // Mettre à jour le CSRF token
@@ -93,7 +90,7 @@ $(document).ready(function() {
                     $('#csrf-global').val(res.csrf_token);
                     $('input[name="csrf_token"]').val(res.csrf_token);
                 }
-                showToast('Deconnexion reussie.');
+                showToast('Déconnexion réussie.');
             }
         }, 'json');
     });
@@ -111,7 +108,7 @@ $(document).ready(function() {
 
         $.post('index.php?action=motdepasseoublie', formData, function(res) {
             if (res.success) {
-                showToast(res.message || 'Si ce mail existe, un lien a ete envoye.');
+                showToast(res.message || 'Si ce mail existe, un lien a été envoyé.');
             } else {
                 showToast(res.error || 'Erreur lors de la demande.', 'error');
             }
@@ -154,11 +151,11 @@ $(document).ready(function() {
         }
 
         if (debut < today) {
-            showToast("La date d'arrivee ne peut pas etre dans le passe.", "error");
+            showToast("La date d'arrivée ne peut pas être dans le passé.", "error");
             return;
         }
         if (fin <= debut) {
-            showToast("La date de depart doit etre apres la date d'arrivee.", "error");
+            showToast("La date de départ doit être après la date d'arrivée.", "error");
             return;
         }
 
@@ -174,17 +171,13 @@ $(document).ready(function() {
 
         $.post('index.php?action=reservationchambre', formData, function(res) {
             if (res.success) {
-                showToast(res.message || 'Reservation envoyee.');
+                showToast(res.message || 'Réservation envoyée.');
                 $('#popup-reservation').removeClass('active');
                 $('#form-reservation')[0].reset();
             } else {
-                showToast(res.error || 'Erreur lors de la reservation.', 'error');
+                showToast(res.error || 'Erreur lors de la réservation.', 'error');
             }
-        }, 'json').fail(function(xhr) {
-            // === LE NOUVEAU CODE EST ICI ===
-            showToast("Erreur critique du serveur. Regarde la console (F12).", "error");
-            console.error("Réponse du serveur :", xhr.responseText);
-        });
+        }, 'json');
     });
 
     // ===== CARROUSEL =====
@@ -250,14 +243,14 @@ $(document).ready(function() {
         var date = $('#da-date').val();
 
         if (date < today) {
-            showToast("La date ne peut pas etre dans le passe.", "error");
+            showToast("La date ne peut pas être dans le passé.", "error");
             return;
         }
 
         var formData = $(this).serialize();
         $.post('index.php?action=reservationactivite', formData, function(res) {
             if (res.success) {
-                showToast(res.message || "Demande d'activite envoyee.");
+                showToast(res.message || "Demande d'activité envoyée.");
                 $('#form-demande-activite')[0].reset();
             } else {
                 showToast(res.error || "Erreur lors de la demande.", "error");
