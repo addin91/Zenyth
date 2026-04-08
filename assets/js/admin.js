@@ -281,6 +281,27 @@ $(document).ready(function() {
         $('#popup-valider-activite').addClass('active');
     });
 
+        // ===== Refuse ACTIVITE (ouverture modal) =====
+    $('#admin-liste-demandes-activites').on('click', '.btn-refusee-activite', function() {
+        var id = $(this).data('id');
+
+        $.ajax({
+            url: 'index.php?action=adminrefuseractvite',
+            method: 'POST',
+            data: { id_demande_activite: id, csrf_token: $('#csrf-global').val() },
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.success) {
+                showToast(res.message || 'Reservation refusee.');
+                chargerActivitesPrevues();
+            } else {
+                showToast((res && res.error) || 'Erreur lors du refus.', 'error');
+            }
+        }).fail(function() {
+            showToast('Erreur serveur lors du refus.', 'error');
+        });
+    });
+
     // NOTE : ces endpoints ne sont PAS encore routes cote backend.
     // Les formulaires restent fonctionnels (validation, UX) et .fail()
     // affichera un toast explicite en attendant que le backend les expose.
@@ -419,6 +440,13 @@ $(document).ready(function() {
             showToast('En attente backend : emission de facture.', 'error');
         });
     });
+
+
+     $('#admin-liste-factures').on('click', '.btn-telecharger-facture', function() {
+        var idFacture = $(this).data('id-facture');
+        window.open('index.php?action=telechargementfacture&id_facture=' + idFacture, '_blank');
+    });
+
 
     // ===== COPIER MESSAGE MAIL =====
     $('#btn-copier-message').on('click', function() {
@@ -613,7 +641,7 @@ function chargerDemandesActivites(date) {
             $.each(liste, function(i, d) {
                 var id = d.id_demande || d.id || '';
                 var nbPers = d.nombre_personnes_concernees || d.nombre_personnes || '?';
-                var act = actById[String(d.id)];
+                var act = actById[String(d.id_activite)];
                 var nomAct = act ? act.nom : ('Activite #' + (d.id || '?'));
                 html += '<tr>';
                 html += '<td>#' + (id || '?') + '</td>';
@@ -627,7 +655,10 @@ function chargerDemandesActivites(date) {
                 html += ' data-date="' + (d.date || '') + '"';
                 html += ' data-creneau="' + (d.creneau || '') + '"';
                 html += ' data-personnes="' + nbPers + '"';
-                html += ' data-nom="' + nomAct + '">Programmer</button></td>';
+                html += ' data-nom="' + nomAct + '">Programmer</button>';
+                html += '<button class="btn btn-sm btn-outline-danger btn-refusee-activite"';
+                html += ' data-id="' + id + '"';
+                html += ' data-nom="' + nomAct + '">Supprimer</button></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
@@ -832,6 +863,8 @@ function chargerFactures(statut) {
             if (statutBrut.toLowerCase() === 'provisoire') {
                 html += '<button class="btn btn-sm btn-accent btn-emettre-facture" data-id="' + idFact + '">Emettre</button>';
             }
+            html += '<button class="btn btn-sm btn-outline-accent btn-telecharger-facture" data-id-facture="' + idFact + '">Télécharger</button> ';
+
             html += '</td>';
             html += '</tr>';
         });

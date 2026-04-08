@@ -45,6 +45,7 @@ $(document).ready(function() {
         $.post('index.php?action=login', formData, function(res) {
             if (res.success) {
                 var d = res.data || {};
+                $('#co-email, #co-password').val('');
                 $('#popup-connexion').removeClass('active');
                 $('#nav-connexion').addClass('d-none');
                 $('#nav-dashboard').removeClass('d-none');
