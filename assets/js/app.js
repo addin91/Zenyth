@@ -475,7 +475,7 @@ function chargerDashActivitesSelect() {
 }
 
 function chargerDashActivitesValidees() {
-    $.ajax({ url: 'index.php?action=recupereactivitesvalidees&id_reservation=', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=recupereactivitesvalidees', method: 'GET', dataType: 'json' })
     .done(function(res) {
         if (res.success && res.data && res.data.length > 0) {
             var html = '';
