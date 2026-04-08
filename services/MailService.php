@@ -25,7 +25,7 @@ class MailService{
             $this->mail->Port = 587;
 
         } catch (Exception $e) {
-            echo "Erreur : {$this->mail->ErrorInfo}";
+            error_log("Erreur : {$this->mail->ErrorInfo}");
         }
     }
 
@@ -43,7 +43,7 @@ class MailService{
             $this->mail->send();
             $this->mail->clearAddresses();
         } catch (Exception $e) {
-            echo "Erreur : {$this->mail->ErrorInfo}";
+            error_log("Erreur : {$this->mail->ErrorInfo}");
         }
     }
 
@@ -61,7 +61,7 @@ class MailService{
             $this->mail->send();
             $this->mail->clearAddresses();
         } catch (Exception $e) {
-            echo "Erreur : {$this->mail->ErrorInfo}";
+            error_log("Erreur : {$this->mail->ErrorInfo}");
         }
     }
 }
