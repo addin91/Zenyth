@@ -1,101 +1,50 @@
 <?php
-// sécuriser affichage
 
-// calculs
-$debut = new DateTime($reservation['date_debut']);
-$fin = new DateTime($reservation['date_fin']);
-$interval = $debut->diff($fin);
-$nbNuits = $interval->days;
-
-$totalChambre = $chambre['prix_nuit'] * $nbNuits ?? 0;
-
+// 🔹 Calculs
+$totalChambre = ($chambre['prix_nuit'] ?? 0) * ($nbNuits ?? 1);
 
 $totalPrestations = 0;
-if (!empty($reservationPrestations)) {
-    foreach ($reservationPrestations as $p) {
-        $totalPrestations += $p['total'];
-    }
+foreach ($reservationPrestations as $p) {
+    $totalPrestations += $p['total'] ?? 0;
 }
 
 $totalActivites = 0;
-if (!empty($reservationActivites)) {
-    foreach ($reservationActivites as $a) {
-        if ($a['statut'] === 'validée') {
-            // ⚠️ adapte prix si tu l’as ailleurs
-            $totalActivites += $a['nombre_personnes_concernées'] * 0; 
-        }
+foreach ($reservationActivites as $a) {
+    if (in_array(strtolower($a['statut']), ['validee','validée'])) {
+        $totalActivites += $a['prix'] ?? 0;
     }
 }
 
 $total = $totalChambre + $totalPrestations + $totalActivites;
 
-// Avoirs
 $avoirs = max(0, $facture['avoirs'] ?? 0);
+$reduction = max(0, min(100, $facture['reduction'] ?? 0));
 
-// Réduction (%)
-$reduction = $facture['reduction'] ?? 0;
-$reduction = max(0, min(100, $reduction));
-
-// Calcul après avoirs
 $sousTotal = $total - $avoirs;
-
-// Calcul réduction
-$montantReduction = ($reduction > 0) ? $sousTotal * ($reduction / 100) : 0;
-
-// Total final
+$montantReduction = $sousTotal * ($reduction / 100);
 $prixTotal = max(0, $sousTotal - $montantReduction);
 ?>
 
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Facture Zenyth</title>
-
 <style>
-body {
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-}
-
-h1 {
-    text-align: center;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-table, th, td {
-    border: 1px solid #000;
-}
-
-th, td {
-    padding: 8px;
-    text-align: left;
-}
-
-.total {
-    text-align: right;
-    font-weight: bold;
-}
+body { font-family: Arial; font-size: 12px; }
+table { width:100%; border-collapse: collapse; margin-top:20px; }
+table, th, td { border:1px solid #000; }
+th, td { padding:8px; }
+.total { text-align:right; font-weight:bold; }
 </style>
 </head>
 
 <body>
 
-<h1>Facture - Zenyth</h1>
+<h1>Facture</h1>
 
-<p><strong>Date :</strong>
-<?php 
-if (!empty($facture['date_emission'])) {
-    echo date('d/m/Y', strtotime($facture['date_emission']));
-} else {
-    echo "En cours";
-}
-?>
+<p>
+<strong>Date :</strong>
+<?= !empty($facture['date_emission']) ? date('d/m/Y', strtotime($facture['date_emission'])) : 'En cours' ?>
 </p>
 
 <h3>Client</h3>
@@ -104,98 +53,79 @@ if (!empty($facture['date_emission'])) {
 <?= e($client['email']) ?>
 </p>
 
----
-
 <h3>Détails</h3>
 
 <table>
-    <thead>
-        <tr>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Prix</th>
-        </tr>
-    </thead>
-    <tbody>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+<th>Prix</th>
+</tr>
+</thead>
 
-        <!-- Chambre -->
-        <tr>
-            <td>Chambre</td>
-            <td>
-                <?= e($chambre['nom_chambre']) ?> <br>
-                <?= e($nbNuits ?? 1) ?> nuit(s)
-            </td>
-            <td><?= number_format($totalChambre, 2) ?> €</td>
-        </tr>
+<tbody>
 
-        <!-- Prestations -->
-        <?php if (!empty($reservationPrestations)): ?>
-            <?php foreach ($reservationPrestations as $p): ?>
-                <tr>
-                    <td>Prestation</td>
-                    <td>ID prestation : <?= e($p['id_prestation']) ?></td>
-                    <td><?= number_format($p['total'], 2) ?> €</td>
-                </tr>
-            <?php endforeach; ?>
-        <?php endif; ?>
+<!-- Chambre -->
+<tr>
+<td>Chambre</td>
+<td>
+<?= e($chambre['nom_chambre']) ?><br>
+<?= $nbNuits ?> nuit(s)
+</td>
+<td><?= number_format($totalChambre,2) ?> €</td>
+</tr>
 
-        <!-- Activités -->
-        <?php if (!empty($reservationActivites)): ?>
-            <?php foreach ($reservationActivites as $a): ?>
-                <?php if ($a['statut'] === 'validée'): ?>
-                    <tr>
-                        <td>Activité</td>
-                        <td>
-                            Activité #<?= e($a['id_activite']) ?><br>
-                            <?= e($a['date']) ?> - <?= e($a['créneau']) ?><br>
-                            <?= e($a['nombre_personnes_concernées']) ?> personne(s)
-                        </td>
-                        <td>0.00 €</td>
-                    </tr>
-                <?php endif; ?>
-            <?php endforeach; ?>
-        <?php endif; ?>
+<!-- Prestations -->
+<?php foreach ($reservationPrestations as $p): ?>
+<tr>
+<td>Prestation</td>
+<td><?= e($p['nom']) ?></td>
+<td><?= number_format($p['total'] ?? 0,2) ?> €</td>
+</tr>
+<?php endforeach; ?>
 
-    </tbody>
-    <tfoot>
-        <!-- Avoirs -->
-        <?php if ($avoirs > 0): ?>
-        <tr>
-            <td colspan="2"><strong>Avoirs</strong></td>
-            <td>-<?= number_format($avoirs, 2) ?> €</td>
-        </tr>
-        <?php endif; ?>
+<!-- Activités -->
+<?php foreach ($reservationActivites as $a): ?>
+<?php if (in_array(strtolower($a['statut']), ['validee','validée'])): ?>
+<tr>
+<td>Activité</td>
+<td>
+<?= e($a['nom']) ?><br>
+<?= e($a['date']) ?> - <?= e($a['creneau'] ?? '') ?><br>
+<?= e($a['nombre_personnes_concernées'] ?? 1) ?> pers.
+</td>
+<td><?= number_format($a['prix'] ?? 0,2) ?> €</td>
+</tr>
+<?php endif; ?>
+<?php endforeach; ?>
 
-        <!-- Réduction -->
-        <?php if ($reduction > 0): ?>
-        <tr>
-            <td colspan="2">
-                <strong>Réduction (<?= number_format($reduction, 0) ?>%)</strong>
-            </td>
-            <td>-<?= number_format($montantReduction, 2) ?> €</td>
-        </tr>
-        <?php endif; ?>
-    </tfoot>
+</tbody>
+
+<tfoot>
+
+<?php if ($avoirs > 0): ?>
+<tr>
+<td colspan="2">Avoirs</td>
+<td>-<?= number_format($avoirs,2) ?> €</td>
+</tr>
+<?php endif; ?>
+
+<?php if ($reduction > 0): ?>
+<tr>
+<td colspan="2">Réduction (<?= $reduction ?>%)</td>
+<td>-<?= number_format($montantReduction,2) ?> €</td>
+</tr>
+<?php endif; ?>
+
+</tfoot>
 </table>
 
----
-
 <h3 class="total">
-    Total HT : <?= number_format($total, 2) ?> €<br>
-
-    <?php if ($avoirs > 0): ?>
-        Avoirs : -<?= number_format($avoirs, 2) ?> €<br>
-    <?php endif; ?>
-
-    <?php if ($reduction > 0): ?>
-        Réduction : -<?= number_format($montantReduction, 2) ?> €<br>
-    <?php endif; ?>
-
-    <span style="font-size:16px;">
-        Total à payer : <?= number_format($prixTotal, 2) ?> €
-    </span>
+Total : <?= number_format($prixTotal,2) ?> €
 </h3>
-<p><strong>Statut :</strong> <?= e($facture['statut']) ?></p>
+
+<p>Statut : <?= e($facture['statut']) ?></p>
 
 </body>
 </html>
