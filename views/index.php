@@ -148,14 +148,6 @@
                 </select>
             </div>
 
-            <!-- Activites souhaitees -->
-            <div class="mb-3">
-                <label class="form-label">Activités souhaitées</label>
-                <div id="res-activites" class="row">
-                    <p class="text-muted">Chargement des activités...</p>
-                </div>
-            </div>
-
             <!-- Commentaire -->
             <div class="mb-4">
                 <label for="res-commentaire" class="form-label">Commentaire / souhaits particuliers</label>

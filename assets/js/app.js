@@ -314,7 +314,6 @@ $(document).ready(function() {
     chargerActivitesAccueil();
     chargerPrestationsAccueil();
     chargerChambresFormulaire();
-    chargerActivitesFormulaire();
 
 });
 
@@ -776,24 +775,6 @@ function majChambresDisponibles() {
             }
             $('#res-chambre').html(html);
         }
-    });
-}
-
-function chargerActivitesFormulaire() {
-    $.ajax({ url: 'index.php?action=apiactivite', method: 'GET', dataType: 'json' })
-    .done(function(activites) {
-        var html = '';
-        $.each(activites, function(i, act) {
-            html += '<div class="col-md-6 mb-2">';
-            html += '  <div class="form-check">';
-            html += '    <input class="form-check-input" type="checkbox" name="activites[]" value="' + act.id_activite + '" id="act-' + act.id_activite + '">';
-            html += '    <label class="form-check-label" for="act-' + act.id_activite + '">';
-            html += '      ' + act.nom + ' <small class="text-muted">(' + act.prix + ' &euro;)</small>';
-            html += '    </label>';
-            html += '  </div>';
-            html += '</div>';
-        });
-        $('#res-activites').html(html);
     });
 }
 
