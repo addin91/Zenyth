@@ -4,9 +4,13 @@
         "id_reservation_chambre": 1,
         "id_reservation_prestations": [
             "1",
-            4
+            4,
+            5,
+            6
         ],
-        "id_demandes_activite": [],
+        "id_demandes_activite": [
+            5
+        ],
         "date_debut": "2026-09-19",
         "date_fin": "2026-09-30",
         "nombre_personnes": "3",
@@ -30,5 +34,33 @@
         "commentaire": "",
         "date_demande": "2026-04-08 08:33:07",
         "id": 2
+    },
+    "3": {
+        "id_client": 3,
+        "id_reservation_chambre": 3,
+        "id_reservation_prestations": [],
+        "id_demandes_activite": [],
+        "date_debut": "2026-05-10",
+        "date_fin": "2026-05-20",
+        "nombre_personnes": "3",
+        "statut": "valid\u00e9e",
+        "commentaire": "",
+        "date_demande": "2026-04-08 19:04:03",
+        "id": 3
+    },
+    "4": {
+        "id_client": 4,
+        "id_reservation_chambre": 4,
+        "id_reservation_prestations": [
+            7
+        ],
+        "id_demandes_activite": [],
+        "date_debut": "2026-05-10",
+        "date_fin": "2026-05-20",
+        "nombre_personnes": "6",
+        "statut": "valid\u00e9e",
+        "commentaire": "",
+        "date_demande": "2026-04-08 19:14:09",
+        "id": 4
     }
 }

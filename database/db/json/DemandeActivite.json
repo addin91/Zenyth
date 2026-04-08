@@ -25,5 +25,23 @@
         "message": "",
         "statut": "refusee",
         "id": 3
+    },
+    "4": {
+        "id_activite": "9",
+        "date": "2026-09-22",
+        "creneau": "heure",
+        "nombre_personnes_concernees": "1",
+        "message": "",
+        "statut": "refusee",
+        "id": 4
+    },
+    "5": {
+        "id_activite": "10",
+        "date": "2026-09-22",
+        "creneau": "demi-journee",
+        "nombre_personnes_concernees": "1",
+        "message": "",
+        "statut": "validee",
+        "id": 5
     }
 }
