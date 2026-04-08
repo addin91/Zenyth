@@ -51,6 +51,7 @@ $(document).ready(function() {
                 $('#nav-dashboard').removeClass('d-none');
                 $('#nav-deconnexion').removeClass('d-none');
                 $('#bloc-info-client').hide();
+                $('#bloc-info-client input').prop('required', false);
                 $('#info-nom').val(d.nom || '');
                 $('#info-prenom').val(d.prenom || '');
                 $('#info-email').val(d.email || '');
@@ -72,6 +73,7 @@ $(document).ready(function() {
                 $('#nav-dashboard').addClass('d-none');
                 $('#nav-deconnexion').addClass('d-none');
                 $('#bloc-info-client').show();
+                $('#bloc-info-client input').prop('required', true);
                 // Fermer le dashboard si ouvert
                 $('#popup-dashboard').removeClass('active');
                 // Vider les infos perso
@@ -178,7 +180,11 @@ $(document).ready(function() {
             } else {
                 showToast(res.error || 'Erreur lors de la reservation.', 'error');
             }
-        }, 'json');
+        }, 'json').fail(function(xhr) {
+            // === LE NOUVEAU CODE EST ICI ===
+            showToast("Erreur critique du serveur. Regarde la console (F12).", "error");
+            console.error("Réponse du serveur :", xhr.responseText);
+        });
     });
 
     // ===== CARROUSEL =====
@@ -304,6 +310,7 @@ $(document).ready(function() {
         $('#nav-dashboard').removeClass('d-none');
         $('#nav-deconnexion').removeClass('d-none');
         $('#bloc-info-client').hide();
+        $('#bloc-info-client input').prop('required', false);
         $('#info-nom').val(SESSION_USER.nom);
         $('#info-prenom').val(SESSION_USER.prenom);
         $('#info-email').val(SESSION_USER.email);
