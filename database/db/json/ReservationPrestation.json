@@ -19,5 +19,12 @@
         "reduction": 0,
         "prix": 20,
         "id": 3
+    },
+    "4": {
+        "id_reservation": 1,
+        "id_prestation": "3",
+        "reduction": 0,
+        "prix": 25,
+        "id": 4
     }
 }

@@ -3,7 +3,8 @@
         "id_client": 1,
         "id_reservation_chambre": 1,
         "id_reservation_prestations": [
-            "1"
+            "1",
+            4
         ],
         "id_demandes_activite": [],
         "date_debut": "2026-09-19",

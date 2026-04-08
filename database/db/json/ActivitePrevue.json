@@ -10,5 +10,17 @@
         "message": "",
         "capacite_restante": 9,
         "id": 1
+    },
+    "2": {
+        "id_activite": "1",
+        "id_animateur": "2",
+        "id_demandes_activites": [
+            "2"
+        ],
+        "date": "2026-09-21",
+        "creneau": "journee",
+        "message": "",
+        "capacite_restante": 9,
+        "id": 2
     }
 }

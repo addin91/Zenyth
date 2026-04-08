@@ -7,5 +7,23 @@
         "message": "",
         "statut": "validee",
         "id": 1
+    },
+    "2": {
+        "id_activite": "1",
+        "date": "2026-09-21",
+        "creneau": "journee",
+        "nombre_personnes_concernees": "1",
+        "message": "",
+        "statut": "validee",
+        "id": 2
+    },
+    "3": {
+        "id_activite": "6",
+        "date": "2026-09-19",
+        "creneau": "heure",
+        "nombre_personnes_concernees": "1",
+        "message": "",
+        "statut": "refusee",
+        "id": 3
     }
 }

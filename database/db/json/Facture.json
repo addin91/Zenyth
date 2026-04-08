@@ -4,14 +4,15 @@
         "id_reservation": "1",
         "id_reservation_chambre": 1,
         "id_reservations_prestation": [
-            "1"
+            "1",
+            4
         ],
         "id_demandes_activite": [],
-        "montant_total": 1060.2,
+        "montant_total": 1335,
         "avoirs": "10",
-        "reduction": "10",
-        "statut": "Provisoire",
-        "date_emission": null,
+        "reduction": "0",
+        "statut": "emise",
+        "date_emission": "2026-04-08 12:21:13",
         "id": "1"
     },
     "2": {
@@ -23,11 +24,11 @@
             3
         ],
         "id_demandes_activite": [],
-        "montant_total": 980,
-        "avoirs": 0,
-        "reduction": 0,
+        "montant_total": 922.5,
+        "avoirs": "0",
+        "reduction": "10",
         "statut": "Provisoire",
         "date_emission": null,
-        "id": 2
+        "id": "2"
     }
 }
