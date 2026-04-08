@@ -1,5 +1,11 @@
 {
-  "1": {"id_demande": 1, "id_reservation": 1, "id_activite": 1, "date": "2025-06-02", "creneau": "matin", "nombre_personnes_concernees": 2, "message": "", "statut" : "validee"},
-  "2": {"id_demande": 2, "id_reservation": 2, "id_activite": 2, "date": "2025-07-12", "creneau": "après-midi", "nombre_personnes_concernees": 4, "message": "niveau débutant", "statut" : "validee"},
-  "3": {"id_demande": 3, "id_reservation": 4, "id_activite": 3, "date": "2025-09-14", "creneau": "soir", "nombre_personnes_concernees": 2, "message": "", "statut" : "validee"}
+    "1": {
+        "id_activite": "1",
+        "date": "2026-09-26",
+        "creneau": "heure",
+        "nombre_personnes_concernees": "1",
+        "message": "",
+        "statut": "validee",
+        "id": 1
+    }
 }

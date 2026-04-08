@@ -1,6 +1,32 @@
 {
-  "1": {"id_animateur": 1, "nom": "Lefevre", "prenom": "Paul", "specialite": "Yoga", "actif": true},
-  "2": {"id_animateur": 2, "nom": "Moreau", "prenom": "Sophie", "specialite": "Randonnée", "actif": true},
-  "3": {"id_animateur": 3, "nom": "Garcia", "prenom": "Luis", "specialite": "Cuisine", "actif": true},
-  "4": {"id_animateur": 4, "nom": "Roux", "prenom": "Anna", "specialite": "Plongée", "actif": false}
+    "1": {
+        "id": 1,
+        "nom": "Lefevre",
+        "prenom": "Paul",
+        "specialite": "Yoga"
+    },
+    "2": {
+        "id": 2,
+        "nom": "Moreau",
+        "prenom": "Sophie",
+        "specialite": "Randonn\u00e9e"
+    },
+    "3": {
+        "id": 3,
+        "nom": "Garcia",
+        "prenom": "Luis",
+        "specialite": "Cuisine"
+    },
+    "4": {
+        "id": 4,
+        "nom": "Roux",
+        "prenom": "Anna",
+        "specialite": "Plong\u00e9e"
+    },
+    "5": {
+        "nom": "Jacques",
+        "prenom": "Dupont",
+        "specialite": "Football",
+        "id": 5
+    }
 }

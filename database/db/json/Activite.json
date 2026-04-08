@@ -1,6 +1,12 @@
 {
-  "1": {"id_activite": 1, "nom": "Yoga", "type": "bien-être", "duree": 60, "capacite_min": 2, "capacite_max": 10, "prix": 15, "actif": true},
-  "2": {"id_activite": 2, "nom": "Randonnée", "type": "sport", "duree": 180, "capacite_min": 4, "capacite_max": 15, "prix": 25, "actif": true},
-  "3": {"id_activite": 3, "nom": "Atelier cuisine", "type": "loisir", "duree": 120, "capacite_min": 2, "capacite_max": 8, "prix": 40, "actif": true},
-  "4": {"id_activite": 4, "nom": "Plongée", "type": "sport", "duree": 90, "capacite_min": 2, "capacite_max": 6, "prix": 60, "actif": false}
+  "1": {"id": 1, "nom": "Yoga", "type": "bien-être", "duree": 60, "capacite_min": 2, "capacite_max": 10, "prix": 15, "actif": true},
+  "2": {"id": 2, "nom": "Randonnée", "type": "sport", "duree": 180, "capacite_min": 4, "capacite_max": 15, "prix": 25, "actif": true},
+  "3": {"id": 3, "nom": "Atelier cuisine", "type": "loisir", "duree": 120, "capacite_min": 2, "capacite_max": 8, "prix": 40, "actif": true},
+  "4": {"id": 4, "nom": "Plongée", "type": "sport", "duree": 90, "capacite_min": 2, "capacite_max": 6, "prix": 60, "actif": false},
+  "5": {"id": 5, "nom": "Pilates", "type": "bien-être", "duree": 60, "capacite_min": 2, "capacite_max": 10, "prix": 18, "actif": true},
+  "6": {"id": 6, "nom": "Kayak", "type": "sport", "duree": 120, "capacite_min": 2, "capacite_max": 8, "prix": 35, "actif": true},
+  "7": {"id": 7, "nom": "Dégustation de vin", "type": "loisir", "duree": 90, "capacite_min": 2, "capacite_max": 12, "prix": 50, "actif": true},
+  "8": {"id": 8, "nom": "Cours de danse", "type": "loisir", "duree": 75, "capacite_min": 4, "capacite_max": 20, "prix": 20, "actif": true},
+  "9": {"id": 9, "nom": "Escalade", "type": "sport", "duree": 120, "capacite_min": 2, "capacite_max": 10, "prix": 30, "actif": false},
+  "10": {"id": 10, "nom": "Méditation guidée", "type": "bien-être", "duree": 45, "capacite_min": 1, "capacite_max": 15, "prix": 12, "actif": true}
 }

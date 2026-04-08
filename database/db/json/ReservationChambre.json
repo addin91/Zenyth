@@ -1,52 +1,12 @@
 {
     "1": {
-        "id": 1,
-        "id_reservation": 1,
-        "id_chambre": 1
+        "id_client": 1,
+        "id_chambre": "3",
+        "id": 1
     },
     "2": {
-        "id": 2,
-        "id_reservation": 2,
-        "id_chambre": 2
-    },
-    "3": {
-        "id": 3,
-        "id_reservation": 4,
-        "id_chambre": 3
-    },
-    "4": {
-        "id": 4,
-        "id_reservation": 1,
-        "id_chambre": 3
-    },
-    "5": {
-        ":id_reservation": 9,
-        ":id_chambre": "undefined",
-        "id": 5
-    },
-    "6": {
-        ":id_reservation": 10,
-        ":id_chambre": "undefined",
-        "id": 6
-    },
-    "7": {
-        "id_reservation": 11,
-        "id_chambre": "undefined",
-        "id": 7
-    },
-    "8": {
-        "id_client": null,
-        "id_chambre": "undefined",
-        "id": 8
-    },
-    "9": {
-        "id_client": 17,
-        "id_chambre": "undefined",
-        "id": 9
-    },
-    "10": {
-        "id_client": 18,
-        "id_chambre": "undefined",
-        "id": 10
+        "id_client": 2,
+        "id_chambre": "7",
+        "id": 2
     }
 }

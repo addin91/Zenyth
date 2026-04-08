@@ -1,6 +1,12 @@
 {
-  "1": {"id_prestation": 1, "nom": "Petit déjeuner", "description": "Buffet complet", "prix_unitaire": 12, "actif": true},
-  "2": {"id_prestation": 2, "nom": "Spa", "description": "Accès spa 2h", "prix_unitaire": 30, "actif": true},
-  "3": {"id_prestation": 3, "nom": "Navette", "description": "Transport aéroport", "prix_unitaire": 25, "actif": false},
-  "4": {"id_prestation": 4, "nom": "Room service", "description": "Service en chambre", "prix_unitaire": 20, "actif": true}
+  "1": {"id": 1, "nom": "Petit déjeuner", "description": "Buffet complet", "prix_unitaire": 12, "actif": false},
+  "2": {"id": 2, "nom": "Spa", "description": "Accès spa 2h", "prix_unitaire": 30, "actif": false},
+  "3": {"id": 3, "nom": "Navette", "description": "Transport aéroport", "prix_unitaire": 25, "actif": true},
+  "4": {"id": 4, "nom": "Room service", "description": "Service en chambre", "prix_unitaire": 20, "actif": true},
+  "5": {"id": 5, "nom": "Blanchisserie", "description": "Service de lavage et repassage", "prix_unitaire": 15, "actif": true},
+  "6": {"id": 6, "nom": "Location vélo", "description": "Location à la journée", "prix_unitaire": 18, "actif": true},
+  "7": {"id": 7, "nom": "Massage", "description": "Massage relaxant 1h", "prix_unitaire": 50, "actif": true},
+  "8": {"id": 8, "nom": "Parking", "description": "Place de parking sécurisée", "prix_unitaire": 10, "actif": true},
+  "9": {"id": 9, "nom": "Excursion guidée", "description": "Visite touristique locale", "prix_unitaire": 45, "actif": false},
+  "10": {"id": 10, "nom": "Baby-sitting", "description": "Garde d'enfants", "prix_unitaire": 20, "actif": true}
 }

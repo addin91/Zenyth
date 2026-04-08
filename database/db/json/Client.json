@@ -1,96 +1,20 @@
 {
     "1": {
-        "id_client": 1,
-        "nom": "Dupont",
-        "prenom": "Jean",
-        "email": "jean.dupont@mail.com",
-        "mot_de_passe": "hash123",
+        "nom": "Ravi",
+        "prenom": "Cin",
+        "email": "ravicin271@nazisat.com",
         "statut_compte": "actif",
-        "date_creation": "2025-01-10"
+        "date_creation": "2026-04-08 07:43:15",
+        "id": 1,
+        "password": "$2y$10$v0cHTwv1KVwq1QPnMpQIWOxtdi8T666RnJc8fZapkLzEhv27E2Jmq"
     },
     "2": {
-        "id_client": 2,
-        "nom": "Martin",
-        "prenom": "Claire",
-        "email": "claire.martin@mail.com",
-        "mot_de_passe": "hash456",
+        "nom": "dabi",
+        "prenom": "ni",
+        "email": "daboni6785@nyspring.com",
         "statut_compte": "actif",
-        "date_creation": "2025-02-15"
-    },
-    "3": {
-        "id_client": 3,
-        "nom": "Bernard",
-        "prenom": "Luc",
-        "email": "luc.bernard@mail.com",
-        "mot_de_passe": "hash789",
-        "statut_compte": "inactif",
-        "date_creation": "2025-03-05"
-    },
-    "4": {
-        "id_client": 4,
-        "nom": "Petit",
-        "prenom": "Emma",
-        "email": "emma.petit@mail.com",
-        "mot_de_passe": "hash321",
-        "statut_compte": "invit\u00e9",
-        "date_creation": "2025-03-20"
-    },
-    "12": {
-        "nom": "aa",
-        "prenom": "a",
-        "email": "pibecin143@flownue.com",
-        "statut_compte": "actif",
-        "id": 12,
-        "password": "$2y$10$nhrqymT8rMZWWpE3qbU58Or7igkMQzbH8J77hArvl\/LLsiuQkc7tS"
-    },
-    "13": {
-        "nom": "Test",
-        "prenom": "Adel",
-        "email": "adel@test.com",
-        "password": "$2y$12$VDTWjN5wq633C2sgaGpWFO89oXQng66VoT13bBeAtQgKyR26vxoPy",
-        "statut_compte": "actif",
-        "date_creation": "2026-04-06",
-        "id": 13
-    },
-    "14": {
-        "nom": "kim",
-        "prenom": "ovak",
-        "email": "kimovak724@availors.com",
-        "statut_compte": "invit\u00e9",
-        "date_creation": "2026-04-05 18:33:59",
-        "id": 14
-    },
-    "15": {
-        "nom": "kim",
-        "prenom": "ovak",
-        "email": "kimovak724@availors.com",
-        "statut_compte": "invit\u00e9",
-        "date_creation": "2026-04-05 18:38:47",
-        "id": 15
-    },
-    "16": {
-        "nom": "kim",
-        "prenom": "ovak",
-        "email": "kimovak724@availors.com",
-        "statut_compte": "invit\u00e9",
-        "date_creation": "2026-04-05 18:41:06",
-        "id": 16
-    },
-    "17": {
-        "nom": "kim",
-        "prenom": "ovak",
-        "email": "kimovak724@availors.com",
-        "statut_compte": "invit\u00e9",
-        "date_creation": "2026-04-05 18:42:10",
-        "id": 17
-    },
-    "18": {
-        "nom": "pivon",
-        "prenom": "kon",
-        "email": "pivokon818@nexafilm.com",
-        "statut_compte": "actif",
-        "date_creation": "2026-04-06 07:31:28",
-        "id": 18,
-        "password": "$2y$10$GGBK\/kYiqvNOp.HXj46AtOdNmJ6RQC7KVLYUl1OhCiyG1N4Ji7AmS"
+        "date_creation": "2026-04-08 08:33:07",
+        "id": 2,
+        "password": "$2y$10$7tqhhwDI1fRtYSXaPcgCX.bJF5LKohGoNQuSQXa2oLwrde6WAOY.O"
     }
 }

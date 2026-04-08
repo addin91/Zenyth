@@ -1,6 +1,82 @@
 {
-  "1": {"id_chambre": 1, "nom_chambre": "Suite Océan", "type_chambre": "suite", "capacite": 4, "prix_nuit": 180, "statut": "occupé"},
-  "2": {"id_chambre": 2, "nom_chambre": "Chambre Standard 1", "type_chambre": "standard", "capacite": 2, "prix_nuit": 80, "statut": "libre"},
-  "3": {"id_chambre": 3, "nom_chambre": "Chambre Deluxe", "type_chambre": "deluxe", "capacite": 3, "prix_nuit": 120, "statut": "occupé"},
-  "4": {"id_chambre": 4, "nom_chambre": "Studio Jardin", "type_chambre": "studio", "capacite": 2, "prix_nuit": 90, "statut": "libre"}
+    "1": {
+        "id": 1,
+        "nom_chambre": "Suite Oc\u00e9an",
+        "type_chambre": "suite",
+        "capacite": 4,
+        "prix_nuit": 180,
+        "statut": "libre"
+    },
+    "2": {
+        "id": 2,
+        "nom_chambre": "Chambre Standard 1",
+        "type_chambre": "standard",
+        "capacite": 2,
+        "prix_nuit": 80,
+        "statut": "libre"
+    },
+    "3": {
+        "id": 3,
+        "nom_chambre": "Chambre Deluxe",
+        "type_chambre": "deluxe",
+        "capacite": 3,
+        "prix_nuit": 120,
+        "statut": "occup\u00e9"
+    },
+    "4": {
+        "id": 4,
+        "nom_chambre": "Studio Jardin",
+        "type_chambre": "studio",
+        "capacite": 2,
+        "prix_nuit": 90,
+        "statut": "libre"
+    },
+    "5": {
+        "id": 5,
+        "nom_chambre": "Suite Prestige",
+        "type_chambre": "suite",
+        "capacite": 5,
+        "prix_nuit": 250,
+        "statut": "libre"
+    },
+    "6": {
+        "id": 6,
+        "nom_chambre": "Chambre Standard 2",
+        "type_chambre": "standard",
+        "capacite": 2,
+        "prix_nuit": 85,
+        "statut": "libre"
+    },
+    "7": {
+        "id": 7,
+        "nom_chambre": "Chambre Deluxe Vue Mer",
+        "type_chambre": "deluxe",
+        "capacite": 3,
+        "prix_nuit": 140,
+        "statut": "occup\u00e9"
+    },
+    "8": {
+        "id": 8,
+        "nom_chambre": "Studio Terrasse",
+        "type_chambre": "studio",
+        "capacite": 2,
+        "prix_nuit": 100,
+        "statut": "libre"
+    },
+    "9": {
+        "id": 9,
+        "nom_chambre": "Suite Familiale",
+        "type_chambre": "suite",
+        "capacite": 6,
+        "prix_nuit": 220,
+        "statut": "libre"
+    },
+    "10": {
+        "id": 10,
+        "nom_chambre": "Chambre \u00c9conomique",
+        "type_chambre": "standard",
+        "capacite": 2,
+        "prix_nuit": 70,
+        "statut": "libre"
+    }
 }
