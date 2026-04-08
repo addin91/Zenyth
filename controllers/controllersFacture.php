@@ -69,14 +69,14 @@ class controllersFacture{
                 $facture['prix_nuit'] = $chambre['prix_nuit'];
                 $facture['prestations'] = $reservationPrestations;
                 $facture['activites'] = $reservationActivites;
-                
+                $this->factureModel->update($facture["id"],
+                    [
+                        "id_reservations_prestation" => $reservation["id_reservation_prestations"],
+                        "id_demandes_activite" => $reservation["id_demandes_activite"]
+                    ]
+                );
             }
-            $this->factureModel->update($facture["id"],
-                [
-                    "id_reservations_prestation" => $reservation["id_reservation_prestations"],
-                    "id_demandes_activite" => $reservation["id_demandes_activite"]
-                ]
-            );
+            
             echo json_encode(['success' => true, 'data' => $factures]);
             return;
         } echo json_encode(['success' => false, 'error' => 'Non connecte.']); 

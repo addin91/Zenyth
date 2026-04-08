@@ -82,24 +82,54 @@ class controllersAdmin{
         return;
     }
 
-    public function prevoirActivite($id_activite, $id_animateur, $id_demandes_actvites, $date, $creneau, $message){
+    public function prevoirActivite(){
+        if(isAdmin()){
+            if(isset($_POST['id_demande_activite'], $_POST['id_animateur'], $_POST['message']) && controlPostForm()){
+                $idDemandeActivite = $_POST['id_demande_activite'];
+                $idAnimateur = $_POST['id_animateur'];
+                $message = $_POST['message'];
 
-        $activiteModel = new Activite();
-        $activite = $activiteModel->findById($id_activite);
+                $demandeActiviteModel = new DemandeActivite();
+                $demandeActivite = $demandeActiviteModel->findById($idDemandeActivite);
 
-        $animateurModel = new Animateur();
-        $animateur = $animateurModel->findById($id_animateur);
+                $activiteModel = new Activite();
+                $activite = $activiteModel->findById($demandeActivite["id_activite"]);
 
-        $capacite_restante = $activite["capacite_max"];
-        $demandeActiviteModel = new DemandeActivite();
-        foreach($id_demandes_actvites as $id){
-            $demandeActivite = $demandeActiviteModel->findById($id);
-            $capacite_restante-= $demandeActivite["nombre_personnes_concernees"];
-        } 
+                $activitePrevuModel = new ActivitePrevue();
+                $activitePrevus = $activitePrevuModel->findAll();
+                foreach($activitePrevus as $activitePrevu){
+                    if($activitePrevu["id_activite"] == $demandeActivite["id_activite"]
+                        && $activitePrevu["id_animateur"] == $idAnimateur
+                        && $activitePrevu["date"] == $demandeActivite["date"]
+                        && $activitePrevu["creneau"] == $demandeActivite["creneau"]){
+                                $activitePrevu["id_demandes_activites"][] = $idDemandeActivite;
+                                $activitePrevu["capacite_restante"] -= $demandeActivite["nombre_personnes_concernees"];
+                                if($activitePrevu["capacite_restante"] < 0){
+                                    echo json_encode(['success' => false, 'error' => "Trop nombreux pour cette activité"]);
+                                    return;
+                                }
+                                $activitePrevuModel->update($activitePrevu["id"], $activitePrevu);
+                                $demandeActiviteModel->updateStatut($idDemandeActivite, "validee");
+                                echo json_encode(['success' => true, 'message' => "Réservation accepté"]);
+                                return;
+                    }
+                }
 
-        if($capacite_restante < 0); // Erreur;
-        $activitePrevuModel = new ActivitePrevue();
-        $activitePrevu = $activitePrevuModel->create($id_activite, $id_animateur, $id_demandes_actvites, $date, $creneau, $message, $capacite_restante);
+                $capacite_restante = $activite["capacite_max"];
+                $capacite_restante-= $demandeActivite["nombre_personnes_concernees"];
+                 
+                if($capacite_restante < 0){
+                    echo json_encode(['success' => false, 'error' => "Trop nombreux pour cette activité"]);
+                    return;
+                }
+                $activitePrevuModel->create($demandeActivite["id_activite"], $idAnimateur, [$idDemandeActivite], $demandeActivite["date"], $demandeActivite["creneau"], $demandeActivite["message"], $capacite_restante);
+                $demandeActiviteModel->updateStatut($idDemandeActivite, "validee");
+                echo json_encode(['success' => true, 'message' => "Réservation accepté"]);
+                return;
+            }
+        }
+        echo json_encode(['success' => false, 'error' => !isAdmin() ? "Autorisation manquante" : "Erreur dans la requete"]);
+        return;
     }
 
     public function recupereReservation(){
@@ -133,7 +163,6 @@ class controllersAdmin{
                 if($actif == 1) $prestationModel->update($idPrestation, ["actif" => true]);
                 else if($actif == 0) $prestationModel->update($idPrestation, ["actif" => false]);
                 $prestation = $prestationModel->findById($idPrestation);
-                error_log($prestation["actif"]);
                 echo json_encode(['success' => true, 'message' => "Statut actif modifié"]);
                 return;
             }
@@ -142,8 +171,108 @@ class controllersAdmin{
         return;
     }
 
+    public function creerAnimateur(){
+        if(isAdmin()){
+            if(isset($_POST['nom'], $_POST['prenom'], $_POST['specialite']) && controlPostForm()){
+                $nom = $_POST['nom'];
+                $prenom = $_POST['prenom'];
+                $specialite = $_POST['specialite'];
+                $animateurModel = new Animateur();
+                $animateurModel->create($nom, $prenom, $specialite);
+                echo json_encode(['success' => true, 'message' => "Animateur créé"]);
+                return;
+            }
+        }
+        echo json_encode(['success' => false, 'error' => !isAdmin() ? "Autorisation manquante" : "Erreur dans la requete"]);
+    }
 
+    public function supprimerAnimateur(){
+        if(isAdmin()){
+            if(isset($_POST['id_animateur']) && controlPostForm()){
+                $idAnimateur = $_POST['id_animateur'];
+                $animateurModel = new Animateur();
+                $animateurModel->delete($idAnimateur);
+                echo json_encode(['success' => true, 'message' => "Animateur supprimé"]);
+                return;
+            }
+        }
+        echo json_encode(['success' => false, 'error' => !isAdmin() ? "Autorisation manquante" : "Erreur dans la requete"]);
+    }
 
+    public function recuperefactures(){
+        if(isAdmin()){
+            $factureModel = new Facture();
+            if(isset($_GET["statut"])){
+                if($_GET["statut"] == "Provisoire") $factures = $factureModel->findByStatut("Provisoire");
+                else if($_GET["statut"] == "emise") $factures = $factureModel->findByStatut("emise");
+                else if($_GET["statut"] == "payée") $factures = $factureModel->findByStatut("payee");
+            }else $factures = $factureModel->findAll();
+            
+            foreach($factures as &$facture){
+                $reservation = $this->reservationModel->findById($facture['id_reservation']);
+                $debut = new DateTime($reservation['date_debut']);
+                $fin = new DateTime($reservation['date_fin']);
+                $interval = $debut->diff($fin);
+                $nbNuits = $interval->days;
+
+                $reservationChambreModel = new ReservationChambre();
+                $reservationChambre = $reservationChambreModel->findById($facture["id_reservation_chambre"]);
+                $chambreModel = new Chambre();
+                $chambre = $chambreModel->findById($reservationChambre["id_chambre"]);
+                
+                $reservationPrestationModel = new ReservationPrestation();
+                $reservationActiviteModel = new DemandeActivite();
+                $reservationPrestations = [];
+                $reservationActivites = [];
+                foreach(($reservation["id_reservation_prestations"] ?? []) as $id) $reservationPrestations[] = $reservationPrestationModel->findById($id);
+                foreach(($reservation["id_demandes_activite"] ?? []) as $id) $reservationActivites[] = $reservationActiviteModel->findById($id);
+                $facture['date_debut'] = $reservation['date_debut'];
+                $facture['date_fin'] = $reservation['date_fin'];
+                $facture['nuits'] = $nbNuits;
+                $facture['chambre'] = $chambre['nom_chambre'] ?? "";
+                $facture['prix_nuit'] = $chambre['prix_nuit'] ?? "";
+                $facture['prestations'] = $reservationPrestations;
+                $facture['activites'] = $reservationActivites;
+                $factureModel->update($facture["id"],
+                    [
+                        "id_reservations_prestation" => $reservation["id_reservation_prestations"],
+                        "id_demandes_activite" => $reservation["id_demandes_activite"]
+                    ]
+                    );
+                } 
+            echo json_encode(['success' => true, 'data' => $factures]);
+            return;
+        }  echo json_encode(['success' => false, 'error' => !isAdmin() ? "Autorisation manquante" : "Erreur dans la requete"]);
+    }
+
+    public function editerFacture(){
+        if(isAdmin()){
+            if(isset($_POST['id_facture'], $_POST['avoirs'], $_POST['reduction']) && controlPostForm()){
+                $idFacture = $_POST['id_facture'];
+                $avoirs = $_POST['avoirs'];
+                $reduction = $_POST['reduction'];
+                $factureModel = new Facture();
+                $factureModel->update($idFacture, ["avoirs" => $avoirs, "reduction" => $reduction]);
+                echo json_encode(['success' => true, 'message' => "Facture édité"]);
+                return;
+            }
+        }
+        echo json_encode(['success' => false, 'error' => !isAdmin() ? "Autorisation manquante" : "Erreur dans la requete"]);
+    }
+
+    public function emettreFacture(){
+        if(isAdmin()){
+            if(isset($_POST['id_facture']) && controlPostForm()){
+                $idFacture = $_POST['id_facture'];
+                $factureModel = new Facture();
+                $factureModel->updateStatut($idFacture, "emise");
+                echo json_encode(['success' => true, 'message' => "Facture émise"]);
+                return;
+            }
+        }
+        echo json_encode(['success' => false, 'error' => !isAdmin() ? "Autorisation manquante" : "Erreur dans la requete"]);
+    }
+    
     public function recupereDemandesActivites(){
         if(isAdmin()){
             if(isset($_GET['statut'])){

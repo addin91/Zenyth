@@ -21,6 +21,7 @@ class Facture
         // JOIN reservations r ON r.id = f.id_reservation
         // LEFT JOIN clients c ON c.id = r.id_client
         // ORDER BY f.date_emission DESC
+        return $this->jsondb->selectAll();
     }
 
     public function findById($id)
@@ -43,6 +44,7 @@ class Facture
         // LEFT JOIN clients c ON c.id = r.id_client
         // WHERE f.statut = ?
         // ORDER BY f.date_emission DESC
+        return $this->jsondb->where('statut', $statut);
     }
 
     public function create($id_client, $id_reservation, $id_reservation_chambre, $id_reservations_prestation = [], $id_demandes_activite = [], $montant_total, $avoirs, $reduction)

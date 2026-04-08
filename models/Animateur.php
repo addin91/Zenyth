@@ -37,14 +37,12 @@ class Animateur
         // SELECT * FROM animateurs WHERE specialite LIKE ? ORDER BY nom, prenom ASC
     }
 
-    public function create($id_animateur, $nom, $prenom, $specialite, $actif)
+    public function create($nom, $prenom, $specialite)
     {
         $data = [
-            'id_animateur' => $id_animateur,
             'nom' => $nom,
             'prenom' => $prenom,
             'specialite' => $specialite,
-            'actif' => $actif,
         ];
         return $this->jsondb->add($data);
     }

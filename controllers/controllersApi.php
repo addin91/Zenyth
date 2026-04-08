@@ -3,7 +3,7 @@ require_once  __DIR__ . '/../models/Activite.php';
 require_once  __DIR__ . '/../models/Chambre.php';
 require_once  __DIR__ . '/../models/Prestation.php';
 require_once  __DIR__ . '/../models/Animateur.php';
-require_once  __DIR__ . '/../models/Animateur.php';
+require_once  __DIR__ . '/../models/Client.php';
 require_once  __DIR__ . '/../models/DemandeActivite.php';
 require_once  __DIR__ . '/../models/ActivitePrevue.php';
 
@@ -46,6 +46,14 @@ class controllersApi{
         $activitePrevueModel = new ActivitePrevue();
         echo json_encode($activitePrevueModel->findAll());
     }
+
+    public function recupereClient(){
+        header('Content-Type: application/json');
+        $clientModel = new Client();
+        echo json_encode($clientModel->findAll());
+    }
+
+    
 }
 
 
