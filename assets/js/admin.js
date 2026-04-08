@@ -292,8 +292,8 @@ $(document).ready(function() {
             dataType: 'json'
         }).done(function(res) {
             if (res && res.success) {
-                showToast(res.message || 'Reservation refusee.');
-                chargerActivitesPrevues();
+                showToast(res.message || 'Demande refusee.');
+                chargerDemandesActivites($('#adm-act-filtre-date').val() || null);
             } else {
                 showToast((res && res.error) || 'Erreur lors du refus.', 'error');
             }
@@ -656,9 +656,9 @@ function chargerDemandesActivites(date) {
                 html += ' data-creneau="' + (d.creneau || '') + '"';
                 html += ' data-personnes="' + nbPers + '"';
                 html += ' data-nom="' + nomAct + '">Programmer</button>';
-                html += '<button class="btn btn-sm btn-outline-danger btn-refusee-activite"';
+                html += ' <button class="btn btn-sm btn-danger btn-refusee-activite"';
                 html += ' data-id="' + id + '"';
-                html += ' data-nom="' + nomAct + '">Supprimer</button></td>';
+                html += ' data-nom="' + nomAct + '">Refuser</button></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';

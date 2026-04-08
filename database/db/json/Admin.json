@@ -5,5 +5,12 @@
         "email": "abdelrahmenbentahar@gmail.com",
         "mot_de_passe": "$2y$10$RrueVoBIX68QihkXaalaOO8OQqNj35R83mR9oj6LzjgXTNsIYw2p6",
         "id": 1
+    },
+    "2": {
+        "nom": "Mokhtari",
+        "prenom": "Adel",
+        "email": "mokhadel31000@gmail.com",
+        "mot_de_passe": "$2y$12$R/gcgdIiJbdSZyP.DDGKAewHs.IkHj/DERkuTLPDHDzXQrJp7eQ5i",
+        "id": 2
     }
 }

@@ -130,6 +130,12 @@ a {
     box-shadow: 0 6px 20px rgba(124, 154, 142, 0.25);
 }
 
+.btn-sm.btn-accent {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 4px;
+}
+
 .btn-outline-accent {
     border: 1px solid var(--accent);
     color: var(--accent-light);
@@ -803,6 +809,8 @@ footer p {
     color: var(--accent-light) !important;
     font-size: 0.85rem;
     font-style: italic;
+    display: flex;
+    align-items: center;
 }
 
 /* ===== HERO ADMIN ===== */

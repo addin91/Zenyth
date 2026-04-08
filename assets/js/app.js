@@ -418,7 +418,7 @@ function chargerDashPrestations() {
         if (resFact.success && resFact.data) {
             $.each(resFact.data, function(i, f) {
                 $.each(f.prestations || [], function(j, p) {
-                    if (p.id) prestasDejaReservees.push(String(p.id));
+                    if (p.id_prestation) prestasDejaReservees.push(String(p.id_prestation));
                 });
             });
         }
@@ -557,7 +557,7 @@ function chargerDashFactures() {
                 // Prestations : resolution nom + prix via lookup
                 $.each(f.prestations || [], function(j, p) {
                     if (!p) return;
-                    var presta = prestaById[String(p.id)] || {};
+                    var presta = prestaById[String(p.id_prestation)] || {};
                     var nom = presta.nom || 'Prestation';
                     // Le backend renvoie soit "total" (anciennes lignes) soit "prix" (nouvelles)
                     // Sinon on calcule depuis prix_unitaire * quantite de la table de reference
