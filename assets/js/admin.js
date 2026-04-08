@@ -175,7 +175,7 @@ $(document).ready(function() {
                 html += '<thead><tr><th>#</th><th>Nom</th><th>Type</th><th>Capacite</th><th>Prix/nuit</th></tr></thead><tbody>';
                 $.each(res.data, function(i, ch) {
                     html += '<tr>';
-                    html += '<td>#' + ch.id_chambre + '</td>';
+                    html += '<td>#' + ch.id + '</td>';
                     html += '<td><strong>' + ch.nom_chambre + '</strong></td>';
                     html += '<td>' + ch.type_chambre + '</td>';
                     html += '<td>' + ch.capacite + ' pers.</td>';
@@ -529,7 +529,7 @@ function chargerChambres() {
             html += '<thead><tr><th>#</th><th>Nom</th><th>Type</th><th>Capacite</th><th>Prix/nuit</th></tr></thead><tbody>';
             $.each(chambres, function(i, ch) {
                 html += '<tr>';
-                html += '<td>#' + ch.id_chambre + '</td>';
+                html += '<td>#' + ch.id + '</td>';
                 html += '<td><strong>' + ch.nom_chambre + '</strong></td>';
                 html += '<td>' + ch.type_chambre + '</td>';
                 html += '<td>' + ch.capacite + ' pers.</td>';
@@ -558,12 +558,12 @@ function chargerPrestations() {
             $.each(prestas, function(i, p) {
                 var actif = (p.actif === undefined || p.actif === null || p.actif == 1 || p.actif === true);
                 html += '<tr>';
-                html += '<td>#' + p.id_prestation + '</td>';
+                html += '<td>#' + p.id + '</td>';
                 html += '<td><strong>' + p.nom + '</strong></td>';
                 html += '<td>' + (p.description || '') + '</td>';
                 html += '<td>' + p.prix_unitaire + ' &euro;</td>';
                 html += '<td><div class="form-check form-switch">';
-                html += '<input class="form-check-input toggle-presta" type="checkbox" data-id="' + p.id_prestation + '"' + (actif ? ' checked' : '') + '>';
+                html += '<input class="form-check-input toggle-presta" type="checkbox" data-id="' + p.id + '"' + (actif ? ' checked' : '') + '>';
                 html += '</div></td>';
                 html += '</tr>';
             });
@@ -595,7 +595,7 @@ function chargerDemandesActivites(date) {
         var actById = {};
         if (activites) {
             $.each(Object.values(activites), function(i, a) {
-                actById[String(a.id_activite)] = a;
+                actById[String(a.id)] = a;
             });
         }
 
@@ -613,8 +613,8 @@ function chargerDemandesActivites(date) {
             $.each(liste, function(i, d) {
                 var id = d.id_demande || d.id || '';
                 var nbPers = d.nombre_personnes_concernees || d.nombre_personnes || '?';
-                var act = actById[String(d.id_activite)];
-                var nomAct = act ? act.nom : ('Activite #' + (d.id_activite || '?'));
+                var act = actById[String(d.id)];
+                var nomAct = act ? act.nom : ('Activite #' + (d.id || '?'));
                 html += '<tr>';
                 html += '<td>#' + (id || '?') + '</td>';
                 html += '<td><strong>' + nomAct + '</strong></td>';
@@ -659,7 +659,7 @@ function chargerActivitesPrevues() {
         var actById = {};
         if (activites) {
             $.each(Object.values(activites), function(i, a) {
-                actById[String(a.id_activite)] = a;
+                actById[String(a.id)] = a;
             });
         }
         var animById = {};

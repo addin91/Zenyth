@@ -293,8 +293,8 @@ $(document).ready(function() {
 
     // ===== TELECHARGER FACTURE PDF =====
     $('#dash-liste-factures').on('click', '.btn-telecharger-facture', function() {
-        var idReservation = $(this).data('id-reservation');
-        window.open('index.php?action=telechargementfacture&id_reservation=' + idReservation, '_blank');
+        var idFacture = $(this).data('id-facture');
+        window.open('index.php?action=telechargementfacture&id_facture=' + idFacture, '_blank');
     });
 
     // ===== SESSION : RESTAURER L'ETAT CONNECTE =====
@@ -417,7 +417,7 @@ function chargerDashPrestations() {
         if (resFact.success && resFact.data) {
             $.each(resFact.data, function(i, f) {
                 $.each(f.prestations || [], function(j, p) {
-                    if (p.id_prestation) prestasDejaReservees.push(String(p.id_prestation));
+                    if (p.id) prestasDejaReservees.push(String(p.id));
                 });
             });
         }
@@ -427,7 +427,8 @@ function chargerDashPrestations() {
         .done(function(prestations) {
             var html = '';
             $.each(prestations, function(i, p) {
-                var dejaAjoutee = prestationsAjoutees.indexOf(String(p.id_prestation)) !== -1;
+               
+                var dejaAjoutee = prestationsAjoutees.indexOf(String(p.id)) !== -1;
                 var actif = (p.actif === undefined || p.actif === null || p.actif == 1 || p.actif === true);
                 // Si la prestation est desactivee cote admin et qu'on ne l'a pas deja ajoutee, on la cache
                 if (!actif && !dejaAjoutee) return;
@@ -437,9 +438,9 @@ function chargerDashPrestations() {
                 html += '<small>' + (p.description || '') + ' — ' + p.prix_unitaire + ' &euro;</small>';
                 html += '</div>';
                 if (dejaAjoutee) {
-                    html += '<button class="btn btn-sm btn-outline-accent btn-ajout-presta disabled" data-id="' + p.id_prestation + '" disabled>Ajoutee</button>';
+                    html += '<button class="btn btn-sm btn-outline-accent btn-ajout-presta disabled" data-id="' + p.id + '" disabled>Ajoutee</button>';
                 } else {
-                    html += '<button class="btn btn-sm btn-outline-accent btn-ajout-presta" data-id="' + p.id_prestation + '">Ajouter</button>';
+                    html += '<button class="btn btn-sm btn-outline-accent btn-ajout-presta" data-id="' + p.id + '">Ajouter</button>';
                 }
                 html += '</div>';
             });
@@ -459,14 +460,14 @@ function chargerDashActivitesSelect() {
     .done(function(activites) {
         var html = '<option value="" selected disabled>Choisir...</option>';
         $.each(activites, function(i, act) {
-            html += '<option value="' + act.id_activite + '">' + act.nom + ' (' + act.prix + ' &euro;)</option>';
+            html += '<option value="' + act.id + '">' + act.nom + ' (' + act.prix + ' &euro;)</option>';
         });
         $('#da-activite').html(html);
     });
 }
 
 function chargerDashActivitesValidees() {
-    $.ajax({ url: 'index.php?action=recupereactivitesvalidees', method: 'GET', dataType: 'json' })
+    $.ajax({ url: 'index.php?action=recupereactivitesvalidees&id_reservation=', method: 'GET', dataType: 'json' })
     .done(function(res) {
         if (res.success && res.data && res.data.length > 0) {
             var html = '';
@@ -507,9 +508,9 @@ function chargerDashFactures() {
 
         // Lookup par id pour resoudre nom + prix
         var prestaById = {};
-        $.each(prestasList, function(i, p) { prestaById[String(p.id_prestation)] = p; });
+        $.each(prestasList, function(i, p) { prestaById[String(p.id)] = p; });
         var actById = {};
-        $.each(activitesList, function(i, a) { actById[String(a.id_activite)] = a; });
+        $.each(activitesList, function(i, a) { actById[String(a.id)] = a; });
 
         if (res && res.success && res.data && (res.data.length > 0 || Object.keys(res.data).length > 0)) {
             var html = '';
@@ -555,7 +556,7 @@ function chargerDashFactures() {
                 // Prestations : resolution nom + prix via lookup
                 $.each(f.prestations || [], function(j, p) {
                     if (!p) return;
-                    var presta = prestaById[String(p.id_prestation)] || {};
+                    var presta = prestaById[String(p.id)] || {};
                     var nom = presta.nom || 'Prestation';
                     // Le backend renvoie soit "total" (anciennes lignes) soit "prix" (nouvelles)
                     // Sinon on calcule depuis prix_unitaire * quantite de la table de reference
@@ -586,7 +587,7 @@ function chargerDashFactures() {
                     if (!a) return;
                     var statut = (a.statut || '').toLowerCase();
                     if (statut !== 'validée' && statut !== 'validee') return;
-                    var activite = actById[String(a.id_activite)] || {};
+                    var activite = actById[String(a.id)] || {};
                     var nom = activite.nom || 'Activite';
                     var prix = parseFloat(activite.prix) || 0;
                     totalCalcule += prix;
@@ -636,7 +637,7 @@ function chargerDashFactures() {
                 html += '<span>Total</span>';
                 html += '<span class="facture-total-prix">' + totalCalcule.toFixed(2) + ' &euro;</span>';
                 html += '</div>';
-                html += '<button class="btn btn-sm btn-outline-accent btn-telecharger-facture" data-id-reservation="' + f.id_reservation + '">Telecharger PDF</button>';
+                html += '<button class="btn btn-sm btn-outline-accent btn-telecharger-facture" data-id-facture="' + f.id + '">Telecharger PDF</button>';
                 html += '</div>';
 
                 html += '</div>';
@@ -739,7 +740,7 @@ function chargerChambresFormulaire() {
     .done(function(chambres) {
         var html = '<option value="" selected disabled>Choisir une chambre...</option>';
         $.each(chambres, function(i, ch) {
-            html += '<option value="' + ch.id_chambre + '" data-capacite="' + ch.capacite + '">';
+            html += '<option value="' + ch.id + '" data-capacite="' + ch.capacite + '">';
             html += ch.nom_chambre + ' (' + ch.type_chambre + ') - ' + ch.capacite + ' pers. - ' + ch.prix_nuit + ' &euro;/nuit';
             html += '</option>';
         });
@@ -752,7 +753,7 @@ function majChambresDisponibles() {
     var fin = $('#res-date-fin').val();
     var personnes = parseInt($('#res-personnes').val()) || 0;
 
-    if (!debut || !fin) return;
+    if (!debut || !fin || personnes <= 0) return;
 
     $.ajax({
         url: 'index.php?action=chambresdisponibles&date_debut=' + debut + '&date_fin=' + fin + '&nombre_personnes=' + personnes,
@@ -765,7 +766,7 @@ function majChambresDisponibles() {
             var count = 0;
             $.each(res.data, function(i, ch) {
                 if (personnes > 0 && ch.capacite < personnes) return;
-                html += '<option value="' + ch.id_chambre + '" data-capacite="' + ch.capacite + '">';
+                html += '<option value="' + ch.id + '" data-capacite="' + ch.capacite + '">';
                 html += ch.nom_chambre + ' (' + ch.type_chambre + ') - ' + ch.capacite + ' pers. - ' + ch.prix_nuit + ' &euro;/nuit';
                 html += '</option>';
                 count++;
