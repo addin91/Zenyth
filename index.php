@@ -9,6 +9,9 @@ require_once __DIR__ . '/controllers/controllersApi.php';
 
 $action = isset($_GET['action']) ? strtolower($_GET['action']) : 'index';
 
+
+error_log(ini_get('session.gc_maxlifetime'));
+
 switch ($action) {
 
     // --- CONNEXION ---
@@ -110,6 +113,11 @@ switch ($action) {
     case 'adminrefuserreservation':
         $controller = new controllersAdmin();
         $controller->refuseReservationChambre();
+        break;
+
+    case 'adminrefuseractvite':
+        $controller = new controllersAdmin();
+        $controller->refuserActvite();
         break;
 
     case 'admintoggleprestation':
