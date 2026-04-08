@@ -31,7 +31,7 @@ class controllersReservations{
     public function reservationChambre(){
         header('Content-Type: application/json');  
         if (controlPostForm()) {
-            if (isset($_POST['dateDebut'], $_POST['dateFin'], $_POST['nombrePersonne'], $_POST['commentaire'], $_POST['id_chambre'], $_POST['activites'])) {
+            if (isset($_POST['dateDebut'], $_POST['dateFin'], $_POST['nombrePersonne'], $_POST['commentaire'], $_POST['id_chambre'])) {
 
                 if(isLoggedIn()) $idClient = $_SESSION["user_id"];
                 else{
@@ -52,12 +52,11 @@ class controllersReservations{
                 $nombrePersonne = htmlspecialchars($_POST['nombrePersonne'] ?? '');
                 $commentaire = htmlspecialchars($_POST['commentaire'] ?? '');
                 $idChambre = htmlspecialchars($_POST['id_chambre'] ?? '');
-                $idsActivite = array_map(function($v) { return htmlspecialchars($v);}, $_POST['activites']);
-                
+
                 $reservationChambreModel = new ReservationChambre();
                 $idReservationChambre = $reservationChambreModel->create($idClient, $idChambre);
 
-                $idReservation = $this->reservationModel->create($idClient, $idReservationChambre, $idsActivite, [], $dateDebut, $dateFin, $nombrePersonne, $commentaire);
+                $idReservation = $this->reservationModel->create($idClient, $idReservationChambre, [], [], $dateDebut, $dateFin, $nombrePersonne, $commentaire);
                 echo json_encode(['success' => true, 'message' => 'Votre demande de reservation a ete envoyee.']);
             } else echo json_encode(['success' => false, 'error' => 'Champs manquant']);
 
@@ -88,7 +87,7 @@ class controllersReservations{
                 $toutesChambres = $chambreModel->findAll();
 
                 $chambresDisponibles = array_filter($toutesChambres, function($chambre) use ($chambresOccupees) {
-                    return !in_array($chambre['id_chambre'], $chambresOccupees);
+                    return !in_array($chambre['id'], $chambresOccupees);
                 });
                 $chambresDisponiblesCapaciteSuffisante = array_filter($chambresDisponibles, function($chambre) use ($capacite) {
                     return $chambre["capacite"] >= $capacite;
@@ -122,12 +121,13 @@ class controllersReservations{
                     echo json_encode(['success' => false, 'error' => 'Vous avez déjà réservé cette prestation']);
                     return;
                 }
-                $this->reservationModel->ajoutReservationPrestation($reservation["id"], $idPrestation);
                 // créer reservation prestation
                 $reservationPrestationModel = new ReservationPrestation();
                 $reduction  = 0;
                 
-                $reservationPrestationModel->create($reservation['id'], $idPrestation, $reduction, ($prestation["prix_unitaire"]) * (1 - $reduction / 100));
+                $idReservationPrestation = $reservationPrestationModel->create($reservation['id'], $idPrestation, $reduction, ($prestation["prix_unitaire"]) * (1 - $reduction / 100));
+                $this->reservationModel->ajoutReservationPrestation($reservation["id"], $idReservationPrestation);
+
             }
             header('Content-Type: application/json');
             echo json_encode(['success' => true, 'message' => 'Prestation ajoutee.']);
@@ -151,7 +151,7 @@ class controllersReservations{
                 $activiteModel = new Activite();
                 $activite = $activiteModel->findById($idActivite);
                 if (!$activite) {
-                    echo json_encode(['success' => false, 'message' => 'Activité inexistante']);
+                    echo json_encode(['success' => false, 'error' => 'Activité inexistante']);
                     return;
                 }
 
@@ -160,7 +160,7 @@ class controllersReservations{
                 $reservations = $this->reservationModel->findByClient($idClient);
                 $reservation = !empty($reservations) ? end($reservations) : null;
                 if (!$reservation) {
-                    echo json_encode(['success' => false, 'message' => 'Aucune réservation trouvée']);
+                    echo json_encode(['success' => false, 'error' => 'Aucune réservation trouvée']);
                     return;
                 }
 
@@ -168,12 +168,12 @@ class controllersReservations{
                 $capaciteOK = $activiteModel->capaciteSuffisante($activite, $nombrePersonne);
 
                 if (!$estDansIntervalle) {
-                    echo json_encode(['success' => false, 'message' => "L'activité ne se déroule pas durant votre réservation"]);
+                    echo json_encode(['success' => false, 'error' => "L'activité ne se déroule pas durant votre réservation"]);
                     return;
                 }
 
                 if (!$capaciteOK) {
-                    echo json_encode(['success' => false, 'message' => "Capacité insuffisante"]);
+                    echo json_encode(['success' => false, 'error' => "Capacité insuffisante"]);
                     return;
                 }
 
@@ -190,8 +190,18 @@ class controllersReservations{
 
 
     public function activitesValidees(){
-        $reservationActiviteModel = new DemandeActivite();
-        return $reservationActiviteModel->findByStatut("validée");
+        if(isLoggedIn() && isset($_GET["id_reservation"])){
+            $idReservation = $_GET["id_reservation"];
+            $reservation = $this->reservationModel->findById($idReservation);
+            $demandeActiviteModel = new DemandeActivite();
+            $demandeActivites = [];
+            foreach($reservation['id_demandes_activite'] as $idDemandeActivite){
+                $demandeActivite = $demandeActiviteModel->findById($idDemandeActivite);
+                if($demandeActivite["statut"] === "validee") $demandeActivites[] = $demandeActivite;
+            }
+            echo json_encode(['success' => true, 'data' => $demandeActivites]);
+        } echo json_encode(['success' => false, 'error' => "Erreur dans la requete"]);
+
     }
 
 }

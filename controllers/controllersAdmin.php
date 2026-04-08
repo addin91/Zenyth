@@ -252,7 +252,10 @@ class controllersAdmin{
                 $avoirs = $_POST['avoirs'];
                 $reduction = $_POST['reduction'];
                 $factureModel = new Facture();
-                $factureModel->update($idFacture, ["avoirs" => $avoirs, "reduction" => $reduction]);
+                
+                $facture = $factureModel->findById($idFacture);
+                $prixTotal = ($facture['montant_total'] - max(0, $avoirs ?? 0)) * (($reduction >= 0 && $reduction <= 100) ? (1 - $reduction / 100) : 1); 
+                $factureModel->update($idFacture, ["avoirs" => $avoirs, "reduction" => $reduction, "montant_total" => $prixTotal]);
                 echo json_encode(['success' => true, 'message' => "Facture édité"]);
                 return;
             }
@@ -290,75 +293,8 @@ class controllersAdmin{
         } else echo json_encode(['success' => false, 'error' => "Autorisation manquante"]);
     }
 
-    public function recuperePrestation(){
-        if(isAdmin()){
-            if(isset($_GET['statut'])){
-            $statut = $_GET['statut'];
-            if($statut === "valide") $statut = "en_attente";
-            else if($statut === "all") $statut = "validée";
-            else if($statut === "all") $statut = "validée";
-            else{
-                echo json_encode(['success' => false, 'error' => "Requete invalide"]);
-                return;
-            }
-            echo json_encode(['success' => true, 'data' => $this->reservationModel->findByStatut($statut)]);
-            return;
-            }
-        } else echo json_encode(['success' => false, 'error' => "Autorisation manquante"]);
-    }
-
-    public function recupereActivite(){
-        if(isAdmin()){
-            if(isset($_GET['statut'])){
-            $statut = $_GET['statut'];
-            if($statut === "valide") $statut = "en_attente";
-            else if($statut === "all") $statut = "validée";
-            else if($statut === "all") $statut = "validée";
-            else{
-                echo json_encode(['success' => false, 'error' => "Requete invalide"]);
-                return;
-            }
-            echo json_encode(['success' => true, 'data' => $this->reservationModel->findByStatut($statut)]);
-            return;
-            }
-        } else echo json_encode(['success' => false, 'error' => "Autorisation manquante"]);
-    }
 
 
-
-    public function recupereAnimateur(){
-        if(isAdmin()){
-            if(isset($_GET['statut'])){
-            $statut = $_GET['statut'];
-            if($statut === "valide") $statut = "en_attente";
-            else if($statut === "all") $statut = "validée";
-            else if($statut === "all") $statut = "validée";
-            else{
-                echo json_encode(['success' => false, 'error' => "Requete invalide"]);
-                return;
-            }
-            echo json_encode(['success' => true, 'data' => $this->reservationModel->findByStatut($statut)]);
-            return;
-            }
-        } else echo json_encode(['success' => false, 'error' => "Autorisation manquante"]);
-    }
-
-    public function recupereFacture(){
-        if(isAdmin()){
-            if(isset($_GET['statut'])){
-            $statut = $_GET['statut'];
-            if($statut === "valide") $statut = "en_attente";
-            else if($statut === "all") $statut = "validée";
-            else if($statut === "all") $statut = "validée";
-            else{
-                echo json_encode(['success' => false, 'error' => "Requete invalide"]);
-                return;
-            }
-            echo json_encode(['success' => true, 'data' => $this->reservationModel->findByStatut($statut)]);
-            return;
-            }
-        } else echo json_encode(['success' => false, 'error' => "Autorisation manquante"]);
-    }
 
 }
 
