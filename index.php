@@ -117,6 +117,36 @@ switch ($action) {
         $controller->gereActivation();
         break;
 
+    case 'adminvaliderdemandeactivite':
+        $controller = new controllersAdmin();
+        $controller->prevoirActivite();
+        break;
+
+    case 'admincreeranimateur':
+        $controller = new controllersAdmin();
+        $controller->creerAnimateur();
+        break;
+
+    case 'adminsupprimeranimateur':
+        $controller = new controllersAdmin();
+        $controller->supprimerAnimateur();
+        break;
+
+    case 'adminrecuperefactures':
+        $controller = new controllersAdmin();
+        $controller->recuperefactures();
+        break;
+
+    case 'adminediterfacture':
+        $controller = new controllersAdmin();
+        $controller->editerFacture();
+        break;
+
+    case 'adminemettrefacture':
+        $controller = new controllersAdmin();
+        $controller->emettreFacture();
+        break;
+
     // --- API ---
     case 'apichambre':
         $controller = new controllersApi();
@@ -147,6 +177,11 @@ switch ($action) {
     case 'apidemandesactivites':
         $controller = new controllersApi();
         $controller->recupereDemandesActivites();
+        break;
+
+    case 'apiclient':
+        $controller = new controllersApi();
+        $controller->recupereClient();
         break;
 
     // --- PAGE PRINCIPALE ---
