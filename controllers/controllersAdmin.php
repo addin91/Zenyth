@@ -17,8 +17,7 @@ class controllersAdmin{
     private $clientModel;
     private $reservationModel;
 
-    public function __construct()
-    {
+    public function __construct(){
         $this->clientModel = new Client();
         $this->reservationModel = new Reservation();
     }
@@ -67,7 +66,7 @@ class controllersAdmin{
 
                     ]
                 );
-                if($client["statut_compte"] == "invité") $this->clientModel->delete($reservation["id_client"]);
+                if($client["statut_compte"] == "invité") $this->clientModel->desactiveClient($reservation["id_client"]);
 
                 $mailservice = new MailService();
                 $mailservice->envoieMail($client["email"], "Reservation annulé", "Votre réservation a été annulé", true);

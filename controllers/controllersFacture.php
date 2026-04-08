@@ -21,8 +21,7 @@ class controllersFacture{
     private $reservationModel;
     private $factureModel;
 
-    public function __construct()
-    {
+    public function __construct(){
         $this->clientModel = new Client();
         $this->reservationModel = new Reservation();
         $this->factureModel = new Facture();
@@ -69,9 +68,10 @@ class controllersFacture{
                 $facture['prix_nuit'] = $chambre['prix_nuit'];
                 $facture['prestations'] = $reservationPrestations;
                 $facture['activites'] = $reservationActivites;
-                $facture['montant_total'] = $reservationActivites;
+                $facture['montant_total'] = $this->factureModel->calculerMontantFinal($facture["id"]);
                 $this->factureModel->update($facture["id"],
-                    [
+                    [   
+                        "montant_total" => $this->factureModel->calculerMontantFinal($facture["id"]),
                         "id_reservations_prestation" => $reservation["id_reservation_prestations"],
                         "id_demandes_activite" => $reservation["id_demandes_activite"]
                     ]
@@ -90,38 +90,27 @@ class controllersFacture{
 
             $idFacture = $_GET["id_facture"];
 
-            // 🔹 Facture
             $facture = $this->factureModel->findById($idFacture);
             if (!$facture) {
                 die("Facture introuvable");
             }
 
-            // 🔐 Sécurité
             if ((!isLoggedIn() && !isAdmin()) || (!isAdmin() && $_SESSION['user_id'] != $facture['id_client'])) {
                 die("Accès non autorisé");
             }
 
-            // 🔹 Données principales
             $client = $this->clientModel->findById($facture["id_client"]);
             $reservation = $this->reservationModel->findById($facture["id_reservation"]);
 
-            // 🔹 Dates / nuits
             $debut = new DateTime($reservation['date_debut']);
             $fin = new DateTime($reservation['date_fin']);
             $interval = $debut->diff($fin);
             $nbNuits = $interval->days;
-
-            // 🔹 Chambre
             $reservationChambreModel = new ReservationChambre();
             $reservationChambre = $reservationChambreModel->findById($facture["id_reservation_chambre"]);
-
             $chambreModel = new Chambre();
-            $chambre = $chambreModel->findById($reservationChambre["id_chambre"]);
-
-            // 🔹 Prestations
             $reservationPrestationModel = new ReservationPrestation();
             $prestationModel = new Prestation();
-
             $reservationPrestations = [];
 
             $idsPrestations = $facture["id_reservations_prestation"] ?? [];
@@ -130,41 +119,36 @@ class controllersFacture{
             }
 
             foreach($idsPrestations as $id){
-                $p = $reservationPrestationModel->findById($id);
-                error_log(print_r($p, true));
-                if ($p) {
-                    $prestation = $prestationModel->findById($p["id_prestation"]);
-                    error_log(print_r($prestation, true));
-                    $p["nom"] = $prestation["nom"] ?? "Prestation";
-                    $p["total"] = $prestation["prix_unitaire"];
-                    $reservationPrestations[] = $p;
+                $reservationPrestation = $reservationPrestationModel->findById($id);
+                if ($reservationPrestation) {
+                    $prestation = $prestationModel->findById($reservationPrestation["id_prestation"]);
+                    $reservationPrestation["nom"] = $prestation["nom"] ?? "Prestation";
+                    $reservationPrestation["total"] = $prestation["prix_unitaire"];
+                    $reservationPrestations[] = $reservationPrestation;
                 }
             }
-
-            // 🔹 Activités
             $reservationActiviteModel = new DemandeActivite();
             $activiteModel = new Activite();
 
             $reservationActivites = [];
-
             $idsActivites = $facture["id_demandes_activite"] ?? [];
             if (is_string($idsActivites)) {
                 $idsActivites = json_decode($idsActivites, true) ?? [];
             }
 
             foreach($idsActivites as $id){
-                $a = $reservationActiviteModel->findById($id);
-                if ($a) {
-                    if (in_array(strtolower($a["statut"]), ["validee", "validée"])) {
-                        $activite = $activiteModel->findById($a["id_activite"]);
-                        $a["nom"] = $activite["nom"] ?? "Activité";
-                        $a["prix"] = $activite["prix"] ?? 0;
+                $reservationActivite = $reservationActiviteModel->findById($id);
+                if ($reservationActivite) {
+                    if (in_array(strtolower($reservationActivite["statut"]), ["validee", "validée"])) {
+                        $activite = $activiteModel->findById($reservationActivite["id_activite"]);
+                        $reservationActivite["nom"] = $activite["nom"] ?? "Activité";
+                        $reservationActivite["prix"] = $activite["prix"] ?? 0;
                     }
-                    $reservationActivites[] = $a;
+                    $reservationActivites[] = $reservationActivite;
                 }
             }
 
-            // 🔹 Dompdf
+            // Création du pdf
             $options = new Options();
             $options->set('isRemoteEnabled', true);
 
@@ -178,7 +162,7 @@ class controllersFacture{
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
 
-            $dompdf->stream("facture_" . $facture["id"] . ".pdf", ["Attachment" => false]);
+            $dompdf->stream("facture_" . $facture["id"] . ".pdf", ["Attachment" => true]);
             exit;
     }
 }

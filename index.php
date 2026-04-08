@@ -50,6 +50,30 @@ switch ($action) {
         $controller->reservationPrestation();
         break;
 
+    // --- ACTIVITES VALIDEES ---
+    case 'recupereactivitesvalidees':
+        $controller = new controllersReservations();
+        $controller->ActivitesValidees();
+        break;
+
+    // --- CHAMBRES DISPONIBLES ---
+    case 'chambresdisponibles':
+        $controller = new controllersReservations();
+        $controller->chambresDisponibles();
+        break;
+
+       // --- ACTIVITES VALIDEES ---
+    case 'recupereactivitesvalidees':
+        $controller = new controllersReservations();
+        $controller->ActivitesValidees();
+        break;
+
+    // --- CHAMBRES DISPONIBLES ---
+    case 'chambresdisponibles':
+        $controller = new controllersReservations();
+        $controller->chambresDisponibles();
+        break;
+
     // --- RESERVATION ACTIVITE ---
     case 'reservationactivite':
         $controller = new controllersReservations();
@@ -68,26 +92,9 @@ switch ($action) {
         $controller->recupereFactures();
         break;
 
-    case 'recuperefactureencours':
-        $controller = new controllersFacture();
-        $controller->recupereFactureEnCours();
-        break;
-
     case 'telechargementfacture':
         $controller = new controllersFacture();
         $controller->telechargementFacture();
-        break;
-
-    // --- ACTIVITES VALIDEES ---
-    case 'recupereactivitesvalidees':
-        $controller = new controllersReservations();
-        $controller->ActivitesValidees();
-        break;
-
-    // --- CHAMBRES DISPONIBLES ---
-    case 'chambresdisponibles':
-        $controller = new controllersReservations();
-        $controller->chambresDisponibles();
         break;
 
     // --- PAGE ADMIN  ---

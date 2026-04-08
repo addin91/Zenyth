@@ -9,52 +9,19 @@ class ReservationChambre
 {
     private $jsondb;
 
-    public function __construct()
-    {
+    public function __construct(){
         $this->jsondb = new JsonDB("ReservationChambre");
     }
 
-    public function findAll()
-    {
-        // TODO : adapter manuellement (necessite un JOIN chambres)
-        // SELECT rc.*, ch.nom_chambre, ch.type_chambre, ch.prix_nuit
-        // FROM reservation_chambres rc
-        // JOIN chambres ch ON ch.id = rc.id_chambre
-        // ORDER BY rc.id_reservation ASC
-    }
-
-    public function findById($id)
-    {
-        // TODO : adapter manuellement (necessite un JOIN chambres)
-        // SELECT rc.*, ch.nom_chambre, ch.type_chambre, ch.prix_nuit
-        // FROM reservation_chambres rc
-        // JOIN chambres ch ON ch.id = rc.id_chambre
-        // WHERE rc.id = ?
+    public function findById($id){
         return $this->jsondb->find($id);
     }
 
-    public function findByClient($id_client)
-    {
-        // TODO : adapter manuellement (necessite un JOIN chambres)
-        // SELECT rc.*, ch.nom_chambre, ch.type_chambre, ch.capacite, ch.prix_nuit
-        // FROM reservation_chambres rc
-        // JOIN chambres ch ON ch.id = rc.id_chambre
-        // WHERE rc.id_reservation = ?
+    public function findByClient($id_client){
         return $this->jsondb->where("id_client", $id_client);
     }
 
-    public function findByChambre($id_chambre)
-    {
-        // TODO : adapter manuellement (necessite un JOIN reservations)
-        // SELECT rc.*, r.date_debut, r.date_fin, r.statut
-        // FROM reservation_chambres rc
-        // JOIN reservations r ON r.id = rc.id_reservation
-        // WHERE rc.id_chambre = ?
-        // ORDER BY r.date_debut ASC
-    }
-
-    public function exists($id_reservation, $id_chambre)
-    {
+    public function exists($id_reservation, $id_chambre){
         $reservationChambre = $this->jsondb->where('id_reservation', $id_reservation);
         foreach ($reservationChambre as $rc) {
             if ($rc['id_chambre'] == $id_chambre) return true;
@@ -62,8 +29,7 @@ class ReservationChambre
         return false;
     }
 
-    public function create($id_client, $id_chambre)
-    {
+    public function create($id_client, $id_chambre){
         $data = [
             'id_client' => $id_client,
             'id_chambre' => $id_chambre,
@@ -71,21 +37,18 @@ class ReservationChambre
         return $this->jsondb->add($data);
     }
 
-    public function update($id, $data)
-    {
+    public function update($id, $data){
         $data['id'] = $id;
         $reservationChambre = $this->jsondb->update($id, $data);
         return $reservationChambre;
     }
 
-    public function delete($id)
-    {
+    public function delete($id){
         $reservationChambre = $this->jsondb->delete($id);
         return $reservationChambre;
     }
 
-    public function deleteByReservation($id_reservation)
-    {
+    public function deleteByReservation($id_reservation){
         $reservationChambre = $this->jsondb->where('id_reservation', $id_reservation);
         foreach ($reservationChambre as $rc) {
             $this->jsondb->delete($rc['id']);
@@ -97,12 +60,9 @@ class ReservationChambre
         $reservationChambre = $this->findById($id);
         $chambreModel = new Chambre();
         $chambre = $chambreModel->findById($reservationChambre['id_chambre']);
-        error_log($reservationChambre['id_chambre']);
-        error_log(print_r($chambre, true));
         return $chambre["prix_nuit"] * $nbNuit;
     }
 }
 
-// id 
-// id_client 
-// id_chambre 
+
+?>

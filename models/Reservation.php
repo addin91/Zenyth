@@ -2,51 +2,32 @@
 
 require_once __DIR__ . '/../database/db/JsonDB.php';
 
-
-// models/Reservation.php
 class Reservation
 {
     private $jsondb;
 
-    public function __construct()
-    {
+    public function __construct(){
         $this->jsondb = new JsonDB("Reservation");
     }
 
-    public function findAll()
-    {
-        // TODO : adapter manuellement (necessite un JOIN clients)
-        // SELECT r.*, c.nom, c.prenom, c.email
-        // FROM reservations r
-        // LEFT JOIN clients c ON c.id = r.id_client
-        // ORDER BY r.date_demande DESC
+    public function findAll(){
         return $this->jsondb->selectAll();
     }
 
-    public function findById($id)
-    {
+    public function findById($id){
         return $this->jsondb->find($id);
     }
 
-    public function findByClient($id_client)
-    {
+    public function findByClient($id_client){
         $reservation = $this->jsondb->where('id_client', $id_client);
         return $reservation;
     }
 
-    public function findByStatut($statut)
-    {
-        // TODO : adapter manuellement (necessite un JOIN clients)
-        // SELECT r.*, c.nom, c.prenom
-        // FROM reservations r
-        // LEFT JOIN clients c ON c.id = r.id_client
-        // WHERE r.statut = ? ORDER BY r.date_debut ASC
+    public function findByStatut($statut){
         return $this->jsondb->where('statut', $statut);
     }
 
-    public function findByPeriode($date_debut, $date_fin)
-    {
-        // Convertir en timestamp pour comparaison
+    public function findByPeriode($date_debut, $date_fin){
         $debutDemande = strtotime($date_debut);
         $finDemande   = strtotime($date_fin);
 
@@ -68,8 +49,7 @@ class Reservation
         return $resultat;
     }
 
-    public function create($id_client, $id_reservation_chambre, $id_demandes_activite, $id_reservations_prestation, $date_debut , $date_fin , $nombre_personnes , $commentaire)
-    {
+    public function create($id_client, $id_reservation_chambre, $id_demandes_activite, $id_reservations_prestation, $date_debut , $date_fin , $nombre_personnes , $commentaire){
         $data = [
             'id_client' => $id_client,
             'id_reservation_chambre' => $id_reservation_chambre,
@@ -85,15 +65,13 @@ class Reservation
         return $this->jsondb->add($data);
     }
 
-    public function update($id, $data)
-    {
+    public function update($id, $data){
         $data['id'] = $id;
         $reservation = $this->jsondb->update($id, $data);
         return $reservation;
     }
 
-    public function updateStatut($id, $statut)
-    {
+    public function updateStatut($id, $statut){
         $reservation = $this->jsondb->find($id);
         $reservation['statut'] = $statut;
         $reservation = $this->jsondb->update($id, $reservation);
@@ -122,8 +100,7 @@ class Reservation
         return $this->update($id, $reservation);
     }
 
-    public function validerReservation($idReservation)
-    {
+    public function validerReservation($idReservation){
         $reservation = $this->jsondb->find($idReservation);
         if (!$reservation) return false;
 
@@ -139,14 +116,12 @@ class Reservation
         return true;
     }
 
-    public function delete($id)
-    {
+    public function delete($id){
         $reservation = $this->jsondb->delete($id);
         return $reservation;
     }
 
-    public function estDansIntervalleTemps($reservation, $date)
-    {
+    public function estDansIntervalleTemps($reservation, $date){
         $timestamp = strtotime($date);
         $debutTS   = strtotime($reservation['date_debut']);
         $finTS     = strtotime($reservation['date_fin']);
@@ -163,15 +138,4 @@ class Reservation
     }
 }
 
-
-// id 
-// id_client
-// id_reservation_chambre
-// [id_demande_activite]
-// [id_reservation_prestation]
-// date_debut 
-// date_fin 
-// nombre_personnes 
-// statut (en_attente, validée, refusée) 
-// commentaire 
-// date_demande
+?>

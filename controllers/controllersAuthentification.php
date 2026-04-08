@@ -9,13 +9,11 @@ class controllersAuthentification{
     private $clientModel;
     private $adminModel;
 
-    public function __construct()
-    {
+    public function __construct(){
         $this->clientModel = new Client();
         $this->adminModel = new Admin();
     }
 
-    // inscrption
     // connexion
     public function connexion(){
         header('Content-Type: application/json');
@@ -28,18 +26,17 @@ class controllersAuthentification{
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['nom'];
                 $_SESSION['admin'] = false;
-                if (isset($_SESSION['user_id']) && $user) {
-                    echo json_encode([
-                        'success' => true,
-                        'message' => 'Connexion reussie.',
-                        'data' => [
-                            'nom' => $user['nom'],
-                            'prenom' => $user['prenom'],
-                            'email' => $user['email'],
-                        ]
-                    ]);
-                    return;
-                }
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Connexion reussie.',
+                    'data' => [
+                        'nom' => $user['nom'],
+                        'prenom' => $user['prenom'],
+                        'email' => $user['email'],
+                    ]
+                ]);
+                return;
+            
             } else {
                 $_SESSION['error'] = "Identifiant ou mot de passe incorrect.";
             }
@@ -64,11 +61,9 @@ class controllersAuthentification{
         if(controlPostForm()){
                 // verifie email existe
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-            error_log($email);
             if($email){
                 $user = $this->clientModel->findByEmail($email);
                 if($user){
-                    error_log($user["id"]);
                     // envoie code provisoire email
                     $newPassword = $this->clientModel->definiMotDePasseClient($user["id"]);
                     $mailservice = new MailService();
@@ -93,7 +88,8 @@ class controllersAuthentification{
                     $id = $_SESSION['user_id'];
                     $user = $this->clientModel->findById($id);
                     if (!($user && password_verify($ancienPassword, $user['password']))){
-                        $_SESSION['error'] = "Le mot de passe ne correspond pas";
+                        echo json_encode(['success' => false, 'error' => "Le mot de passe ne correspond pas"]) ;
+                        return;
                         // redirection error
                     }
                     // Secu nouveau mdp
@@ -105,16 +101,12 @@ class controllersAuthentification{
                         return;
                         // redirection réussi
                     } else{
-                        if(empty($_SESSION['error'])) $_SESSION['error'] = "Il faut que le nouveau mot de passe soit différent de l'ancien";
+                        echo json_encode(['success' => false, 'error' => "Il faut que le nouveau mot de passe soit différent de l'ancien"]) ;
+                        return;
                     }  
                 } 
             } 
             
-        }
-        
-        if (isset($_SESSION['error'])) {
-            echo json_encode(['success' => false, 'error' => $_SESSION['error']]);
-            unset($_SESSION['error']);
         }
     }
 
@@ -126,7 +118,7 @@ class controllersAuthentification{
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
 
-            $idAdmin = $this->adminModel->create($nom, $prenom, $email, $password);
+            $this->adminModel->create($nom, $prenom, $email, $password);
             }
     }
 

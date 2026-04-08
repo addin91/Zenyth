@@ -1,4 +1,5 @@
 <?php
+
 $totalChambre = ($chambre['prix_nuit'] ?? 0) * ($nbNuits ?? 1);
 
 $totalPrestations = 0;
@@ -22,62 +23,70 @@ $sousTotal = $total - $avoirs;
 $montantReduction = $sousTotal * ($reduction / 100);
 $prixTotal = max(0, $sousTotal - $montantReduction);
 ?>
+
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            body { font-family: Arial; font-size: 12px; }
-            table { width:100%; border-collapse: collapse; margin-top:20px; }
-            table, th, td { border:1px solid #000; }
-            th, td { padding:8px; }
-            .total { text-align:right; font-weight:bold; }
-        </style>
-    </head>
-    <body>
-        <h1>Facture</h1>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial; font-size: 12px; }
+        table { width:100%; border-collapse: collapse; margin-top:20px; }
+        table, th, td { border:1px solid #000; }
+        th, td { padding:8px; }
+        .total { text-align:right; font-weight:bold; }
+    </style>
+</head>
 
-        <p>
-            <strong>Date :</strong>
-            <?= !empty($facture['date_emission']) ? date('d/m/Y', strtotime($facture['date_emission'])) : 'En cours' ?>
-        </p>
+<body>
 
-        <h3>Client</h3>
-        <p>
-            <?= e($client['nom']) ?> <?= e($client['prenom']) ?><br>
-            <?= e($client['email']) ?>
-        </p>
+<h1>Facture</h1>
 
-        <h3>Détails</h3>
+<p>
+    <strong>Date :</strong>
+    <?= !empty($facture['date_emission']) ? date('d/m/Y', strtotime($facture['date_emission'])) : 'En cours' ?>
+</p>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Description</th>
-                    <th>Prix</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Chambre</td>
-                    <td>
-                        <?= e($chambre['nom_chambre']) ?><br>
-                        <?= $nbNuits ?> nuit(s)
-                    </td>
-                    <td><?= number_format($totalChambre,2) ?> €</td>
-                </tr>
+<h3>Client</h3>
+<p>
+    <?= e($client['nom']) ?> <?= e($client['prenom']) ?><br>
+    <?= e($client['email']) ?>
+</p>
 
-                <?php foreach ($reservationPrestations as $p): ?>
-                <tr>
-                    <td>Prestation</td>
-                    <td><?= e($p['nom']) ?></td>
-                    <td><?= number_format($p['total'] ?? 0,2) ?> €</td>
-                </tr>
-                <?php endforeach; ?>
+<h3>Détails</h3>
 
-                <?php foreach ($reservationActivites as $a): ?>
-                <?php if (in_array(strtolower($a['statut']), ['validee','validée'])): ?>
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Prix</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        <!-- Chambre -->
+        <tr>
+            <td>Chambre</td>
+            <td>
+                <?= e($chambre['nom_chambre']) ?><br>
+                <?= $nbNuits ?> nuit(s)
+            </td>
+            <td><?= number_format($totalChambre,2) ?> €</td>
+        </tr>
+
+        <!-- Prestations -->
+        <?php foreach ($reservationPrestations as $p): ?>
+            <tr>
+                <td>Prestation</td>
+                <td><?= e($p['nom']) ?></td>
+                <td><?= number_format($p['total'] ?? 0,2) ?> €</td>
+            </tr>
+        <?php endforeach; ?>
+
+        <!-- Activités -->
+        <?php foreach ($reservationActivites as $a): ?>
+            <?php if (in_array(strtolower($a['statut']), ['validee','validée'])): ?>
                 <tr>
                     <td>Activité</td>
                     <td>
@@ -87,30 +96,35 @@ $prixTotal = max(0, $sousTotal - $montantReduction);
                     </td>
                     <td><?= number_format($a['prix'] ?? 0,2) ?> €</td>
                 </tr>
-                <?php endif; ?>
-                <?php endforeach; ?>
-            </tbody>
-            <tfoot>
-                <?php if ($avoirs > 0): ?>
-                <tr>
-                    <td colspan="2">Avoirs</td>
-                    <td>-<?= number_format($avoirs,2) ?> €</td>
-                </tr>
-                <?php endif; ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
 
-                <?php if ($reduction > 0): ?>
-                <tr>
-                    <td colspan="2">Réduction (<?= $reduction ?>%)</td>
-                    <td>-<?= number_format($montantReduction,2) ?> €</td>
-                </tr>
-                <?php endif; ?>
-            </tfoot>
-        </table>
+    </tbody>
 
-        <h3 class="total">
-            Total : <?= number_format($prixTotal,2) ?> €
-        </h3>
+    <tfoot>
 
-        <p>Statut : <?= e($facture['statut']) ?></p>
-    </body>
+        <?php if ($avoirs > 0): ?>
+            <tr>
+                <td colspan="2">Avoirs</td>
+                <td>-<?= number_format($avoirs,2) ?> €</td>
+            </tr>
+        <?php endif; ?>
+
+        <?php if ($reduction > 0): ?>
+            <tr>
+                <td colspan="2">Réduction (<?= $reduction ?>%)</td>
+                <td>-<?= number_format($montantReduction,2) ?> €</td>
+            </tr>
+        <?php endif; ?>
+
+    </tfoot>
+</table>
+
+<h3 class="total">
+    Total : <?= number_format($prixTotal,2) ?> €
+</h3>
+
+<p>Statut : <?= e($facture['statut']) ?></p>
+
+</body>
 </html>
