@@ -28,6 +28,22 @@ if (!empty($reservationActivites)) {
 }
 
 $total = $totalChambre + $totalPrestations + $totalActivites;
+
+// Avoirs
+$avoirs = max(0, $facture['avoirs'] ?? 0);
+
+// Réduction (%)
+$reduction = $facture['reduction'] ?? 0;
+$reduction = max(0, min(100, $reduction));
+
+// Calcul après avoirs
+$sousTotal = $total - $avoirs;
+
+// Calcul réduction
+$montantReduction = ($reduction > 0) ? $sousTotal * ($reduction / 100) : 0;
+
+// Total final
+$prixTotal = max(0, $sousTotal - $montantReduction);
 ?>
 
 <!DOCTYPE html>
@@ -141,12 +157,44 @@ if (!empty($facture['date_emission'])) {
         <?php endif; ?>
 
     </tbody>
+    <tfoot>
+        <!-- Avoirs -->
+        <?php if ($avoirs > 0): ?>
+        <tr>
+            <td colspan="2"><strong>Avoirs</strong></td>
+            <td>-<?= number_format($avoirs, 2) ?> €</td>
+        </tr>
+        <?php endif; ?>
+
+        <!-- Réduction -->
+        <?php if ($reduction > 0): ?>
+        <tr>
+            <td colspan="2">
+                <strong>Réduction (<?= number_format($reduction, 0) ?>%)</strong>
+            </td>
+            <td>-<?= number_format($montantReduction, 2) ?> €</td>
+        </tr>
+        <?php endif; ?>
+    </tfoot>
 </table>
 
 ---
 
-<h3 class="total">Total : <?= number_format($total, 2) ?> €</h3>
+<h3 class="total">
+    Total HT : <?= number_format($total, 2) ?> €<br>
 
+    <?php if ($avoirs > 0): ?>
+        Avoirs : -<?= number_format($avoirs, 2) ?> €<br>
+    <?php endif; ?>
+
+    <?php if ($reduction > 0): ?>
+        Réduction : -<?= number_format($montantReduction, 2) ?> €<br>
+    <?php endif; ?>
+
+    <span style="font-size:16px;">
+        Total à payer : <?= number_format($prixTotal, 2) ?> €
+    </span>
+</h3>
 <p><strong>Statut :</strong> <?= e($facture['statut']) ?></p>
 
 </body>
