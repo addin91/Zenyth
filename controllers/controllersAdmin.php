@@ -38,7 +38,7 @@ class controllersAdmin{
                 // factures
                 $factureModel = new Facture();
                 $reservationChambreModel = new ReservationChambre();
-                $this->reservationModel->nbNuit($idReservation);
+                $nbNuits = $this->reservationModel->nbNuit($idReservation);
                 $factureModel->create($client["id"], $idReservation, $reservation["id_reservation_chambre"], [], [], $reservationChambreModel->prixTotalReservationChambre($reservation["id_reservation_chambre"], $nbNuits), 0, 0);
                 echo json_encode(['success' => true, 'message' => "Réservation accepté"]);
                 return;
