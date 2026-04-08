@@ -38,10 +38,7 @@ class controllersAdmin{
                 // factures
                 $factureModel = new Facture();
                 $reservationChambreModel = new ReservationChambre();
-                $debut = new DateTime($reservation['date_debut']);
-                $fin = new DateTime($reservation['date_fin']);
-                $interval = $debut->diff($fin);
-                $nbNuits = $interval->days;
+                $this->reservationModel->nbNuit($idReservation);
                 $factureModel->create($client["id"], $idReservation, $reservation["id_reservation_chambre"], [], [], $reservationChambreModel->prixTotalReservationChambre($reservation["id_reservation_chambre"], $nbNuits), 0, 0);
                 echo json_encode(['success' => true, 'message' => "Réservation accepté"]);
                 return;
@@ -233,13 +230,15 @@ class controllersAdmin{
                 $facture['prix_nuit'] = $chambre['prix_nuit'] ?? "";
                 $facture['prestations'] = $reservationPrestations;
                 $facture['activites'] = $reservationActivites;
+                $facture['montant_total'] = $factureModel->calculerMontantFinal($facture["id"]);
                 $factureModel->update($facture["id"],
-                    [
+                    [   
+                        "montant_total" => $factureModel->calculerMontantFinal($facture["id"]),
                         "id_reservations_prestation" => $reservation["id_reservation_prestations"],
                         "id_demandes_activite" => $reservation["id_demandes_activite"]
                     ]
-                    );
-                } 
+                );
+            } 
             echo json_encode(['success' => true, 'data' => $factures]);
             return;
         }  echo json_encode(['success' => false, 'error' => !isAdmin() ? "Autorisation manquante" : "Erreur dans la requete"]);
@@ -253,8 +252,7 @@ class controllersAdmin{
                 $reduction = $_POST['reduction'];
                 $factureModel = new Facture();
                 
-                $facture = $factureModel->findById($idFacture);
-                $prixTotal = ($facture['montant_total'] - max(0, $avoirs ?? 0)) * (($reduction >= 0 && $reduction <= 100) ? (1 - $reduction / 100) : 1); 
+                $prixTotal = $factureModel->calculerMontantFinal($idFacture);
                 $factureModel->update($idFacture, ["avoirs" => $avoirs, "reduction" => $reduction, "montant_total" => $prixTotal]);
                 echo json_encode(['success' => true, 'message' => "Facture édité"]);
                 return;
@@ -293,7 +291,19 @@ class controllersAdmin{
         } else echo json_encode(['success' => false, 'error' => "Autorisation manquante"]);
     }
 
-
+    public function refuserActvite(){
+        if(isAdmin()){
+            if(isset($_POST['id_demande_activite']) && controlPostForm()){
+                $idDemandeActivite = $_POST['id_demande_activite'];
+                $demandeActiviteModel = new DemandeActivite();
+                $demandeActiviteModel->updateStatut($idDemandeActivite, "refusee");
+                echo json_encode(['success' => true, 'message' => "Activite refusée"]);
+                return;
+            }
+        }
+        echo json_encode(['success' => false, 'error' => !isAdmin() ? "Autorisation manquante" : "Erreur dans la requete"]);
+        return;
+    }
 
 
 }

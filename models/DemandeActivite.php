@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../database/db/JsonDB.php';
+require_once __DIR__ . '/../models/Activite.php';
 
 
 // models/DemandeActivite.php
@@ -109,6 +110,14 @@ class DemandeActivite
             $this->jsondb->delete($da['id']);
         }
         return true;
+    }
+
+    public function prixActivite($id){
+        $demande = $this->findById($id);
+        $activiteModel = new Activite();
+        $activite = $activiteModel->findById($demande["id_activite"]);
+        if($activite["statut"] == "validee") return ((int) $activite["prix"]) * ((int) $demande["nombre_personnes_concernees"]);
+        return 0;
     }
 }
 

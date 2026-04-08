@@ -141,6 +141,14 @@ class Reservation
 
         return ($timestamp >= $debutTS && $timestamp < $finTS);
     }
+
+    public function nbNuit($id){
+        $reservation = $this->findById($id);
+        $debut = new DateTime($reservation['date_debut']);
+        $fin = new DateTime($reservation['date_fin']);
+        $interval = $debut->diff($fin);
+        return $interval->days;
+    }
 }
 
 

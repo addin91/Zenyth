@@ -6,6 +6,7 @@ require_once __DIR__ . '/../models/Reservation.php';
 require_once __DIR__ . '/../models/ReservationChambre.php';
 require_once __DIR__ . '/../models/ReservationPrestation.php';
 require_once __DIR__ . '/../models/Prestation.php';
+require_once __DIR__ . '/../models/Prestation.php';
 
 class controllersReservations{
     private $clientModel;

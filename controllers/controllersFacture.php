@@ -69,6 +69,7 @@ class controllersFacture{
                 $facture['prix_nuit'] = $chambre['prix_nuit'];
                 $facture['prestations'] = $reservationPrestations;
                 $facture['activites'] = $reservationActivites;
+                $facture['montant_total'] = $reservationActivites;
                 $this->factureModel->update($facture["id"],
                     [
                         "id_reservations_prestation" => $reservation["id_reservation_prestations"],
@@ -83,98 +84,102 @@ class controllersFacture{
     }
 
 
-    // recup facture en cours
-    public function recupereFactureEnCours($idReservation){
-        return $this->factureModel->findByReservation($idReservation);
-    }
-
     // télécharger facture
     public function telechargementFacture(){
         if(isset($_GET["id_facture"])){
-            $idFacture = $_GET["id_facture"];
-            // 🔹 Récupération de la facture
-            $facture = $this->factureModel->findById($idFacture);
 
+            $idFacture = $_GET["id_facture"];
+
+            // 🔹 Facture
+            $facture = $this->factureModel->findById($idFacture);
             if (!$facture) {
                 die("Facture introuvable");
             }
 
-            if (!isLoggedIn() || ($facture['id_client'] !== $_SESSION['user_id'] && !isAdmin())) {
+            // 🔐 Sécurité
+            if ((!isLoggedIn() && !isAdmin()) || (!isAdmin() && $_SESSION['user_id'] != $facture['id_client'])) {
                 die("Accès non autorisé");
             }
 
-            // 🔹 Récupération des données liées
+            // 🔹 Données principales
             $client = $this->clientModel->findById($facture["id_client"]);
             $reservation = $this->reservationModel->findById($facture["id_reservation"]);
 
-            // 🔹 Modèles
+            // 🔹 Dates / nuits
+            $debut = new DateTime($reservation['date_debut']);
+            $fin = new DateTime($reservation['date_fin']);
+            $interval = $debut->diff($fin);
+            $nbNuits = $interval->days;
+
+            // 🔹 Chambre
             $reservationChambreModel = new ReservationChambre();
-            $reservationPrestationModel = new ReservationPrestation();
-            $reservationActiviteModel = new DemandeActivite();
-
-            // 🔹 Données liées à la facture
             $reservationChambre = $reservationChambreModel->findById($facture["id_reservation_chambre"]);
+
+            $chambreModel = new Chambre();
+            $chambre = $chambreModel->findById($reservationChambre["id_chambre"]);
+
+            // 🔹 Prestations
+            $reservationPrestationModel = new ReservationPrestation();
+            $prestationModel = new Prestation();
+
             $reservationPrestations = [];
-            $reservationActivites = [];
-            
-            $total = 0;
 
-            // chambre
-            if ($reservationChambre) {
-                $chambreModel = new Chambre();
-                $chambre = $chambreModel->findById($reservationChambre["id_chambre"]);
-                $total += $chambre["prix"] ?? 0;
+            $idsPrestations = $facture["id_reservations_prestation"] ?? [];
+            if (is_string($idsPrestations)) {
+                $idsPrestations = json_decode($idsPrestations, true) ?? [];
             }
 
-
-            if(isset($facture["id_reservation_prestation"])){
-                foreach($facture["id_reservation_prestation"] as $id){
-                    $reservationPrestation = $reservationPrestationModel->findById($id);
-                    $prestationModel = new Prestation();
-                    $prestation = $prestationModel->findById($reservationPrestation["id_prestation"]);
-                    $reservationPrestation["nom"] = $prestation['nom'];
-                    $total += $reservationPrestation["total"] ?? 0;
-                    $reservationPrestations[] = $reservationPrestation;
-                } 
-            }
-            if(isset($facture["id_demande_activite"])){
-                foreach($facture["id_demande_activite"] as $id){
-                    $reservationActivite = $reservationActiviteModel->findById($id);
-                    if ($reservationActivite["statut"] === "validee") {
-                        $activiteModel = new Activite();
-                        $activite = $activiteModel->findById($reservationActivite["id_activite"]);
-                        $reservationActivite["nom"] = $activite['nom'];
-                        $total += $activite["prix"] ?? 0;
-                    }
-                    $reservationActivites[] = $reservationActivite;
+            foreach($idsPrestations as $id){
+                $p = $reservationPrestationModel->findById($id);
+                if ($p) {
+                    $prestation = $prestationModel->findById($p["id_prestation"]);
+                    $p["nom"] = $prestation["nom"] ?? "Prestation";
+                    $p["total"] = $prestation["prix_unitaire"];
+                    $reservationPrestations[] = $p;
                 }
             }
-            
 
-            // 🔹 Calcul du total (exemple)
-            
+            // 🔹 Activités
+            $reservationActiviteModel = new DemandeActivite();
+            $activiteModel = new Activite();
+
+            $reservationActivites = [];
+
+            $idsActivites = $facture["id_demandes_activite"] ?? [];
+            if (is_string($idsActivites)) {
+                $idsActivites = json_decode($idsActivites, true) ?? [];
+            }
+
+            foreach($idsActivites as $id){
+                $a = $reservationActiviteModel->findById($id);
+                if ($a) {
+                    if (in_array(strtolower($a["statut"]), ["validee", "validée"])) {
+                        $activite = $activiteModel->findById($a["id_activite"]);
+                        $a["nom"] = $activite["nom"] ?? "Activité";
+                        $a["prix"] = $activite["prix"] ?? 0;
+                    }
+                    $reservationActivites[] = $a;
+                }
+            }
 
             // 🔹 Dompdf
             $options = new Options();
             $options->set('isRemoteEnabled', true);
+
             $dompdf = new Dompdf($options);
 
-            // 🔹 Passage des variables à la vue
             ob_start();
             include __DIR__ . '/../views/template/factureTemplate.php';
             $html = ob_get_clean();
 
-            // 🔹 Génération PDF
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
 
-            // 🔹 Téléchargement
             $dompdf->stream("facture_" . $facture["id"] . ".pdf", ["Attachment" => false]);
-
             exit;
-        } 
     }
+}
     
 }
 

@@ -2,6 +2,15 @@
 
 require_once __DIR__ . '/../database/db/JsonDB.php';
 
+require_once __DIR__ . '/../models/Reservation.php';
+require_once __DIR__ . '/../models/Chambre.php';
+require_once __DIR__ . '/../models/ReservationChambre.php';
+require_once __DIR__ . '/../models/ReservationPrestation.php';
+require_once __DIR__ . '/../models/Prestation.php';
+require_once __DIR__ . '/../models/DemandeActivite.php';
+require_once __DIR__ . '/../models/Activite.php';
+
+
 
 // models/Facture.php
 class Facture
@@ -86,9 +95,29 @@ class Facture
         return $facture;
     }
 
-    public function calculerMontantFinal($montant_total, $avoirs, $reductions)
+    public function calculerMontantFinal($id)
     {
-        return round(max(0, $montant_total - $avoirs - $reductions), 2);
+        $facture = $this->findById($id);
+        $reservationModel = new Reservation();
+        $reservationChambreModel = new ReservationChambre();
+        $prixChambre = $reservationChambreModel->prixTotalReservationChambre($facture["id_reservation_chambre"], $reservationModel->nbNuit($facture["id_reservation"]));
+        $reservationPrestationModel = new ReservationPrestation();
+        
+        $prixTotalPrestation = 0;
+        foreach($facture["id_reservations_prestation"] as $id){
+            $reservationPrestation = $reservationPrestationModel->findById($id);
+            $prixTotalPrestation += $reservationPrestation["prix"];
+        }
+
+        $prixTotalActivite = 0;
+        $demandeActiviteModel = new DemandeActivite();
+        foreach($facture["id_demandes_activite"] as $id){
+            $prixTotalActivite += $demandeActiviteModel->prixActivite($id);
+        }
+
+        $montant_total = $prixChambre + $prixTotalPrestation + $prixTotalActivite;
+        $prixTotal = ($montant_total - max(0, $facture["avoirs"] ?? 0)) * (($facture["reduction"] >= 0 && $facture["reduction"] <= 100) ? (1 - $facture["reduction"] / 100) : 1); 
+        return round(max(0, $prixTotal), 2);
     }
 }
 
