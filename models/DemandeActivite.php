@@ -116,7 +116,7 @@ class DemandeActivite
         $demande = $this->findById($id);
         $activiteModel = new Activite();
         $activite = $activiteModel->findById($demande["id_activite"]);
-        if($activite["statut"] == "validee") return ((int) $activite["prix"]) * ((int) $demande["nombre_personnes_concernees"]);
+        if($demande["statut"] == "validee") return ((int) $activite["prix"]) * ((int) $demande["nombre_personnes_concernees"]);
         return 0;
     }
 }

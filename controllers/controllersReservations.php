@@ -180,7 +180,8 @@ class controllersReservations{
 
                 // enregistrement
                 $reservationActiviteModel = new DemandeActivite();
-                $reservationActiviteModel->create($idActivite, $date, $creneau, $nombrePersonne, $message);
+                $idReservationActiviteModel = $reservationActiviteModel->create($idActivite, $date, $creneau, $nombrePersonne, $message);
+                $this->reservationModel->ajoutDemandeActivite($reservation["id"], $idReservationActiviteModel);
 
                 echo json_encode(['success' => true, 'message' => "Demande d'activité envoyée."]);
            }
@@ -191,9 +192,13 @@ class controllersReservations{
 
 
     public function activitesValidees(){
-        if(isLoggedIn() && isset($_GET["id_reservation"])){
-            $idReservation = $_GET["id_reservation"];
-            $reservation = $this->reservationModel->findById($idReservation);
+        if(isLoggedIn()){
+            $reservations = $this->reservationModel->findByClient($_SESSION["user_id"]);
+            $reservation = !empty($reservations) ? end($reservations) : null;
+            if (!$reservation) {
+                echo json_encode(['success' => false, 'error' => 'Aucune réservation trouvée']);
+                return;
+            }
             $demandeActiviteModel = new DemandeActivite();
             $demandeActivites = [];
             foreach($reservation['id_demandes_activite'] as $idDemandeActivite){
@@ -201,6 +206,7 @@ class controllersReservations{
                 if($demandeActivite["statut"] === "validee") $demandeActivites[] = $demandeActivite;
             }
             echo json_encode(['success' => true, 'data' => $demandeActivites]);
+            return;
         } echo json_encode(['success' => false, 'error' => "Erreur dans la requete"]);
 
     }

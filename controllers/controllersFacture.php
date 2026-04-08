@@ -131,8 +131,10 @@ class controllersFacture{
 
             foreach($idsPrestations as $id){
                 $p = $reservationPrestationModel->findById($id);
+                error_log(print_r($p, true));
                 if ($p) {
                     $prestation = $prestationModel->findById($p["id_prestation"]);
+                    error_log(print_r($prestation, true));
                     $p["nom"] = $prestation["nom"] ?? "Prestation";
                     $p["total"] = $prestation["prix_unitaire"];
                     $reservationPrestations[] = $p;

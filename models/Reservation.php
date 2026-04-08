@@ -104,9 +104,21 @@ class Reservation
         $reservation = $this->jsondb->find($id);
         return in_array($idReservationPrestation, $reservation["id_reservation_prestations"]);
     }
+    
+    public function aDemandeActivite($id, $idDemandeActivite){
+        $reservation = $this->jsondb->find($id);
+        return in_array($idDemandeActivite, $reservation["id_demandes_activite"]);
+    }
+
     public function ajoutReservationPrestation($id, $idReservationPrestation){
         $reservation = $this->jsondb->find($id);
         if(!$this->aReservePrestation($id, $idReservationPrestation)) array_push($reservation["id_reservation_prestations"], $idReservationPrestation);
+        return $this->update($id, $reservation);
+    }
+
+    public function ajoutDemandeActivite($id, $idDemandeActivite){
+        $reservation = $this->jsondb->find($id);
+        if(!$this->aDemandeActivite($id, $idDemandeActivite)) array_push($reservation["id_demandes_activite"], $idDemandeActivite);
         return $this->update($id, $reservation);
     }
 
