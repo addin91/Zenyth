@@ -62,8 +62,6 @@ class controllersAdmin{
                 $this->reservationModel->update($idReservation,
                     [
                         "id_reservation_chambre" => null,
-                        "id_client" => null,
-
                     ]
                 );
                 if($client["statut_compte"] == "invité") $this->clientModel->desactiveClient($reservation["id_client"]);
