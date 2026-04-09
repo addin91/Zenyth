@@ -109,6 +109,7 @@ class controllersFacture{
             $reservationChambreModel = new ReservationChambre();
             $reservationChambre = $reservationChambreModel->findById($facture["id_reservation_chambre"]);
             $chambreModel = new Chambre();
+            $chambre = $chambreModel->findById($reservationChambre["id_chambre"]);
             $reservationPrestationModel = new ReservationPrestation();
             $prestationModel = new Prestation();
             $reservationPrestations = [];

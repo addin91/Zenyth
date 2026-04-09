@@ -67,7 +67,6 @@ class controllersReservations{
                 echo json_encode(['success' => true, 'message' => 'Votre demande de reservation a ete envoyee.']);
             
         }
-                    
     }
 
     public function chambresDisponibles(){

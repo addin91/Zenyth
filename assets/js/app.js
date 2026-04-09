@@ -475,7 +475,14 @@ function chargerDashActivitesValidees() {
             $.each(res.data, function(i, a) {
                 html += '<div class="dash-history-card">';
                 html += '<div class="d-flex justify-content-between align-items-center">';
-                html += '<h6>' + a.nom + '</h6>';
+                html += '<h6>' + "Activite" + '</h6>';
+                $.ajax({ url: 'index.php?action=apiactivite', method: 'GET', dataType: 'json' })
+                .done(function(activites) {
+                    $.each(activites, function(iAct, act) {
+                        console.log(a.id == parseInt(iAct))
+                        if(a.id == parseInt(iAct)) $("#dash-activites-validees > .dash-history-card h6").text(act.nom);
+                    });
+                });
                 html += '<span class="badge bg-success">Validee</span>';
                 html += '</div>';
                 html += '<small class="text-muted">' + a.date + ' — ' + a.creneau + '</small>';
