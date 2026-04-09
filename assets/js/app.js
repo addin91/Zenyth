@@ -479,8 +479,8 @@ function chargerDashActivitesValidees() {
                 $.ajax({ url: 'index.php?action=apiactivite', method: 'GET', dataType: 'json' })
                 .done(function(activites) {
                     $.each(activites, function(iAct, act) {
-                        console.log(a.id == parseInt(iAct))
-                        if(a.id == parseInt(iAct)) $("#dash-activites-validees > .dash-history-card h6").text(act.nom);
+                        console.log(a.id_activite == parseInt(iAct))
+                        if(a.id_activite == parseInt(iAct)) $("#dash-activites-validees > .dash-history-card h6").text(act.nom);
                     });
                 });
                 html += '<span class="badge bg-success">Validee</span>';

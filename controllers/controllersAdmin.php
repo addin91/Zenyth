@@ -182,8 +182,8 @@ class controllersAdmin{
 
     public function supprimerAnimateur(){
         if(isAdmin()){
-            if(isset($_POST['id_animateur']) && controlPostForm()){
-                $idAnimateur = $_POST['id_animateur'];
+            if(isset($_POST['id']) && controlPostForm()){
+                $idAnimateur = $_POST['id'];
                 $animateurModel = new Animateur();
                 $animateurModel->delete($idAnimateur);
                 echo json_encode(['success' => true, 'message' => "Animateur supprimé"]);
