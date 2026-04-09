@@ -62,18 +62,6 @@ switch ($action) {
         $controller->chambresDisponibles();
         break;
 
-       // --- ACTIVITES VALIDEES ---
-    case 'recupereactivitesvalidees':
-        $controller = new controllersReservations();
-        $controller->ActivitesValidees();
-        break;
-
-    // --- CHAMBRES DISPONIBLES ---
-    case 'chambresdisponibles':
-        $controller = new controllersReservations();
-        $controller->chambresDisponibles();
-        break;
-
     // --- RESERVATION ACTIVITE ---
     case 'reservationactivite':
         $controller = new controllersReservations();
