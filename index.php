@@ -10,8 +10,6 @@ require_once __DIR__ . '/controllers/controllersApi.php';
 $action = isset($_GET['action']) ? strtolower($_GET['action']) : 'index';
 
 
-error_log(ini_get('session.gc_maxlifetime'));
-
 switch ($action) {
 
     // --- CONNEXION ---

@@ -1,33 +1,5 @@
 <?php
-// config/config.php
 // Complexe touristique sportif — Système de réservation
-
-
-// Migration db a json
-/*
-// ─────────────────────────────────────────────
-// BASE DE DONNÉES
-// ─────────────────────────────────────────────
-define('DB_HOST', 'localhost');
-//define('DB_PORT', '');
-define('DB_NAME', 'zenyth');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_CHARSET', 'utf8mb4');
-
-try {
-    $pdo = new PDO(
-        'mysql:host='.DB_HOST.';port='.DB_PORT.';dbname='.DB_NAME.';charset=utf8mb4',
-        DB_USER,
-        DB_PASS
-    );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); // requêtes préparées natives
-} catch (PDOException $e) {
-    die('Erreur de connexion : ' . $e->getMessage());
-}
-*/
 
 // ─────────────────────────────────────────────
 // SESSION
@@ -59,22 +31,6 @@ function isAdmin()
     return isset($_SESSION['admin']) && $_SESSION['admin'] === true;
 }
 
-/** Redirige vers $path si l'utilisateur n'est pas connecté */
-function requireLogin(string $path = '/login.php')
-{
-    if (!isLoggedIn()) {
-        redirect($path);
-    }
-}
-
-/** Redirige vers $path si l'utilisateur n'est pas administrateur */
-function requireAdmin(string $path = '/index.php')
-{
-    if (!isAdmin()) {
-        redirect($path);
-    }
-}
-
 /** Vérifie le respect de la politique de mot de passe */
 function verifierMotDePasse($mdp) {
     $_SESSION['error'] = [];
@@ -101,17 +57,6 @@ function verifierMotDePasse($mdp) {
 
     // Retourne true si aucune erreur
     return empty($_SESSION['error']);
-}
-
-// ─────────────────────────────────────────────
-// NAVIGATION
-// ─────────────────────────────────────────────
-
-/** Redirige vers l'URL indiquée et stoppe l'exécution */
-function redirect(string $path): void
-{
-    header('Location: ' . $path);
-    exit;
 }
 
 // ─────────────────────────────────────────────
@@ -165,31 +110,4 @@ function controlPostForm(){
 function e(?string $str)
 {
     return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8');
-}
-
-// ─────────────────────────────────────────────
-// FLASH MESSAGES
-// ─────────────────────────────────────────────
-
-/**
- * Stocke un message flash en session.
- * Types : 'success', 'error', 'warning', 'info'
- */
-function setFlash(string $type, string $message)
-{
-    $_SESSION['flash'] = ['type' => $type, 'message' => $message];
-}
-
-/**
- * Retourne le message flash s'il existe et le supprime de la session.
- * Retourne null s'il n'y en a pas.
- */
-function getFlash()
-{
-    if (isset($_SESSION['flash'])) {
-        $flash = $_SESSION['flash'];
-        unset($_SESSION['flash']);
-        return $flash;
-    }
-    return null;
 }
